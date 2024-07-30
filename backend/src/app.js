@@ -2,8 +2,9 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-import cookieParser from "cookie-parser"; // Import cookie-parser
+import cookieParser from "cookie-parser";
 import adminRoutes from "../src/routes/admin.routes.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,7 +16,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // Middleware for parsing cookies
-app.use(cookieParser()); // Use cookie-parser middleware
+app.use(cookieParser());
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "public")));
@@ -24,7 +25,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // CORS configuration
-const allowedOrigins = ["*"]; // Change "*" to specific origins for production
+const allowedOrigins = ["http://localhost:5173"]; // Adjust as needed
+
 
 app.use(
   cors({
@@ -35,11 +37,17 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
+    
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   })
+
 );
 
 // Register admin routes
 app.use("/api/admin", adminRoutes);
+
+// Error handling middleware
+app.use(errorHandler);
 
 // Export the app module
 export { app };

@@ -24,13 +24,11 @@ import { PiStudent } from "react-icons/pi";
 import { LuListChecks } from "react-icons/lu";
 import { FaUsers } from "react-icons/fa6";
 import { IoIosGitBranch } from "react-icons/io";
-import Dropdown from "./Dropdown"; // Import the Dropdown component
+import Dropdown from "./Dropdown";
 import { BASE_PATH } from "../Utils/URLPath.jsx";
+import TokenCountdown from "./TokenCountDown.jsx";
 
-
-
-
-
+import { LuLayoutDashboard } from "react-icons/lu";
 
 const drawerWidth = 240;
 
@@ -55,22 +53,73 @@ const Sidebar = (props) => {
   };
 
   // Define sidebar items based on user role
-  const sidebarItems = userRole === "admin"
-    ? [
-        { icon: <FaUsers size={25}/>, text: "Students", path: `${BASE_PATH}/students` },
-        { icon: <PiFactory size={25}/>, text: "Companies", path: `${BASE_PATH}/companies` },
-        { icon: <CiViewList size={25}/>, text: "Job Listings", path: `${BASE_PATH}/job-listings` },
-        { icon: <LuListChecks size={25}/>, text: "Shortlisted Students", path: `${BASE_PATH}/shortlisted-students` },
-        { icon: <PiStudent size={25}/>, text: "Placed Students", path: `${BASE_PATH}/placed-students` },
-        { icon: <IoIosGitBranch size={25}/>, text: "Branch", path: `${BASE_PATH}/branch` },
-      ]
-    : [
-        { icon: <PiFactory size={25}/>, text: "Companies", path: "/companies" },
-        { icon: <CiViewList size={25}/>, text: "Job Listings", path: "/job-listings" },
-        { icon: <LuListChecks size={25}/>, text: "Shortlisted Students", path: "/shortlisted-students" },
-        { icon: <PiStudent size={25}/>, text: "Placed Students", path: "/placed-students" },
-        { icon: <FaUsers size={25}/>, text: "Profile", path: "/profile" },
-      ];
+  const sidebarItems =
+    userRole === "admin"
+      ? [
+          {
+            icon: <LuLayoutDashboard size={25} />,
+            text: "Dashboard",
+            path: `${BASE_PATH}/dashboard`,
+          },
+          {
+            icon: <FaUsers size={25} />,
+            text: "Students",
+            path: `${BASE_PATH}/students`,
+          },
+          {
+            icon: <PiFactory size={25} />,
+            text: "Companies",
+            path: `${BASE_PATH}/companies`,
+          },
+          {
+            icon: <CiViewList size={25} />,
+            text: "Job Listings",
+            path: `${BASE_PATH}/job-listings`,
+          },
+          {
+            icon: <LuListChecks size={25} />,
+            text: "Shortlisted Students",
+            path: `${BASE_PATH}/shortlisted-students`,
+          },
+          {
+            icon: <PiStudent size={25} />,
+            text: "Placed Students",
+            path: `${BASE_PATH}/placed-students`,
+          },
+          {
+            icon: <IoIosGitBranch size={25} />,
+            text: "Branch",
+            path: `${BASE_PATH}/branch`,
+          },
+        ]
+      : [
+          {
+            icon: <LuLayoutDashboard size={25} />,
+            text: "Dashboard",
+            path: "/dashboard",
+          },
+          {
+            icon: <PiFactory size={25} />,
+            text: "Companies",
+            path: "/companies",
+          },
+          {
+            icon: <CiViewList size={25} />,
+            text: "Job Listings",
+            path: "/job-listings",
+          },
+          {
+            icon: <LuListChecks size={25} />,
+            text: "Shortlisted Students",
+            path: "/shortlisted-students",
+          },
+          {
+            icon: <PiStudent size={25} />,
+            text: "Placed Students",
+            path: "/placed-students",
+          },
+          { icon: <FaUsers size={25} />, text: "Profile", path: "/profile" },
+        ];
 
   const drawer = (
     <div>
@@ -138,6 +187,11 @@ const Sidebar = (props) => {
               alt="logo"
               sx={{ height: 56 }} // Adjust size as needed
             />
+
+            <Box>
+              <TokenCountdown />
+            </Box>
+
             <Box sx={{ ml: "auto" }}>
               <Dropdown>
                 <img src={user} alt="User" className="h-10" />

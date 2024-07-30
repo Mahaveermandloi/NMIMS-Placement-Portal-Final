@@ -6,14 +6,23 @@ import {
   logoutAdmin,
   reGenerateAccessToken,
 } from "../controllers/admin.controller.js";
+
+import {
+  sendOtp,
+  verifyOtp,
+  updatePassword,
+} from "../controllers/forgetpassword.controller.js";
 import handleFormData from "../middleware/multer.middleware.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
+
 const router = Router();
 
 router.post("/register", registerAdmin);
 router.post("/login", handleFormData, loginAdmin);
 router.post("/logout", verifyJWT, logoutAdmin);
-router.get("/refresh-token",reGenerateAccessToken);
-// router.get("/forget-password" , forgetPassword);
+router.get("/refresh-token", reGenerateAccessToken);
+router.get("/forget-password", handleFormData, sendOtp);
+router.post("/verify-otp", handleFormData, verifyOtp);
+router.post("/update-password/:email", handleFormData , updatePassword);
 
 export default router;
