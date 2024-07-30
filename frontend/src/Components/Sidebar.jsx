@@ -26,7 +26,7 @@ import { FaUsers } from "react-icons/fa6";
 import { IoIosGitBranch } from "react-icons/io";
 import Dropdown from "./Dropdown";
 import { BASE_PATH } from "../Utils/URLPath.jsx";
-import TokenCountdown from "./TokenCountDown.jsx";
+import TokenManager from "./TokenManager.jsx";
 
 import { LuLayoutDashboard } from "react-icons/lu";
 
@@ -189,7 +189,7 @@ const Sidebar = (props) => {
             />
 
             <Box>
-              <TokenCountdown />
+              <TokenManager />
             </Box>
 
             <Box sx={{ ml: "auto" }}>

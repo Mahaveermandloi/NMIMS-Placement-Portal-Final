@@ -28,7 +28,6 @@ const AdminRoutes = () => {
   };
 
   useEffect(() => {
-   
     const checkAuthentication = () => {
       const refreshToken = getCookie("refreshToken");
       if (refreshToken) {
@@ -39,8 +38,6 @@ const AdminRoutes = () => {
       }
       setLoading(false); // Set loading to false after checking
     };
-
-    
 
     checkAuthentication();
   }, [navigate]);
@@ -55,7 +52,6 @@ const AdminRoutes = () => {
         <>
           <Route path="/login" element={<AdminLogin />} />
           <Route path="/forget-password" element={<ForgetPassword />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
         </>
       ) : (
         <>

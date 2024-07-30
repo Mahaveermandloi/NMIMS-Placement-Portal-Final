@@ -10,10 +10,15 @@ import { Toast } from "../Components/Toast.jsx";
 import { postApi } from "../Utils/API.js";
 import { BASE_API_URL } from "../Utils/URLPath.jsx";
 import logo from "../../public/images/nmimslogo.png";
-import TokenCountDown from "../Components/TokenCountDown.jsx";
 
-const Login = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+import TokenManager from "../Components/TokenManager.jsx";
+
+const Login = ({ AuthAdminService, TokenCountDown }) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -33,6 +38,8 @@ const Login = () => {
 
         toast.success("Login successful");
         setTimeout(() => {
+          <TokenManager />;
+
           navigate(`/admin/dashboard`);
           window.location.reload();
         }, 1000);
@@ -57,7 +64,9 @@ const Login = () => {
       <section className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
         <div className="flex flex-col items-center mb-6">
           <img className="h-20 mb-4" src={logo} alt="logo" />
-          <h1 className="text-2xl font-bold text-gray-900">ADMIN LOGIN PANEL</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            ADMIN LOGIN PANEL
+          </h1>
         </div>
         <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-md">
           {loading ? (
@@ -141,7 +150,8 @@ const Login = () => {
           )}
         </div>
       </section>
-      <TokenCountDown />
+
+      {/* <TokenCountDown /> */}
     </>
   );
 };
