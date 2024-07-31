@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import ms from "ms";
 
 // Register Admin
@@ -50,11 +51,8 @@ const registerAdmin = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, createdAdmin, "Admin registered successfully"));
 });
 
-// Login Admin
 const loginAdmin = asyncHandler(async (req, res) => {
   const { adminID, password } = req.body;
-
-  console.log(adminID, password);
 
   // Validate input
   if ([adminID, password].some((field) => field?.trim() === "")) {
@@ -83,35 +81,17 @@ const loginAdmin = asyncHandler(async (req, res) => {
   admin.refreshToken = refreshToken;
   await admin.save();
 
-  // Set access token cookie
-  // res.cookie("accessToken", accessToken, {
-  //   httpOnly: true, // Ensures the cookie is only accessible by the web server
-  //   secure: process.env.NODE_ENV === "production" , // Cookie will be sent only over HTTPS
-  //   maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY), // Cookie expiration time
-  //   sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Cross-site request behavior
-  // });
-
-  // // Set refresh token cookie
-  // res.cookie("refreshToken", refreshToken, {
-  //   httpOnly: true, // Ensures the cookie is only accessible by the web server
-  //   secure: process.env.NODE_ENV === "production", // Cookie will be sent only over HTTPS
-  //   maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY), // Cookie expiration time
-  //   sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Cross-site request behavior
-  // });
-
+  // Set cookies
   res.cookie("accessToken", accessToken, {
-    // httpOnly: true,
-    secure: false, // Cookie will be sent over HTTP for development
-    maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY), // Cookie expiration time
-    sameSite: "Lax", // Cross-site request behavior
+    secure: false,
+    maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
+    sameSite: "Lax",
   });
 
-  // Set refresh token cookie
   res.cookie("refreshToken", refreshToken, {
-    // httpOnly: true, // Ensures the cookie is only accessible by the web server
-    secure: false, // Cookie will be sent over HTTP for development
-    maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY), // Cookie expiration time
-    sameSite: "Lax", // Cross-site request behavior
+    secure: false,
+    maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
+    sameSite: "Lax",
   });
 
   // Send response
@@ -125,6 +105,9 @@ const loginAdmin = asyncHandler(async (req, res) => {
       )
     );
 });
+
+
+
 
 // Logout Admin
 const logoutAdmin = asyncHandler(async (req, res) => {

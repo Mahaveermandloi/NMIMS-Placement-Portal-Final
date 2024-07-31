@@ -32,14 +32,9 @@ export const sendEmail = async (to, subject, text) => {
 
   console.log(mailOptions);
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully:", info.response);
-    return info;
-  } catch (error) {
-    console.error("Error sending email:", error);
-    throw new ApiError(500, "Error sending email");
-  }
+  const info = await transporter.sendMail(mailOptions);
+  console.log("Email sent successfully:", info.response);
+  return info;
 };
 
 // Send OTP function
@@ -103,7 +98,8 @@ export const updatePassword = asyncHandler(async (req, res) => {
   const { email } = req.params; // Get email from URL parameters
   const { password } = req.body; // Get new password from request body
 
-  console.log(email , password)
+  console.log(email, password);
+
   // Validate the input
   if (!email || !password) {
     throw new ApiError(400, "Email and password are required");
@@ -119,25 +115,18 @@ export const updatePassword = asyncHandler(async (req, res) => {
     throw new ApiError(404, "No account found");
   }
 
-  // Hash the new password
-  const saltRounds = 10; // Number of salt rounds for hashing
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-
   // Update the password in the appropriate collection
   if (admin) {
-    admin.password = hashedPassword;
+    admin.password = password; // The `pre` save hook will handle hashing
     await admin.save();
   } else if (student) {
-    student.password = hashedPassword; // Assuming students also have passwords
+    student.password = password; // Assuming students also have passwords
     await student.save();
   }
 
   // Send response
-  res
-    .status(200)
-    .json(new ApiResponse(200, null, "Password updated successfully"));
+  res.status(200).json(new ApiResponse(200, null, "Password updated successfully"));
 });
-
 
 
 // Resend OTP function

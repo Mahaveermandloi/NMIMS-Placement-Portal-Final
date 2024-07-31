@@ -41,19 +41,14 @@ const ForgetPassword = () => {
 
       if (response.statusCode === 200) {
         toast.success("OTP Sent Successfully!");
-
         setTimeout(() => {
           navigate(`/otp-page/${data.email}`); // Navigate to OTP page with email
         }, 2000);
-        
       }
     } catch (error) {
       console.error("Error:", error);
 
-      // Handle error, e.g., show an error message
-      alert(
-        "An error occurred while processing your request. Please try again."
-      );
+      toast.error(error.response.data.message);
     } finally {
       setOtpSent(false);
     }

@@ -39,7 +39,6 @@ const adminSchema = new Schema(
   }
 );
 
-// Middleware to hash password before saving
 adminSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();
@@ -52,7 +51,7 @@ adminSchema.pre("save", async function (next) {
   }
 });
 
-// Custom method to check if password is correct
+// Method to validate password
 adminSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
