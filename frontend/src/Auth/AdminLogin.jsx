@@ -8,11 +8,10 @@ import "react-toastify/dist/ReactToastify.css";
 import Loader from "../Components/Loader.jsx";
 import { Toast } from "../Components/Toast.jsx";
 import { postApi } from "../Utils/API.js";
-import { BASE_API_URL, BASE_PATH } from "../Utils/URLPath.jsx";
+import { BASE_API_URL, ADMIN_PATH } from "../Utils/URLPath.jsx";
 import logo from "../../public/images/nmimslogo.png";
 
-import { TokenManager } from "../Components/TokenManager.jsx";
-
+ 
 const Login = () => {
   const {
     register,
@@ -45,7 +44,7 @@ const Login = () => {
         toast.success("Login successful");
 
         setTimeout(() => {
-          navigate(`${BASE_PATH}/dashboard`);
+          navigate(`${ADMIN_PATH}/dashboard`);
           window.location.reload();
         }, 1000);
       }
@@ -173,7 +172,7 @@ const Login = () => {
         </div>
       </section>
 
-      {/* <TokenCountDown /> */}
+     
     </>
   );
 };

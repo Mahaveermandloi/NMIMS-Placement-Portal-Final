@@ -4,7 +4,7 @@ import { Menu, MenuItem, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { BASE_PATH } from "../Utils/URLPath";
+import { ADMIN_PATH, STUDENT_PATH } from "../Utils/URLPath";
 
 const Dropdown = (props) => {
   const { children } = props;
@@ -35,7 +35,7 @@ const Dropdown = (props) => {
   //   deleteCookie("accessToken");
 
   //   // Navigate to the login page
-  //   navigate(`${BASE_PATH}/login`);
+  //   navigate(`${ADMIN_PATH}/login`);
 
   //   // Reload the page to clear state and session
   //   window.location.reload();
@@ -59,7 +59,7 @@ const Dropdown = (props) => {
     deleteCookie("accessToken");
 
     // Navigate to the login page
-    navigate(`${BASE_PATH}/login`);
+    navigate(`${STUDENT_PATH}/login`);
 
     // Reload the page to clear state and session
     window.location.reload();

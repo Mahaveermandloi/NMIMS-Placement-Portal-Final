@@ -1,75 +1,147 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { FaRegEye, FaEyeSlash } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
+import Loader from "../Components/Loader.jsx";
+import { Toast } from "../Components/Toast.jsx";
+import { postApi } from "../Utils/API.js";
+import { BASE_API_URL, ADMIN_PATH, STUDENT_PATH } from "../Utils/URLPath.jsx";
 import logo from "../../public/images/nmimslogo.png";
-import { FaRegEye } from "react-icons/fa";
-import { FaEyeSlash } from "react-icons/fa";
-import { BASE_PATH } from "../Utils/URLPath";
 
 const Login = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    setShowPassword((prevShowPassword) => !prevShowPassword);
   };
+
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      const response = await postApi(data, `${BASE_API_URL}/api/student/login`);
+      console.log(response.data);
+
+      if (response.statusCode === 200) {
+        const { accessToken } = response.data;
+
+        localStorage.setItem("accessToken", accessToken);
+
+        console.log(accessToken);
+
+        toast.success("Login successful");
+
+        setTimeout(() => {
+          navigate(`/student/dashboard`);
+          window.location.reload();
+        }, 1000);
+      }
+    } catch (error) {
+      if (error.response) {
+        const { message } = error.response.data;
+
+        console.log(error.response.data);
+
+        toast.error(message || "An error occurred. Please try again.");
+      } else {
+        toast.error("An error occurred. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <section className="">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <a className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-          <img className="h-20 mr-2" src={logo} alt="logo" />
-        </a>
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              STUDENT PANEL
-            </h1>
-            <form className="space-y-4 md:space-y-6" action="#">
+    <>
+      <Toast />
+      <section className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+        <div className="flex flex-col items-center mb-6">
+          <img className="h-20 mb-4" src={logo} alt="logo" />
+          <h1 className="text-2xl font-bold text-gray-900">
+            STUDENT LOGIN PANEL
+          </h1>
+        </div>
+        <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-md">
+          {loading ? (
+            <Loader message="Signing in..." />
+          ) : (
+            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               <div>
                 <label
-                  htmlFor="email"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor="student_sap_no"
+                  className="block mb-2 text-sm font-medium text-gray-900"
                 >
                   SAP ID
                 </label>
                 <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  type="text"
+                  id="student_sap_no"
                   placeholder="Enter your SAP ID"
-                  required
+                  className={`bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
+                    errors.student_sap_no ? "border-red-500" : ""
+                  }`}
+                  {...register("student_sap_no", {
+                    required: "SAP ID is required",
+                    pattern: {
+                      value: /^[0-9]{11}$/,
+                      message: "SAP ID must be 11 digits",
+                    },
+                  })}
                 />
+                {errors.student_sap_no && (
+                  <span className="text-red-500 text-sm">
+                    {errors.student_sap_no.message}
+                  </span>
+                )}
               </div>
+
               <div>
                 <label
                   htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="block mb-2 text-sm font-medium text-gray-900"
                 >
                   Password
                 </label>
                 <div className="relative">
                   <input
-                    type={showPassword ? "text" : "password"} // Toggle input type
-                    name="password"
+                    type={showPassword ? "text" : "password"}
                     id="password"
                     placeholder="••••••••"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    required
+                    className={`bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 ${
+                      errors.password ? "border-red-500" : ""
+                    }`}
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 6,
+                        message: "Password should have at least 6 characters",
+                      },
+                    })}
                   />
-                  {/* Eye icon to toggle password visibility */}
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 dark:text-gray-400"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-gray-500"
                   >
-                    {showPassword ? (
-                      // Icon for visible password
-                      <FaEyeSlash />
-                    ) : (
-                      // Icon for hidden password
-                      <FaRegEye />
-                    )}
+                    {showPassword ? <FaEyeSlash /> : <FaRegEye />}
                   </button>
                 </div>
+                {errors.password && (
+                  <span className="text-red-500 text-sm">
+                    {errors.password.message}
+                  </span>
+                )}
               </div>
-          
+
               <div className="flex items-center justify-between">
                 <div className="flex items-start">
                   <div className="ml-3 text-sm">
@@ -81,22 +153,22 @@ const Login = () => {
                 </div>
                 <a
                   href={`/forget-password`}
-                  className="text-sm font-medium text-white"
+                  className="text-sm font-medium text-blue-700"
                 >
                   Forgot password?
                 </a>
               </div>
               <button
                 type="submit"
-                className="w-full text-white bg-blue-600 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
               >
                 Sign in
               </button>
             </form>
-          </div>
+          )}
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 

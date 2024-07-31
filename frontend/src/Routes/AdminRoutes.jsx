@@ -13,7 +13,7 @@ import PlacedStudents from "../Pages/Admin/Placed Students/PlacedStudents.jsx";
 import Branch from "../Pages/Admin/Branch/Branch.jsx";
 import Profile from "../Pages/Admin/Profile/Profile.jsx";
 import Dashboard from "../Pages/Admin/Dashboard/Dashboard.jsx";
-import { BASE_PATH } from "../Utils/URLPath.jsx";
+import { ADMIN_PATH } from "../Utils/URLPath.jsx";
 import OTPPage from "../Auth/OTPPage.jsx";
 import UpdatePassword from "../Auth/UpdatePassword.jsx";
 
@@ -41,14 +41,12 @@ const AdminRoutes = () => {
 
       const accessToken = localStorage.getItem("accessToken");
 
-      console.log("Access Token:", accessToken);
-      console.log("Refresh Token:", refreshToken);
-
+      
       if (refreshToken) {
         setIsAdminAuthenticated(true);
       } else {
         setIsAdminAuthenticated(false);
-        navigate(`${BASE_PATH}/login`);
+        navigate(`${ADMIN_PATH}/login`);
       }
       setLoading(false);
     };

@@ -1,5 +1,5 @@
 // Sidebar.jsx
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -25,8 +25,8 @@ import { LuListChecks } from "react-icons/lu";
 import { FaUsers } from "react-icons/fa6";
 import { IoIosGitBranch } from "react-icons/io";
 import Dropdown from "./Dropdown";
-import { BASE_PATH } from "../Utils/URLPath.jsx";
-import { TokenManager } from "./TokenManager.jsx";
+import { ADMIN_PATH, STUDENT_PATH } from "../Utils/URLPath.jsx";
+import { AdminTokenManager } from "./AdminTokenManager.jsx";
 
 import { LuLayoutDashboard } from "react-icons/lu";
 
@@ -59,66 +59,66 @@ const Sidebar = (props) => {
           {
             icon: <LuLayoutDashboard size={25} />,
             text: "Dashboard",
-            path: `${BASE_PATH}/dashboard`,
+            path: `${ADMIN_PATH}/dashboard`,
           },
           {
             icon: <FaUsers size={25} />,
             text: "Students",
-            path: `${BASE_PATH}/students`,
+            path: `${ADMIN_PATH}/students`,
           },
           {
             icon: <PiFactory size={25} />,
             text: "Companies",
-            path: `${BASE_PATH}/companies`,
+            path: `${ADMIN_PATH}/companies`,
           },
           {
             icon: <CiViewList size={25} />,
             text: "Job Listings",
-            path: `${BASE_PATH}/job-listings`,
+            path: `${ADMIN_PATH}/job-listings`,
           },
           {
             icon: <LuListChecks size={25} />,
             text: "Shortlisted Students",
-            path: `${BASE_PATH}/shortlisted-students`,
+            path: `${ADMIN_PATH}/shortlisted-students`,
           },
           {
             icon: <PiStudent size={25} />,
             text: "Placed Students",
-            path: `${BASE_PATH}/placed-students`,
+            path: `${ADMIN_PATH}/placed-students`,
           },
           {
             icon: <IoIosGitBranch size={25} />,
             text: "Branch",
-            path: `${BASE_PATH}/branch`,
+            path: `${ADMIN_PATH}/branch`,
           },
         ]
       : [
           {
             icon: <LuLayoutDashboard size={25} />,
             text: "Dashboard",
-            path: "/dashboard",
+            path: `${STUDENT_PATH}/dashboard`,
           },
           {
             icon: <PiFactory size={25} />,
             text: "Companies",
-            path: "/companies",
+            path: `${STUDENT_PATH}/companies`,
           },
           {
             icon: <CiViewList size={25} />,
             text: "Job Listings",
-            path: "/job-listings",
+            path: `${STUDENT_PATH}/job-listings`,
           },
           {
             icon: <LuListChecks size={25} />,
             text: "Shortlisted Students",
-            path: "/shortlisted-students",
+            path: `${STUDENT_PATH}/shortlisted-students`,
           },
           {
             icon: <PiStudent size={25} />,
             text: "Placed Students",
-            path: "/placed-students",
+            path: `${STUDENT_PATH}/placed-students`,
           },
-          { icon: <FaUsers size={25} />, text: "Profile", path: "/profile" },
+          // { icon: <FaUsers size={25} />, text: "Profile", path: "/profile" },
         ];
 
   const drawer = (
@@ -141,9 +141,14 @@ const Sidebar = (props) => {
           </NavLink>
         ))}
       </List>
-      <Box>
-        <TokenManager />
-      </Box>
+
+      {userRole === "admin" ? (
+        <Box>
+          <AdminTokenManager />
+        </Box>
+      ) : (
+        <></>
+      )}
 
       <Divider />
     </div>
