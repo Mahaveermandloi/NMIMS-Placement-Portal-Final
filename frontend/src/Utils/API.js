@@ -11,49 +11,6 @@ const api = axios.create({
   withCredentials: true, // Include cookies in cross-origin requests
 });
 
-// Request interceptor to include the access token
-api.interceptors.request.use(
-  (config) => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor to handle token expiration
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // If the error status is 401 (Unauthorized), try refreshing the token
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = localStorage.getItem("refreshToken");
-        const { data } = await api.post("/refresh-token", { refreshToken });
-
-        // Save the new access token and retry the original request
-        localStorage.setItem("accessToken", data.accessToken);
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        // Handle refresh token errors (e.g., log out the user)
-        console.error("Token refresh failed:", refreshError);
-        handleApiError(refreshError);
-      }
-    }
-
-    return Promise.reject(error);
-  }
-);
-
 // Function to convert data to FormData if needed
 const toFormData = (data) => {
   const formData = new FormData();
@@ -76,15 +33,18 @@ const toFormData = (data) => {
 // Function to handle errors centrally
 const handleApiError = (error) => {
   console.error("API Error:", error);
+
   // Optionally, handle specific status codes or errors globally
   if (error.response) {
-    console.error("Response data:", error.response.data);
-    console.error("Response status:", error.response.status);
-    console.error("Response headers:", error.response.headers);
+    console.log("Response data:", error.response);
+    //
+    // console.log("Response status:", error.response.status);
+
+    // console.error("Response headers:", error.response.headers);
   } else if (error.request) {
-    console.error("Request data:", error.request);
+    // console.error("Request data:", error.request);
   } else {
-    console.error("Error message:", error.message);
+    // console.error("Error message:", error.message);
   }
   throw error; // Re-throw the error to handle it in the calling function
 };

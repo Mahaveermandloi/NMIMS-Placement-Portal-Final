@@ -14,33 +14,47 @@ import Branch from "../Pages/Admin/Branch/Branch.jsx";
 import Profile from "../Pages/Admin/Profile/Profile.jsx";
 import Dashboard from "../Pages/Admin/Dashboard/Dashboard.jsx";
 import { BASE_PATH } from "../Utils/URLPath.jsx";
+import OTPPage from "../Auth/OTPPage.jsx";
+import UpdatePassword from "../Auth/UpdatePassword.jsx";
 
 const AdminRoutes = () => {
   const navigate = useNavigate();
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Function to get cookie by name
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
+    // console.log("Document Cookies:", document.cookie); // Log all cookies
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
+    if (parts.length === 2) {
+      return parts.pop().split(";").shift();
+    }
+    return null; // Return null if cookie not found
   };
 
   useEffect(() => {
     const checkAuthentication = () => {
       const refreshToken = getCookie("refreshToken");
+
+      console.log(document.cookie);
+      
+
+      const accessToken = localStorage.getItem("accessToken");
+
+      console.log("Access Token:", accessToken);
+      console.log("Refresh Token:", refreshToken);
+
       if (refreshToken) {
         setIsAdminAuthenticated(true);
       } else {
         setIsAdminAuthenticated(false);
         navigate(`${BASE_PATH}/login`);
       }
-      setLoading(false); // Set loading to false after checking
+      setLoading(false);
     };
 
     checkAuthentication();
-  }, [navigate]);
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>; // Display loading indicator while checking authentication
@@ -52,6 +66,8 @@ const AdminRoutes = () => {
         <>
           <Route path="/login" element={<AdminLogin />} />
           <Route path="/forget-password" element={<ForgetPassword />} />
+          <Route path="/otp-page/:email" element={<OTPPage />} />
+          <Route path="/update-password/:email" element={<UpdatePassword />} />
         </>
       ) : (
         <>

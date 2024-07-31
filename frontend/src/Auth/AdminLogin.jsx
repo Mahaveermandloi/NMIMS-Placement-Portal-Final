@@ -8,17 +8,18 @@ import "react-toastify/dist/ReactToastify.css";
 import Loader from "../Components/Loader.jsx";
 import { Toast } from "../Components/Toast.jsx";
 import { postApi } from "../Utils/API.js";
-import { BASE_API_URL } from "../Utils/URLPath.jsx";
+import { BASE_API_URL, BASE_PATH } from "../Utils/URLPath.jsx";
 import logo from "../../public/images/nmimslogo.png";
 
-import TokenManager from "../Components/TokenManager.jsx";
+import { TokenManager } from "../Components/TokenManager.jsx";
 
-const Login = ({ AuthAdminService, TokenCountDown }) => {
+const Login = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -31,24 +32,29 @@ const Login = ({ AuthAdminService, TokenCountDown }) => {
     setLoading(true);
     try {
       const response = await postApi(data, `${BASE_API_URL}/api/admin/login`);
+      console.log(response.data);
+
       if (response.statusCode === 200) {
         const { accessToken, refreshToken } = response.data;
+
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
 
-        toast.success("Login successful");
-        setTimeout(() => {
-          <TokenManager />;
+        console.log(accessToken, refreshToken);
 
-          navigate(`/admin/dashboard`);
+        toast.success("Login successful");
+
+        setTimeout(() => {
+          navigate(`${BASE_PATH}/dashboard`);
           window.location.reload();
         }, 1000);
-      } else {
-        toast.error("Login failed. Please try again.");
       }
     } catch (error) {
-      if (error.response && error.response.data) {
-        const { statusCode, message } = error.response.data;
+      if (error.response) {
+        const { message } = error.response.data;
+
+        console.log(error.response.data);
+
         toast.error(message || "An error occurred. Please try again.");
       } else {
         toast.error("An error occurred. Please try again.");
@@ -140,6 +146,22 @@ const Login = ({ AuthAdminService, TokenCountDown }) => {
                 )}
               </div>
 
+              <div className="flex items-center justify-between">
+                <div className="flex items-start">
+                  <div className="ml-3 text-sm">
+                    <label
+                      htmlFor="remember"
+                      className="text-gray-500 dark:text-gray-300"
+                    ></label>
+                  </div>
+                </div>
+                <a
+                  href={`/forget-password`}
+                  className="text-sm font-medium text-blue-700"
+                >
+                  Forgot password?
+                </a>
+              </div>
               <button
                 type="submit"
                 className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"

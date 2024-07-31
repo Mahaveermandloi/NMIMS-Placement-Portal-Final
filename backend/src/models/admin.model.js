@@ -9,18 +9,22 @@ const adminSchema = new Schema(
     name: {
       type: String,
       required: true,
+    },
+    email: {
+      type: String,
+      required: true,
       unique: true,
     },
     adminID: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
       trim: true,
       match: /^[a-zA-Z0-9]{8}$/, // Regex for alphanumeric with exactly 8 characters
       minlength: 8,
       maxlength: 8,
     },
+
     password: {
       type: String,
       required: [true, "Password is required"],

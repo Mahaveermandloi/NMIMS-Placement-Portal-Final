@@ -9,6 +9,9 @@ import ShortlistedStudents from "../Pages/User/Shortlisted Students/ShortlistedS
 import PlacedStudents from "../Pages/User/Placed Students/PlacedStudents.jsx";
 import Profile from "../Pages/User/Profile/Profile.jsx";
 import Dashboard from "../Pages/User/Dashboard/Dashboard.jsx";
+import ForgetPassword from "../Auth/ForgetPassword.jsx";
+import OTPPage from "../Auth/OTPPage.jsx";
+import UpdatePassword from "../Auth/UpdatePassword.jsx";
 
 const UserRoutes = () => {
   const isAuthenticated = localStorage.getItem("accessToken") !== null;
@@ -16,14 +19,17 @@ const UserRoutes = () => {
   return (
     <Routes>
       {!isAuthenticated ? (
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <>
+          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="/forget-password" element={<ForgetPassword />} />
+          <Route path="/otp-page/:email" element={<OTPPage />} />
+          <Route path="/update-password/:email" element={<UpdatePassword />} />
+        </>
       ) : (
-        
         <Route
           path="/"
           element={
             <Sidebar userRole="user">
-
               <Routes>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/companies" element={<Companies />} />

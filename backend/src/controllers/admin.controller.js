@@ -7,28 +7,36 @@ import ms from "ms";
 
 // Register Admin
 const registerAdmin = asyncHandler(async (req, res) => {
-  const { name, adminID, password } = req.body;
+  const { name, email, adminID, password } = req.body;
 
-  if ([adminID, name, password].some((field) => field?.trim() === "")) {
+  // Validate input fields
+  if ([name, email, adminID, password].some((field) => field?.trim() === "")) {
     throw new ApiError(400, "All fields are required");
   }
 
-  const existedAdmin = await Admin.findOne({ $or: [{ name }, { adminID }] });
+  // Check if an admin with the given name, email, or adminID already exists
+  const existedAdmin = await Admin.findOne({
+    $or: [{ name }, { email }, { adminID }],
+  });
 
   if (existedAdmin) {
     throw new ApiError(409, "Admin already exists");
   }
 
+  // Create a new admin
   const admin = new Admin({
     name: name.toLowerCase(),
-    adminID: adminID,
+    email: email.toLowerCase(),
+    adminID: adminID.toLowerCase(),
     password,
   });
 
+  // Generate a refresh token and save the admin
   const refreshToken = admin.generateRefreshToken();
   admin.refreshToken = refreshToken;
   await admin.save();
 
+  // Fetch the created admin excluding the password and refresh token fields
   const createdAdmin = await Admin.findById(admin._id).select(
     "-password -refreshToken"
   );
@@ -43,69 +51,17 @@ const registerAdmin = asyncHandler(async (req, res) => {
 });
 
 // Login Admin
-// const loginAdmin = asyncHandler(async (req, res) => {
-//   const { adminID, password } = req.body;
-
-//   if ([adminID, password].some((field) => field?.trim() === "")) {
-//     throw new ApiError(400, "Admin ID and password are required");
-//   }
-
-//   const admin = await Admin.findOne({ adminID });
-
-//   if (!admin) {
-//     throw new ApiError(401, "Invalid Admin ID or password");
-//   }
-
-//   const isPasswordValid = await admin.isPasswordCorrect(password);
-
-//   if (!isPasswordValid) {
-//     throw new ApiError(401, "Incorrect Password");
-//   }
-
-//   // Generate tokens
-//   const accessToken = admin.generateAccessToken();
-//   const refreshToken = admin.generateRefreshToken();
-
-//   // Store refresh token in the database
-//   admin.refreshToken = refreshToken;
-//   await admin.save();
-
-//   res.cookie("accessToken", accessToken, {
-//     httpOnly: true,               // Cookie cannot be accessed via JavaScript
-//     secure: process.env.NODE_ENV === "production", // Only send cookie over HTTPS
-//     maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY), // Expiry time of the cookie
-//     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Controls cross-site request behavior
-//   });
-  
-//   // Set refresh token cookie
-//   res.cookie("refreshToken", refreshToken, {
-//     httpOnly: true,               // Cookie cannot be accessed via JavaScript
-//     secure: process.env.NODE_ENV === "production", // Only send cookie over HTTPS
-//     maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY), // Expiry time of the cookie
-//     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Controls cross-site request behavior
-//   });
-
-//   res
-//     .status(200)
-//     .json(
-//       new ApiResponse(
-//         200,
-//         { accessToken, refreshToken },
-//         "Admin logged in successfully"
-//       )
-//     );
-// });
-
-
 const loginAdmin = asyncHandler(async (req, res) => {
   const { adminID, password } = req.body;
+
+  console.log(adminID, password);
 
   // Validate input
   if ([adminID, password].some((field) => field?.trim() === "")) {
     throw new ApiError(400, "Admin ID and password are required");
   }
 
-  // Find admin by ID
+  // Find admin by adminID
   const admin = await Admin.findOne({ adminID });
 
   if (!admin) {
@@ -128,31 +84,47 @@ const loginAdmin = asyncHandler(async (req, res) => {
   await admin.save();
 
   // Set access token cookie
+  // res.cookie("accessToken", accessToken, {
+  //   httpOnly: true, // Ensures the cookie is only accessible by the web server
+  //   secure: process.env.NODE_ENV === "production" , // Cookie will be sent only over HTTPS
+  //   maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY), // Cookie expiration time
+  //   sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Cross-site request behavior
+  // });
+
+  // // Set refresh token cookie
+  // res.cookie("refreshToken", refreshToken, {
+  //   httpOnly: true, // Ensures the cookie is only accessible by the web server
+  //   secure: process.env.NODE_ENV === "production", // Cookie will be sent only over HTTPS
+  //   maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY), // Cookie expiration time
+  //   sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Cross-site request behavior
+  // });
+
   res.cookie("accessToken", accessToken, {
-    secure: process.env.NODE_ENV === "production", // Send only over HTTPS
-    maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY), // Cookie expiration
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Cross-site request behavior
+    // httpOnly: true,
+    secure: false, // Cookie will be sent over HTTP for development
+    maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY), // Cookie expiration time
+    sameSite: "Lax", // Cross-site request behavior
   });
-  
+
   // Set refresh token cookie
   res.cookie("refreshToken", refreshToken, {
-    secure: process.env.NODE_ENV === "production", // Send only over HTTPS
-    maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY), // Cookie expiration
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Cross-site request behavior
+    // httpOnly: true, // Ensures the cookie is only accessible by the web server
+    secure: false, // Cookie will be sent over HTTP for development
+    maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY), // Cookie expiration time
+    sameSite: "Lax", // Cross-site request behavior
   });
 
   // Send response
-  res.status(200).json(
-    new ApiResponse(
-      200,
-      { accessToken, refreshToken },
-      "Admin logged in successfully"
-    )
-  );
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { accessToken, refreshToken },
+        "Admin logged in successfully"
+      )
+    );
 });
-
-
-
 
 // Logout Admin
 const logoutAdmin = asyncHandler(async (req, res) => {
@@ -191,12 +163,12 @@ const logoutAdmin = asyncHandler(async (req, res) => {
 });
 
 // Re-generate Access Token
-
 const reGenerateAccessToken = asyncHandler(async (req, res) => {
   // Access cookies using req.cookies
   const { refreshToken } = req.cookies;
 
-  console.log(refreshToken);
+  console.log("REFRESH TOKEN ", refreshToken);
+
   if (!refreshToken) {
     throw new ApiError(400, "Refresh token is required");
   }
@@ -219,6 +191,8 @@ const reGenerateAccessToken = asyncHandler(async (req, res) => {
 
       // Generate new access token
       const accessToken = admin.generateAccessToken();
+
+      console.log("NEW TOKEN", accessToken);
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,

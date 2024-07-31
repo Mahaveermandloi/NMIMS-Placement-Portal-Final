@@ -1,20 +1,29 @@
+import mongoose from "mongoose";
 
+const { Schema } = mongoose;
 
-const passwordSchema = new mongoose.Schema({
+const passwordSchema = new Schema(
+  {
     student_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Student',
-      required: true
+      type: Schema.Types.ObjectId,
+      ref: "Student",
+      required: true,
     },
+
     password: {
       type: String,
-      required: true
-    }
-  }, {
-    timestamps: true
-  });
-  
-  const Password = mongoose.model('Password', passwordSchema);
-  
-  module.exports = Password;
-  
+      required: true,
+    },
+    refreshToken: {
+      type: String,
+      default: "",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Password = mongoose.model("Password", passwordSchema);
+
+export default Password;

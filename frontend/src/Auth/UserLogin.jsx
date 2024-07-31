@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import logo from "../../public/images/nmimslogo.png";
 import { FaRegEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
+import { BASE_PATH } from "../Utils/URLPath";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -68,6 +69,7 @@ const Login = () => {
                   </button>
                 </div>
               </div>
+          
               <div className="flex items-center justify-between">
                 <div className="flex items-start">
                   <div className="ml-3 text-sm">
@@ -77,7 +79,10 @@ const Login = () => {
                     ></label>
                   </div>
                 </div>
-                <a href="#" className="text-sm font-medium text-white">
+                <a
+                  href={`/forget-password`}
+                  className="text-sm font-medium text-white"
+                >
                   Forgot password?
                 </a>
               </div>

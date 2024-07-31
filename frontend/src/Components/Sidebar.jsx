@@ -26,7 +26,7 @@ import { FaUsers } from "react-icons/fa6";
 import { IoIosGitBranch } from "react-icons/io";
 import Dropdown from "./Dropdown";
 import { BASE_PATH } from "../Utils/URLPath.jsx";
-import TokenManager from "./TokenManager.jsx";
+import { TokenManager } from "./TokenManager.jsx";
 
 import { LuLayoutDashboard } from "react-icons/lu";
 
@@ -141,6 +141,10 @@ const Sidebar = (props) => {
           </NavLink>
         ))}
       </List>
+      <Box>
+        <TokenManager />
+      </Box>
+
       <Divider />
     </div>
   );
@@ -187,10 +191,6 @@ const Sidebar = (props) => {
               alt="logo"
               sx={{ height: 56 }} // Adjust size as needed
             />
-
-            <Box>
-              <TokenManager />
-            </Box>
 
             <Box sx={{ ml: "auto" }}>
               <Dropdown>

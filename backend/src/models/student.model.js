@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import mongoose from 'mongoose';
+
+const { Schema } = mongoose;
 
 const studentSchema = new Schema({
   student_sap_no: String,
@@ -107,4 +108,5 @@ const studentSchema = new Schema({
 }, { timestamps: true });
 
 const Student = mongoose.model('Student', studentSchema);
-module.exports = Student;
+
+export default Student;

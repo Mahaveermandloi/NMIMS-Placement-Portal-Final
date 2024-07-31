@@ -11,7 +11,7 @@ const App = () => {
       <Routes>
         {/* Provide BASE_PATH to AdminRoutes as a prop */}
         <Route path={`${BASE_PATH}/*`} element={<AdminRoutes basePath={BASE_PATH} />} />
-        {/* <Route path={`/*`} element={<UserRoutes />} /> */}
+        <Route path={`/*`} element={<UserRoutes />} />
       </Routes>
     </Router>
   );

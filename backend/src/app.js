@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import adminRoutes from "../src/routes/admin.routes.js";
+import userRoutes from "../src/routes/student.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -27,7 +28,6 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // CORS configuration
 const allowedOrigins = ["http://localhost:5173"]; // Adjust as needed
 
-
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -37,14 +37,15 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
-    
+
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   })
-
 );
 
 // Register admin routes
 app.use("/api/admin", adminRoutes);
+
+app.use("/api/student", userRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

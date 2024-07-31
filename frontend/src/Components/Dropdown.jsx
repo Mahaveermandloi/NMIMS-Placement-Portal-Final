@@ -25,14 +25,38 @@ const Dropdown = (props) => {
     navigate("/profile");
   };
 
+  // const handleLogoutClick = () => {
+  //   handleClose();
+
+  //   localStorage.removeItem("accessToken");
+  //   localStorage.removeItem("refreshToken");
+
+  //   deleteCookie("refreshToken");
+  //   deleteCookie("accessToken");
+
+  //   // Navigate to the login page
+  //   navigate(`${BASE_PATH}/login`);
+
+  //   // Reload the page to clear state and session
+  //   window.location.reload();
+  // };
+
+  // Function to delete a cookie by name
+  // const deleteCookie = (name) => {
+  //   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  // };
+
   const handleLogoutClick = () => {
+    // Close any open modals or dropdowns
     handleClose();
 
-    // Remove accessToken from localStorage
+    // Remove tokens from local storage
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
 
-    // Remove refreshToken from cookies
+    // Delete cookies
     deleteCookie("refreshToken");
+    deleteCookie("accessToken");
 
     // Navigate to the login page
     navigate(`${BASE_PATH}/login`);
