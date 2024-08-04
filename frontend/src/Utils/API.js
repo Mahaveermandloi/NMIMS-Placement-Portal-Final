@@ -1,4 +1,3 @@
-// api.js
 import axios from "axios";
 import { BASE_API_URL } from "./URLPath.jsx";
 
@@ -37,16 +36,23 @@ const handleApiError = (error) => {
   // Optionally, handle specific status codes or errors globally
   if (error.response) {
     console.log("Response data:", error.response);
-    //
-    // console.log("Response status:", error.response.status);
-
-    // console.error("Response headers:", error.response.headers);
+    console.log("Response status:", error.response.status);
+    console.error("Response headers:", error.response.headers);
   } else if (error.request) {
-    // console.error("Request data:", error.request);
+    console.error("Request data:", error.request);
   } else {
-    // console.error("Error message:", error.message);
+    console.error("Error message:", error.message);
   }
   throw error; // Re-throw the error to handle it in the calling function
+};
+
+// Function to add headers with API key and access token
+const getHeaders = () => {
+  const token = localStorage.getItem("accessToken");
+  return {
+    "x-api-key": "mahaveer", // Add the x-api-key header
+    Authorization: token ? `Bearer ${token}` : "", // Include the access token
+  };
 };
 
 // POST API
@@ -54,7 +60,10 @@ const postApi = async (data, route) => {
   try {
     const formData = toFormData(data);
     const response = await api.post(route, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: {
+        "Content-Type": "multipart/form-data",
+        ...getHeaders(), // Include custom headers
+      },
     });
 
     return response.data;
@@ -66,7 +75,9 @@ const postApi = async (data, route) => {
 // GET API
 const getApi = async (route) => {
   try {
-    const response = await api.get(route);
+    const response = await api.get(route, {
+      headers: getHeaders(), // Include custom headers
+    });
     return response.data;
   } catch (error) {
     handleApiError(error);
@@ -76,7 +87,10 @@ const getApi = async (route) => {
 // GET API WITH DATA
 const getApi2 = async (data, route) => {
   try {
-    const response = await api.get(route, { params: data });
+    const response = await api.get(route, {
+      headers: getHeaders(), // Include custom headers
+      params: data,
+    });
     return response.data;
   } catch (error) {
     handleApiError(error);
@@ -88,7 +102,10 @@ const putApi = async (data, route) => {
   try {
     const formData = toFormData(data);
     const response = await api.put(route, formData, {
-      headers: { "Content-Type": "multipart/form-data" }, // Override default header
+      headers: {
+        "Content-Type": "multipart/form-data",
+        ...getHeaders(), // Include custom headers
+      },
     });
     return response.data;
   } catch (error) {
@@ -99,7 +116,9 @@ const putApi = async (data, route) => {
 // DELETE API
 const deleteApi = async (route) => {
   try {
-    const response = await api.delete(route);
+    const response = await api.delete(route, {
+      headers: getHeaders(), // Include custom headers
+    });
     return response.data;
   } catch (error) {
     handleApiError(error);

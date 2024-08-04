@@ -1,5 +1,4 @@
-// Sidebar.jsx
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -15,7 +14,11 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Collapse from "@mui/material/Collapse";
 import { NavLink } from "react-router-dom";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+
 import logo from "../../public/images/nmimslogo.png";
 import user from "../../public/images/user.png";
 import { PiFactory } from "react-icons/pi";
@@ -34,8 +37,9 @@ const drawerWidth = 240;
 
 const Sidebar = (props) => {
   const { window, userRole } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [isClosing, setIsClosing] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [studentOpen, setStudentOpen] = useState(false); // State for controlling the student dropdown
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -52,6 +56,11 @@ const Sidebar = (props) => {
     }
   };
 
+  // Toggle the student dropdown
+  const handleStudentClick = () => {
+    setStudentOpen(!studentOpen);
+  };
+
   // Define sidebar items based on user role
   const sidebarItems =
     userRole === "admin"
@@ -64,7 +73,22 @@ const Sidebar = (props) => {
           {
             icon: <FaUsers size={25} />,
             text: "Students",
-            path: `${ADMIN_PATH}/students`,
+            path: `${ADMIN_PATH}/student-request`,
+            isDropdown: true, // Flag to indicate this item has a dropdown
+            subItems: [
+              {
+                text: "Student Request",
+                path: `${ADMIN_PATH}/student-request`,
+              },
+              {
+                text: "Student Details",
+                path: `${ADMIN_PATH}/student-details`,
+              },
+              {
+                text: "Upload Student Data",
+                path: `${ADMIN_PATH}/upload-student-details`,
+              },
+            ],
           },
           {
             icon: <PiFactory size={25} />,
@@ -118,7 +142,6 @@ const Sidebar = (props) => {
             text: "Placed Students",
             path: `${STUDENT_PATH}/placed-students`,
           },
-          // { icon: <FaUsers size={25} />, text: "Profile", path: "/profile" },
         ];
 
   const drawer = (
@@ -126,29 +149,59 @@ const Sidebar = (props) => {
       <Toolbar />
       <Divider />
       <List>
-        {sidebarItems.map(({ text, path, icon }, index) => (
-          <NavLink
-            key={text}
-            to={path}
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            <ListItem disablePadding>
-              <ListItemButton>
-                <ListItemIcon>{icon}</ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          </NavLink>
-        ))}
+        {sidebarItems.map(
+          ({ text, path, icon, isDropdown, subItems }, index) => (
+            <div key={text}>
+              {!isDropdown ? (
+                <NavLink
+                  to={path}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <ListItem disablePadding>
+                    <ListItemButton>
+                      <ListItemIcon>{icon}</ListItemIcon>
+                      <ListItemText primary={text} />
+                    </ListItemButton>
+                  </ListItem>
+                </NavLink>
+              ) : (
+                <div>
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={handleStudentClick}>
+                      <ListItemIcon>{icon}</ListItemIcon>
+                      <ListItemText primary={text} />
+                      {studentOpen ? <ExpandLess /> : <ExpandMore />}
+                    </ListItemButton>
+                  </ListItem>
+                  <Collapse in={studentOpen} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      {subItems.map(({ text, path }) => (
+                        <NavLink
+                          key={text}
+                          to={path}
+                          style={{ textDecoration: "none", color: "inherit" }}
+                        >
+                          <ListItem disablePadding>
+                            <ListItemButton sx={{ pl: 4 }}>
+                              <ListItemText primary={text} />
+                            </ListItemButton>
+                          </ListItem>
+                        </NavLink>
+                      ))}
+                    </List>
+                  </Collapse>
+                </div>
+              )}
+            </div>
+          )
+        )}
       </List>
 
       {userRole === "admin" ? (
         <Box>
           <AdminTokenManager />
         </Box>
-      ) : (
-        <></>
-      )}
+      ) : null}
 
       <Divider />
     </div>
@@ -260,8 +313,7 @@ const Sidebar = (props) => {
 
 Sidebar.propTypes = {
   window: PropTypes.func,
-  children: PropTypes.node, // Accept children as props
-  userRole: PropTypes.string.isRequired, // Add userRole prop type
+  userRole: PropTypes.oneOf(["admin", "student"]).isRequired,
 };
 
 export default Sidebar;

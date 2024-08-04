@@ -1,16 +1,16 @@
-
 import "react-toastify/dist/ReactToastify.css";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaRegEye, FaEyeSlash } from "react-icons/fa";
-import logo from "../../public/images/nmimslogo.png";
-import Loader from "../Components/Loader"; // Adjust the import path as needed
-import { postApi } from "../Utils/API"; // Adjust the import path as needed
+import logo from "../../../../public/images/nmimslogo.png";
+import { ADMIN_PATH } from "../../../Utils/URLPath.jsx";
+import Loader from "../../../Components/Loader.jsx"; // Adjust the import path as needed
+import { postApi } from "../../../Utils/API.js"; // Adjust the import path as needed
 import { toast } from "react-toastify"; // Import react-toastify for notifications
-import { Toast } from "../Components/Toast.jsx";
-import { BASE_API_URL } from "../Utils/URLPath.jsx";
-const UpdatePassword = () => {
+import { Toast } from "../../../Components/Toast.jsx";
+import { BASE_API_URL } from "../../../Utils/URLPath.jsx";
+const ChangePassword = () => {
   // Set up react-hook-form
   const {
     register,
@@ -67,10 +67,7 @@ const UpdatePassword = () => {
   return (
     <>
       <Toast />
-      <section className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-        <div className="flex flex-col items-center mb-6">
-          <img className="h-20 mb-4" src={logo} alt="logo" />
-        </div>
+      <section className="mt-20 flex flex-col items-center justify-center ">
         <div className="bg-white rounded-lg shadow-md p-6 w-full max-w-md">
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <div>
@@ -159,6 +156,14 @@ const UpdatePassword = () => {
                 </button>
               </>
             )}
+
+            <button
+              type="button"
+              onClick={() => navigate(`${ADMIN_PATH}/profile`)}
+              className="bg-gray-500 text-white py-2 px-4 w-full rounded-lg hover:bg-gray-600 transition duration-300"
+            >
+              Cancel
+            </button>
           </form>
         </div>
       </section>
@@ -166,4 +171,4 @@ const UpdatePassword = () => {
   );
 };
 
-export default UpdatePassword;
+export default ChangePassword;

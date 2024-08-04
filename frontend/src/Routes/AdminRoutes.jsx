@@ -5,7 +5,6 @@ import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
 import Sidebar from "../Components/Sidebar.jsx";
 import AdminLogin from "../Auth/AdminLogin.jsx";
 import ForgetPassword from "../Auth/ForgetPassword.jsx";
-import Students from "../Pages/Admin/Students/Students.jsx";
 import Companies from "../Pages/Admin/Companies/Companies.jsx";
 import JobListings from "../Pages/Admin/Job Listing/JobListing.jsx";
 import ShortlistedStudents from "../Pages/Admin/Shortlisted Students/ShortlistedStudents.jsx";
@@ -16,6 +15,12 @@ import Dashboard from "../Pages/Admin/Dashboard/Dashboard.jsx";
 import { ADMIN_PATH } from "../Utils/URLPath.jsx";
 import OTPPage from "../Auth/OTPPage.jsx";
 import UpdatePassword from "../Auth/UpdatePassword.jsx";
+import ChangePassword from "../Pages/Admin/Profile/ChangePassword.jsx";
+import UpdateProfile from "../Pages/Admin/Profile/UpdateProfile.jsx";
+import StudentRequest from "../Pages/Admin/Students/StudentRequest.jsx";
+import StudentDetails from "../Pages/Admin/Students/StudentDetails.jsx";
+import UploadStudentData from "../Pages/Admin/Students/UploadStudentData.jsx";
+import StudentCompleteDetails from "../Pages/Admin/Students/Components/StudentCompleteDetails.jsx";
 
 const AdminRoutes = () => {
   const navigate = useNavigate();
@@ -36,12 +41,6 @@ const AdminRoutes = () => {
     const checkAuthentication = () => {
       const refreshToken = getCookie("refreshToken");
 
-      console.log(document.cookie);
-      
-
-      const accessToken = localStorage.getItem("accessToken");
-
-      
       if (refreshToken) {
         setIsAdminAuthenticated(true);
       } else {
@@ -75,16 +74,32 @@ const AdminRoutes = () => {
               <Sidebar userRole="admin">
                 <Routes>
                   <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="students" element={<Students />} />
+
+                  <Route path="student-request" element={<StudentRequest />} />
+
+                  <Route path="student-details" element={<StudentDetails />} />
+                  <Route
+                    path="student-details/:student_sap_no"
+                    element={<StudentCompleteDetails />}
+                  />
+
+                  <Route
+                    path="upload-student-details"
+                    element={<UploadStudentData />}
+                  />
+
                   <Route path="companies" element={<Companies />} />
                   <Route path="job-listings" element={<JobListings />} />
                   <Route
                     path="shortlisted-students"
                     element={<ShortlistedStudents />}
                   />
+
                   <Route path="placed-students" element={<PlacedStudents />} />
                   <Route path="branch" element={<Branch />} />
                   <Route path="profile" element={<Profile />} />
+                  <Route path="change-password" element={<ChangePassword />} />
+                  <Route path="update-profile" element={<UpdateProfile />} />
                   <Route
                     path="*"
                     element={<Navigate to="dashboard" replace />}

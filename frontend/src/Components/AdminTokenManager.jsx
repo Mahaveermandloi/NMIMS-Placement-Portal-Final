@@ -138,7 +138,6 @@
 //   );
 // };
 
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -252,6 +251,7 @@ export const AdminTokenManager = () => {
       const { data } = await getApi(`${BASE_API_URL}/api/admin/refresh-token`);
 
       localStorage.setItem("accessToken", data.accessToken);
+
       setTimeLeft((prevTime) => ({
         ...prevTime,
         accessToken: calculateExpiry(data.accessToken),
@@ -265,9 +265,12 @@ export const AdminTokenManager = () => {
   // Function to remove tokens and redirect the user to the login page
   const removeTokensAndRedirect = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     document.cookie =
       "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     navigate(`${ADMIN_PATH}/login`);
+
+    window.location.reload();
   };
 
   return (

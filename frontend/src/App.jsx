@@ -41,7 +41,7 @@ const App = () => {
         />
 
         {/* Student routes */}
-        <Route path="/*" element={<UserRoutes />} />
+        {/* <Route path="/*" element={<UserRoutes />} /> */}
       </Routes>
     </Router>
   );
