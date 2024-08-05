@@ -3,11 +3,14 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
+
 import ms from "ms";
 
 // Register Admin
+
 const registerAdmin = asyncHandler(async (req, res) => {
   const { name, email, adminID, password } = req.body;
+  const profileImage = req.file;
 
   // Validate input fields
   if ([name, email, adminID, password].some((field) => field?.trim() === "")) {
@@ -16,24 +19,28 @@ const registerAdmin = asyncHandler(async (req, res) => {
 
   // Check if an admin with the given name, email, or adminID already exists
   const existedAdmin = await Admin.findOne({
-    $or: [{ name }, { email }, { adminID }],
+    $or: [{ email }, { adminID }],
   });
 
   if (existedAdmin) {
     throw new ApiError(409, "Admin already exists");
   }
 
-  // Create a new admin
   const admin = new Admin({
     name: name.toLowerCase(),
     email: email.toLowerCase(),
     adminID: adminID.toLowerCase(),
     password,
+    profile_image: profileImage
+      ? `/uploads/Admin/ProfileImage/${profileImage.filename}`
+      : "",
   });
 
-  // Generate a refresh token and save the admin
+  await admin.save();
+
   const refreshToken = admin.generateRefreshToken();
   admin.refreshToken = refreshToken;
+
   await admin.save();
 
   // Fetch the created admin excluding the password and refresh token fields
@@ -46,15 +53,12 @@ const registerAdmin = asyncHandler(async (req, res) => {
   }
 
   res
-    .status(200)
-    .json(new ApiResponse(200, createdAdmin, "Admin registered successfully"));
+    .status(201)
+    .json(new ApiResponse(201, createdAdmin, "Admin registered successfully"));
 });
 
-// Login Admin
 const loginAdmin = asyncHandler(async (req, res) => {
   const { adminID, password } = req.body;
-
-  console.log(adminID, password);
 
   // Validate input
   if ([adminID, password].some((field) => field?.trim() === "")) {
@@ -71,6 +75,8 @@ const loginAdmin = asyncHandler(async (req, res) => {
   // Validate password
   const isPasswordValid = await admin.isPasswordCorrect(password);
 
+
+
   if (!isPasswordValid) {
     throw new ApiError(401, "Incorrect Password");
   }
@@ -83,35 +89,17 @@ const loginAdmin = asyncHandler(async (req, res) => {
   admin.refreshToken = refreshToken;
   await admin.save();
 
-  // Set access token cookie
-  // res.cookie("accessToken", accessToken, {
-  //   httpOnly: true, // Ensures the cookie is only accessible by the web server
-  //   secure: process.env.NODE_ENV === "production" , // Cookie will be sent only over HTTPS
-  //   maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY), // Cookie expiration time
-  //   sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Cross-site request behavior
-  // });
-
-  // // Set refresh token cookie
-  // res.cookie("refreshToken", refreshToken, {
-  //   httpOnly: true, // Ensures the cookie is only accessible by the web server
-  //   secure: process.env.NODE_ENV === "production", // Cookie will be sent only over HTTPS
-  //   maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY), // Cookie expiration time
-  //   sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // Cross-site request behavior
-  // });
-
+  // Set cookies
   res.cookie("accessToken", accessToken, {
-    // httpOnly: true,
-    secure: false, // Cookie will be sent over HTTP for development
-    maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY), // Cookie expiration time
-    sameSite: "Lax", // Cross-site request behavior
+    secure: false,
+    maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
+    sameSite: "Lax",
   });
 
-  // Set refresh token cookie
   res.cookie("refreshToken", refreshToken, {
-    // httpOnly: true, // Ensures the cookie is only accessible by the web server
-    secure: false, // Cookie will be sent over HTTP for development
-    maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY), // Cookie expiration time
-    sameSite: "Lax", // Cross-site request behavior
+    secure: false,
+    maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
+    sameSite: "Lax",
   });
 
   // Send response
@@ -167,8 +155,6 @@ const reGenerateAccessToken = asyncHandler(async (req, res) => {
   // Access cookies using req.cookies
   const { refreshToken } = req.cookies;
 
-  console.log("REFRESH TOKEN ", refreshToken);
-
   if (!refreshToken) {
     throw new ApiError(400, "Refresh token is required");
   }
@@ -192,8 +178,6 @@ const reGenerateAccessToken = asyncHandler(async (req, res) => {
       // Generate new access token
       const accessToken = admin.generateAccessToken();
 
-      console.log("NEW TOKEN", accessToken);
-
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -214,4 +198,133 @@ const reGenerateAccessToken = asyncHandler(async (req, res) => {
   );
 });
 
-export { registerAdmin, loginAdmin, logoutAdmin, reGenerateAccessToken };
+const getAdminDetails = asyncHandler(async (req, res) => {
+  const adminId = req.admin;
+
+  const admin = await Admin.findById(adminId).select("-password"); // Exclude
+
+  if (!admin) {
+    throw new ApiError(404, "Admin not found");
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, admin, "Admin details fetched successfully"));
+});
+
+// const updateProfile = asyncHandler(async (req, res) => {
+//   const adminId = req.admin;
+//   const { email } = req.body;
+//   const profileImage = req.file;
+
+//   const admin = await Admin.findById(adminId);
+
+//   if (!admin) {
+//     throw new ApiError(404, "Admin not found");
+//   }
+
+//   if (email && email !== admin.email) {
+//     const emailExists = await Admin.findOne({ email });
+//     if (emailExists) {
+//       throw new ApiError(409, "Email already in use by another admin");
+//     }
+//     admin.email = email.toLowerCase();
+//   }
+
+//   if (profileImage) {
+//     admin.profile_image = `/uploads/Admin/ProfileImage/${profileImage.filename}`;
+//   }
+
+//   // Save the updated admin
+//   await admin.save();
+
+//   // Fetch the updated admin details excluding the password and refresh token
+//   const updatedAdmin = await Admin.findById(admin._id).select(
+//     "-password -refreshToken"
+//   );
+
+//   res
+//     .status(200)
+//     .json(new ApiResponse(200, updatedAdmin, "Profile updated successfully"));
+// });
+
+const updateProfile = asyncHandler(async (req, res) => {
+  const adminId = req.admin;
+  const { email } = req.body;
+  const profileImage = req.file;
+
+  const admin = await Admin.findById(adminId);
+
+  if (!admin) {
+    throw new ApiError(404, "Admin not found");
+  }
+
+  if (email && email !== admin.email) {
+    const emailExists = await Admin.findOne({ email });
+    if (emailExists) {
+      throw new ApiError(409, "Email already in use by another admin");
+    }
+    admin.email = email.toLowerCase();
+  }
+
+  if (profileImage) {
+    admin.profile_image = `/uploads/Admin/ProfileImage/${profileImage.filename}`;
+  }
+
+  await admin.save();
+
+  const updatedAdmin = await Admin.findById(admin._id).select(
+    "-password -refreshToken"
+  );
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, updatedAdmin, "Profile updated successfully"));
+});
+
+const updateNewPassword = asyncHandler(async (req, res) => {
+  const adminId = req.admin;
+  const { currentPassword, newPassword } = req.body;
+
+  // Validate input fields
+  if ([currentPassword, newPassword].some((field) => field?.trim() === "")) {
+    throw new ApiError(
+      400,
+      "Both current password and new password are required"
+    );
+  }
+
+  // Find admin by ID
+  const admin = await Admin.findById(adminId);
+
+  if (!admin) {
+    throw new ApiError(404, "Admin not found");
+  }
+
+  // Verify current password
+  const isPasswordValid = await admin.isPasswordCorrect(currentPassword);
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Incorrect current password");
+  }
+
+  // Update password
+  admin.password = newPassword;
+
+  // Save updated admin
+  await admin.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, null, "Password updated successfully"));
+});
+
+export {
+  registerAdmin,
+  loginAdmin,
+  logoutAdmin,
+  reGenerateAccessToken,
+  getAdminDetails,
+  updateProfile,
+  updateNewPassword,
+};

@@ -6,6 +6,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
+import Password from "../models/password.model.js";
 
 // In-memory OTP storage using Map
 const otpStore = new Map(); // Map to store OTP data with email as the key
@@ -32,14 +33,9 @@ export const sendEmail = async (to, subject, text) => {
 
   console.log(mailOptions);
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully:", info.response);
-    return info;
-  } catch (error) {
-    console.error("Error sending email:", error);
-    throw new ApiError(500, "Error sending email");
-  }
+  const info = await transporter.sendMail(mailOptions);
+  console.log("Email sent successfully:", info.response);
+  return info;
 };
 
 // Send OTP function
@@ -99,11 +95,48 @@ export const verifyOtp = asyncHandler(async (req, res) => {
 });
 
 // Update password
+// export const updatePassword = asyncHandler(async (req, res) => {
+//   const { email } = req.params; // Get email from URL parameters
+//   const { password } = req.body; // Get new password from request body
+
+//   console.log(email, password);
+
+//   // Validate the input
+//   if (!email || !password) {
+//     throw new ApiError(400, "Email and password are required");
+//   }
+
+//   // Find the admin or student by email
+//   const admin = await Admin.findOne({ email });
+//   const student = await Student.findOne({
+//     $or: [{ student_email_id: email }, { student_alternate_email_id: email }],
+//   });
+
+//   if (!admin && !student) {
+//     throw new ApiError(404, "No account found");
+//   }
+
+//   // Update the password in the appropriate collection
+//   if (admin) {
+//     admin.password = password; // The `pre` save hook will handle hashing
+//     await admin.save();
+//   } else if (student) {
+//     student.password = password; // Assuming students also have passwords
+//     await student.save();
+//   }
+
+//   // Send response
+//   res
+//     .status(200)
+//     .json(new ApiResponse(200, null, "Password updated successfully"));
+// });
+
 export const updatePassword = asyncHandler(async (req, res) => {
   const { email } = req.params; // Get email from URL parameters
   const { password } = req.body; // Get new password from request body
 
-  console.log(email , password)
+  console.log(email, password);
+
   // Validate the input
   if (!email || !password) {
     throw new ApiError(400, "Email and password are required");
@@ -115,30 +148,36 @@ export const updatePassword = asyncHandler(async (req, res) => {
     $or: [{ student_email_id: email }, { student_alternate_email_id: email }],
   });
 
+
+  console.log(admin );
+  console.log(student );
+
   if (!admin && !student) {
     throw new ApiError(404, "No account found");
   }
 
-  // Hash the new password
-  const saltRounds = 10; // Number of salt rounds for hashing
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-  // Update the password in the appropriate collection
+  let userId;
   if (admin) {
-    admin.password = hashedPassword;
-    await admin.save();
+    userId = admin._id;
   } else if (student) {
-    student.password = hashedPassword; // Assuming students also have passwords
-    await student.save();
+    userId = student._id;
   }
+
+  // Find the password record for the user
+  const passwordRecord = await Password.findOne({ student_id: userId });
+  if (!passwordRecord) {
+    throw new ApiError(404, "Password record not found");
+  }
+
+  // Update the password using the `isPasswordCorrect` method
+  passwordRecord.password = password;
+  await passwordRecord.save(); // The `pre` save hook will handle hashing
 
   // Send response
   res
     .status(200)
     .json(new ApiResponse(200, null, "Password updated successfully"));
 });
-
-
 
 // Resend OTP function
 export const resendOtp = asyncHandler(async (req, res) => {

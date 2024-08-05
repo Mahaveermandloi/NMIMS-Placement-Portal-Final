@@ -24,7 +24,6 @@ const adminSchema = new Schema(
       minlength: 8,
       maxlength: 8,
     },
-
     password: {
       type: String,
       required: [true, "Password is required"],
@@ -33,13 +32,16 @@ const adminSchema = new Schema(
       type: String,
       default: "",
     },
+    profile_image: {
+      type: String,
+      default: "", // Optionally, set a default value if you have one
+    },
   },
   {
     timestamps: true,
   }
 );
 
-// Middleware to hash password before saving
 adminSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();
@@ -52,7 +54,7 @@ adminSchema.pre("save", async function (next) {
   }
 });
 
-// Custom method to check if password is correct
+// Method to validate password
 adminSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };

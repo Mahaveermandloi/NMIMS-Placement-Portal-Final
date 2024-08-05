@@ -3,7 +3,6 @@ import Password from "../models/password.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import bcrypt from "bcrypt";
 
 // Register Student
 const registerStudent = asyncHandler(async (req, res) => {
@@ -113,18 +112,11 @@ const registerStudent = asyncHandler(async (req, res) => {
   } = req.body;
 
   // Validate required fields
-  if (
-    [student_sap_no, student_roll_no, first_name, last_name].some(
-      (field) => field?.trim() === ""
-    )
-  ) {
-    throw new ApiError(
-      400,
-      "Student SAP No, Roll No, First Name, and Last Name are required"
-    );
+  if ([student_sap_no, student_roll_no].some((field) => field?.trim() === "")) {
+    throw new ApiError(400, "SAP No and Roll No are required");
   }
 
-  // Check if the student already exists by SAP No
+  // Check if the student already exists
   const existingStudent = await Student.findOne({ student_sap_no });
   if (existingStudent) {
     throw new ApiError(409, "Student with this SAP No already exists");
@@ -238,12 +230,10 @@ const registerStudent = asyncHandler(async (req, res) => {
 
   await student.save();
 
-  // Hash the SAP No and save it to the Password collection
-  const hashedPassword = await bcrypt.hash(student_sap_no, 10);
-
+  // Hash the password (SAP No) and save it to the Password collection
   const password = new Password({
     student_id: student._id,
-    password: hashedPassword,
+    password: student_sap_no,
   });
 
   await password.save();
@@ -251,7 +241,7 @@ const registerStudent = asyncHandler(async (req, res) => {
   // Return success response
   const createdStudent = await Student.findById(student._id).select(
     "-password"
-  ); // Adjust field exclusion as needed
+  );
 
   if (!createdStudent) {
     throw new ApiError(
@@ -268,36 +258,95 @@ const registerStudent = asyncHandler(async (req, res) => {
 });
 
 // Login Student
+
+// Login Student
 const loginStudent = asyncHandler(async (req, res) => {
   const { student_sap_no, password } = req.body;
 
   // Validate required fields
   if (!student_sap_no || !password) {
-    throw new ApiError(400, "SAP ID and Password are required");
+    throw new ApiError(400, "SAP No and password are required");
   }
 
-  // Check if the student exists
+  // Find student by SAP No
   const student = await Student.findOne({ student_sap_no });
   if (!student) {
     throw new ApiError(404, "Student not found");
   }
 
-  // Retrieve hashed password from Password collection
-  const passwordEntry = await Password.findOne({ student_id: student._id });
-
-  if (!passwordEntry) {
-    throw new ApiError(500, "Password entry not found");
+  // Find password record for the student
+  const passwordRecord = await Password.findOne({ student_id: student._id });
+  if (!passwordRecord) {
+    throw new ApiError(404, "Password record not found");
   }
 
-  // Compare the provided password with the hashed password
-  const isMatch = await bcrypt.compare(password, passwordEntry.password);
+  // Check if the provided password is correct
+  const isMatch = await passwordRecord.isPasswordCorrect(password);
   if (!isMatch) {
     throw new ApiError(401, "Invalid password");
   }
 
-  res.status(200).json(new ApiResponse(200, student, "Login successful"));
+  // Generate access token
+  const accessToken = passwordRecord.generateAccessToken();
+
+  // Return success response with token
+  res
+    .status(200)
+    .json(new ApiResponse(200, { accessToken }, "Login successful"));
 });
 
+const getAllStudentDetails = asyncHandler(async (req, res) => {
+  try {
+    const students = await Student.find();
 
+    if (!students || students.length === 0) {
+      throw new ApiError(404, "No students found");
+    }
 
-export { registerStudent, loginStudent };
+    res
+      .status(200)
+      .json(
+        new ApiResponse(200, students, "Student details retrieved successfully")
+      );
+  } catch (error) {
+    throw new ApiError(
+      500,
+      error.message || "An error occurred while retrieving student details"
+    );
+  }
+});
+
+const getStudentDetailsById = asyncHandler(async (req, res) => {
+  try {
+    const { student_sap_no } = req.params;
+    if (!student_sap_no) {
+      throw new ApiError(400, "SAP ID is required");
+    }
+
+    // Find the student with the givenstudent_sap_no
+    const student = await Student.findOne({ student_sap_no });
+
+    // Check if student is found
+    if (!student) {
+      throw new ApiError(404, "Student not found");
+    }
+
+    res
+      .status(200)
+      .json(
+        new ApiResponse(200, student, "Student details retrieved successfully")
+      );
+  } catch (error) {
+    throw new ApiError(
+      500,
+      error.message || "An error occurred while retrieving student details"
+    );
+  }
+});
+
+export {
+  registerStudent,
+  loginStudent,
+  getAllStudentDetails,
+  getStudentDetailsById,
+};
