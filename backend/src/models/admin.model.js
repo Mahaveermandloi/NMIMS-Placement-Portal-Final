@@ -24,7 +24,6 @@ const adminSchema = new Schema(
       minlength: 8,
       maxlength: 8,
     },
-
     password: {
       type: String,
       required: [true, "Password is required"],
@@ -32,6 +31,10 @@ const adminSchema = new Schema(
     refreshToken: {
       type: String,
       default: "",
+    },
+    profile_image: {
+      type: String,
+      default: "", // Optionally, set a default value if you have one
     },
   },
   {

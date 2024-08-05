@@ -295,4 +295,58 @@ const loginStudent = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { accessToken }, "Login successful"));
 });
 
-export { registerStudent, loginStudent };
+const getAllStudentDetails = asyncHandler(async (req, res) => {
+  try {
+    const students = await Student.find();
+
+    if (!students || students.length === 0) {
+      throw new ApiError(404, "No students found");
+    }
+
+    res
+      .status(200)
+      .json(
+        new ApiResponse(200, students, "Student details retrieved successfully")
+      );
+  } catch (error) {
+    throw new ApiError(
+      500,
+      error.message || "An error occurred while retrieving student details"
+    );
+  }
+});
+
+const getStudentDetailsById = asyncHandler(async (req, res) => {
+  try {
+    const { student_sap_no } = req.params;
+    if (!student_sap_no) {
+      throw new ApiError(400, "SAP ID is required");
+    }
+
+    // Find the student with the givenstudent_sap_no
+    const student = await Student.findOne({ student_sap_no });
+
+    // Check if student is found
+    if (!student) {
+      throw new ApiError(404, "Student not found");
+    }
+
+    res
+      .status(200)
+      .json(
+        new ApiResponse(200, student, "Student details retrieved successfully")
+      );
+  } catch (error) {
+    throw new ApiError(
+      500,
+      error.message || "An error occurred while retrieving student details"
+    );
+  }
+});
+
+export {
+  registerStudent,
+  loginStudent,
+  getAllStudentDetails,
+  getStudentDetailsById,
+};

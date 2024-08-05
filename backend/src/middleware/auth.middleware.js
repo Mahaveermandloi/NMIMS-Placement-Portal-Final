@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { ApiError } from "../utils/ApiError.js";
 import { Admin } from "../models/admin.model.js";
+import  Student  from "../models/student.model.js";
 
 export const verifyJWT = async (req, res, next) => {
   try {
@@ -30,7 +31,7 @@ export const verifyJWT = async (req, res, next) => {
         return next();
       }
 
-      user = await User.findOne({ email: decodedToken.email }).select(
+      user = await Student.findOne({ email: decodedToken.email }).select(
         "-password -refreshToken"
       );
 
@@ -43,5 +44,24 @@ export const verifyJWT = async (req, res, next) => {
     throw new ApiError(401, "Invalid token access");
   } catch (error) {
     next(new ApiError(401, error?.message || "Invalid access token"));
+  }
+};
+
+export const verifyAPIKey = (req, res, next) => {
+  try {
+    const apiKey = req.header("x-api-key"); // You can also use req.query or req.body if needed
+
+    if (!apiKey) {
+      throw new ApiError(401, "API key is missing");
+    }
+
+    if (apiKey !== process.env.API_KEY) {
+      throw new ApiError(403, "Invalid API key");
+    }
+
+    // API key is valid, proceed to next middleware or route handler
+    next();
+  } catch (error) {
+    next(new ApiError(403, error.message || "Forbidden"));
   }
 };
