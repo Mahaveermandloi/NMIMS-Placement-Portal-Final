@@ -2,7 +2,7 @@
 // import { useNavigate } from "react-router-dom";
 // import { getApi } from "../Utils/API";
 // import jwtDecode from "jwt-decode";
-// import { BASE_API_URL, ADMIN_PATH } from "../Utils/URLPath";
+// import { SERVER_URL, ADMIN_PATH } from "../Utils/URLPath";
 
 // const AuthAdminService = () => {
 //   const [timeLeft, setTimeLeft] = useState({ accessToken: 0, refreshToken: 0 });
@@ -33,7 +33,7 @@
 //           if (timeLeft.refreshToken > 0) {
 //             try {
 //               const { data } = await getApi(
-//                 `${BASE_API_URL}/api/admin/refresh-token`
+//                 `${SERVER_URL}/api/admin/refresh-token`
 //               );
 //               localStorage.setItem("accessToken", data.accessToken);
 //               setTimeLeft((prevTime) => ({

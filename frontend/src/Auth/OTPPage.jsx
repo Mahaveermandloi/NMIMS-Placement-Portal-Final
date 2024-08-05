@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import logo from "../../public/images/nmimslogo.png";
 import { postApi } from "../Utils/API.js"; // Adjust this import if needed
 import { useParams, useNavigate } from "react-router-dom";
-import { BASE_API_URL } from "../Utils/URLPath";
+import { SERVER_URL } from "../Utils/URLPath";
 import { toast } from "react-toastify";
 import { Toast } from "../Components/Toast.jsx";
 import Loader from "../Components/Loader.jsx";
@@ -36,7 +36,7 @@ const OTPPage = () => {
       // Make the POST request to verify OTP
       const response = await postApi(
         payload,
-        `${BASE_API_URL}/api/admin/verify-otp`
+        `${SERVER_URL}/api/admin/verify-otp`
       );
 
       if (response.success) {
@@ -68,7 +68,7 @@ const OTPPage = () => {
       // Make the POST request to resend OTP
       const response = await postApi(
         payload,
-        `${BASE_API_URL}/api/admin/resend-otp`
+        `${SERVER_URL}/api/admin/resend-otp`
       );
 
       if (response.success) {

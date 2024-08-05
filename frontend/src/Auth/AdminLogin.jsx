@@ -2,13 +2,13 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaRegEye, FaEyeSlash } from "react-icons/fa";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "../Components/Loader.jsx";
 import { Toast } from "../Components/Toast.jsx";
+import { toast } from "react-toastify";
 import { postApi } from "../Utils/API.js";
-import { BASE_API_URL, ADMIN_PATH } from "../Utils/URLPath.jsx";
+import { SERVER_URL, ADMIN_PATH } from "../Utils/URLPath.jsx";
 import logo from "../../public/images/nmimslogo.png";
 
  
@@ -30,7 +30,7 @@ const Login = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const response = await postApi(data, `${BASE_API_URL}/api/admin/login`);
+      const response = await postApi(data, `${SERVER_URL}/api/admin/login`);
       console.log(response.data);
 
       if (response.statusCode === 200) {

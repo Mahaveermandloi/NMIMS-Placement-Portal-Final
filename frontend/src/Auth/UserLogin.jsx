@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Loader from "../Components/Loader.jsx";
 import { Toast } from "../Components/Toast.jsx";
 import { postApi } from "../Utils/API.js";
-import { BASE_API_URL, ADMIN_PATH, STUDENT_PATH } from "../Utils/URLPath.jsx";
+import { SERVER_URL, ADMIN_PATH, STUDENT_PATH } from "../Utils/URLPath.jsx";
 import logo from "../../public/images/nmimslogo.png";
 
 const Login = () => {
@@ -28,7 +28,7 @@ const Login = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const response = await postApi(data, `${BASE_API_URL}/api/student/login`);
+      const response = await postApi(data, `${SERVER_URL}/api/student/login`);
       console.log(response.data);
 
       if (response.statusCode === 200) {

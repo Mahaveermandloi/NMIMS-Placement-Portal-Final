@@ -21,7 +21,8 @@ import StudentRequest from "../Pages/Admin/Students/StudentRequest.jsx";
 import StudentDetails from "../Pages/Admin/Students/StudentDetails.jsx";
 import UploadStudentData from "../Pages/Admin/Students/UploadStudentData.jsx";
 import StudentCompleteDetails from "../Pages/Admin/Students/Components/StudentCompleteDetails.jsx";
-
+import UploadCompaniesDetails from "../Pages/Admin/Companies/CompaniesUploadDetails.jsx";
+import JobUploadDetails from "../Pages/Admin/Job Listing/JobUploadDetails.jsx";
 const AdminRoutes = () => {
   const navigate = useNavigate();
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
@@ -89,7 +90,17 @@ const AdminRoutes = () => {
                   />
 
                   <Route path="companies" element={<Companies />} />
+                  <Route
+                    path="upload-companies-details"
+                    element={<UploadCompaniesDetails />}
+                  />
+
                   <Route path="job-listings" element={<JobListings />} />
+                  <Route
+                    path="upload-job-listings-details"
+                    element={<JobUploadDetails />}
+                  />
+
                   <Route
                     path="shortlisted-students"
                     element={<ShortlistedStudents />}

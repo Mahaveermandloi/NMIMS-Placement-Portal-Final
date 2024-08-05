@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { FaRegEye, FaEyeSlash } from "react-icons/fa";
 import logo from "../../public/images/nmimslogo.png";
 import { postApi } from "../Utils/API.js"; // Import your postApi function
-import { BASE_API_URL } from "../Utils/URLPath";
+import { SERVER_URL } from "../Utils/URLPath";
 import { Toast } from "../Components/Toast.jsx";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -36,7 +36,7 @@ const ForgetPassword = () => {
       // Call the postApi function to send the email to the server
       const response = await postApi(
         data,
-        `${BASE_API_URL}/api/admin/forget-password`
+        `${SERVER_URL}/api/admin/forget-password`
       );
 
       if (response.statusCode === 200) {

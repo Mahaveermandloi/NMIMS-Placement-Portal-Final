@@ -1,9 +1,9 @@
 import axios from "axios";
-import { BASE_API_URL } from "./URLPath.jsx";
+import { SERVER_URL } from "./URLPath.jsx";
 
 // Create an Axios instance
 const api = axios.create({
-  baseURL: BASE_API_URL,
+  baseURL: SERVER_URL,
   headers: {
     "Content-Type": "application/json",
   },

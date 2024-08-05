@@ -9,7 +9,7 @@ import Loader from "../Components/Loader"; // Adjust the import path as needed
 import { postApi } from "../Utils/API"; // Adjust the import path as needed
 import { toast } from "react-toastify"; // Import react-toastify for notifications
 import { Toast } from "../Components/Toast.jsx";
-import { BASE_API_URL } from "../Utils/URLPath.jsx";
+import { SERVER_URL } from "../Utils/URLPath.jsx";
 const UpdatePassword = () => {
   // Set up react-hook-form
   const {
@@ -43,7 +43,7 @@ const UpdatePassword = () => {
         {
           password: data.password,
         },
-        `${BASE_API_URL}/api/admin/update-password/${email}`
+        `${SERVER_URL}/api/admin/update-password/${email}`
       );
 
       console.log(response.data);

@@ -2,7 +2,7 @@
 // import { useNavigate } from "react-router-dom";
 // import { jwtDecode } from "jwt-decode";
 // import { getApi } from "../Utils/API";
-// import { BASE_API_URL, ADMIN_PATH } from "../Utils/URLPath";
+// import { SERVER_URL, ADMIN_PATH } from "../Utils/URLPath";
 
 // export const TokenManager = () => {
 //   const [timeLeft, setTimeLeft] = useState({
@@ -102,7 +102,7 @@
 //   // Function to refresh the access token
 //   const refreshAccessToken = async () => {
 //     try {
-//       const { data } = await getApi(`${BASE_API_URL}/api/admin/refresh-token`);
+//       const { data } = await getApi(`${SERVER_URL}/api/admin/refresh-token`);
 
 //       localStorage.setItem("accessToken", data.accessToken);
 //       setTimeLeft((prevTime) => ({
@@ -142,7 +142,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { getApi } from "../Utils/API";
-import { BASE_API_URL, ADMIN_PATH } from "../Utils/URLPath";
+import { SERVER_URL, ADMIN_PATH } from "../Utils/URLPath";
 
 export const AdminTokenManager = () => {
   const [timeLeft, setTimeLeft] = useState({
@@ -248,7 +248,7 @@ export const AdminTokenManager = () => {
   // Function to refresh the access token
   const refreshAccessToken = async () => {
     try {
-      const { data } = await getApi(`${BASE_API_URL}/api/admin/refresh-token`);
+      const { data } = await getApi(`${SERVER_URL}/api/admin/refresh-token`);
 
       localStorage.setItem("accessToken", data.accessToken);
 
