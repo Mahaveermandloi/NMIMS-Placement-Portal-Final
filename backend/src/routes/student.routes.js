@@ -1,22 +1,50 @@
 import { Router } from "express";
-
+import multer from "multer";
+import { uploadStudentFiles } from "../middleware/studentmulter.middleware.js";
 import {
   loginStudent,
-  // registerAdmin,
-  // loginAdmin,
-  // logoutAdmin,
-  // reGenerateAccessToken,
-  getAllStudentDetails,
   registerStudent,
+  getAllStudentDetails,
   getStudentDetailsById,
+  reGenerateAccessToken,
+  updateStudentProfile,
+  getProfile,
 } from "../controllers/student.controller.js";
-
-import handleFormData from "../middleware/handleFormData.js";
 import { verifyAPIKey, verifyJWT } from "../middleware/auth.middleware.js";
+import handleFormData from "../middleware/handleFormData.js";
 
 const router = Router();
 
-router.post("/register", registerStudent);
+const handleConditionalFileUploads = (req, res, next) => {
+  const fields = [
+    { name: "student_cv", maxCount: 1 },
+    { name: "student_profile_image", maxCount: 1 },
+    { name: "student_marksheet", maxCount: 1 },
+  ];
+
+  const upload = uploadStudentFiles.fields(fields);
+
+  upload(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      return res.status(400).json({ error: err.message });
+    } else if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    next();
+  });
+};
+
+// Define the routes
+router.post(
+  "/register",
+  uploadStudentFiles.fields([
+    { name: "student_profile_image", maxCount: 3 }, // Multiple profile images allowed
+    { name: "student_cv", maxCount: 1 }, // Single CV allowed
+    { name: "student_marksheet", maxCount: 3 }, // Multiple marksheets allowed
+  ]),
+  registerStudent
+);
+
 router.post("/login", handleFormData, loginStudent);
 
 router.get(
@@ -33,10 +61,15 @@ router.get(
   getStudentDetailsById
 );
 
-// router.post("/logout", verifyJWT, logoutUser);
-// router.get("/refresh-token", reGenerateAccessToken);
-// router.get("/forget-password", handleFormData, sendOtp);
-// router.post("/verify-otp", handleFormData, verifyOtp);
-// router.post("/update-password/:email", handleFormData, updatePassword);
+router.get("/refresh-token", reGenerateAccessToken);
+
+router.put(
+  "/update-profile",
+  verifyJWT,
+  handleConditionalFileUploads, // Use the conditional upload middleware
+  updateStudentProfile
+);
+
+router.get("/get-profile", verifyJWT, verifyAPIKey, getProfile);
 
 export default router;

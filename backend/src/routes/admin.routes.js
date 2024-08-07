@@ -71,7 +71,7 @@ import {
 } from "../controllers/forgetpassword.controller.js";
 import handleFormData from "../middleware/handleFormData.js";
 import {
-  uploadProfileImage,
+  uploadAdminProfileImage,
   removeOldProfileImage,
 } from "../middleware/multer.middleware.js";
 import { verifyAPIKey, verifyJWT } from "../middleware/auth.middleware.js";
@@ -80,7 +80,7 @@ import { updateNewPassword } from "../controllers/admin.controller.js";
 
 const router = Router();
 
-router.post("/register", uploadProfileImage, registerAdmin);
+router.post("/register", uploadAdminProfileImage, registerAdmin);
 
 router.post("/login", handleFormData, loginAdmin);
 
@@ -100,7 +100,7 @@ router.put(
   "/update-profile",
   verifyJWT,
   removeOldProfileImage,
-  uploadProfileImage,
+  uploadAdminProfileImage,
   updateProfile
 );
 

@@ -13,12 +13,15 @@ const api = axios.create({
 // Function to convert data to FormData if needed
 const toFormData = (data) => {
   const formData = new FormData();
+
   for (const key in data) {
     if (data.hasOwnProperty(key)) {
       if (data[key] instanceof FileList) {
         Array.from(data[key]).forEach((file) => formData.append(key, file));
+      } else if (data[key] instanceof File) {
+        formData.append(key, data[key]);
       } else if (Array.isArray(data[key])) {
-        data[key].forEach((item) => formData.append(`${key}[]`, item));
+        data[key].forEach((item, index) => formData.append(`${key}[${index}]`, item));
       } else if (data[key] && typeof data[key] === "object") {
         formData.append(key, JSON.stringify(data[key]));
       } else {
@@ -26,6 +29,7 @@ const toFormData = (data) => {
       }
     }
   }
+  
   return formData;
 };
 
@@ -100,7 +104,13 @@ const getApi2 = async (data, route) => {
 // PUT API
 const putApi = async (data, route) => {
   try {
+    console.log(data);
     const formData = toFormData(data);
+    // Log the FormData contents
+    console.log("FormData contents:");
+    formData.forEach((value, key) => {
+      console.log(`${key}:`, value);
+    });
     const response = await api.put(route, formData, {
       headers: {
         "Content-Type": "multipart/form-data",

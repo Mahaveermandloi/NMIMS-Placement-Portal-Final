@@ -41,7 +41,7 @@ const Login = () => {
         toast.success("Login successful");
 
         setTimeout(() => {
-          navigate(`/student/dashboard`);
+          navigate(`${STUDENT_PATH}/dashboard`);
           window.location.reload();
         }, 1000);
       }

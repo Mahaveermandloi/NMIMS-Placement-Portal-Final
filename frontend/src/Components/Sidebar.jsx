@@ -30,7 +30,7 @@ import { IoIosGitBranch } from "react-icons/io";
 import Dropdown from "./Dropdown";
 import { ADMIN_PATH, STUDENT_PATH } from "../Utils/URLPath.jsx";
 import { AdminTokenManager } from "./AdminTokenManager.jsx";
-
+import { StudentTokenManager } from "./StudentTokenManager.jsx";
 import { LuLayoutDashboard } from "react-icons/lu";
 
 const drawerWidth = 240;
@@ -201,7 +201,21 @@ const Sidebar = (props) => {
         <Box>
           <AdminTokenManager />
         </Box>
-      ) : null}
+      ) : (
+        <></>
+      )}
+
+      {userRole === "student" ? (
+        <>
+          <>
+            <Box>
+              <StudentTokenManager />
+            </Box>
+          </>
+        </>
+      ) : (
+        <></>
+      )}
 
       <Divider />
     </div>
