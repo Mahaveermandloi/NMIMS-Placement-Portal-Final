@@ -9,6 +9,7 @@ import {
   reGenerateAccessToken,
   updateStudentProfile,
   getProfile,
+  updateStudentPassword,
 } from "../controllers/student.controller.js";
 import { verifyAPIKey, verifyJWT } from "../middleware/auth.middleware.js";
 import handleFormData from "../middleware/handleFormData.js";
@@ -69,6 +70,15 @@ router.put(
   handleConditionalFileUploads, // Use the conditional upload middleware
   updateStudentProfile
 );
+
+router.put(
+  "/update-student-password",
+  verifyJWT,
+  handleFormData,
+  updateStudentPassword
+);
+
+
 
 router.get("/get-profile", verifyJWT, verifyAPIKey, getProfile);
 

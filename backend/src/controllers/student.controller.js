@@ -389,11 +389,9 @@ const getStudentDetailsById = asyncHandler(async (req, res) => {
   }
 });
 
-
 const updateStudentProfile = asyncHandler(async (req, res) => {
   const { student_email_id } = req.body;
 
- 
   const studentProfileImage = req.files["student_profile_image"]
     ? req.files["student_profile_image"][0]
     : null;
@@ -401,8 +399,6 @@ const updateStudentProfile = asyncHandler(async (req, res) => {
   const studentMarksheet = req.files["student_marksheet"]
     ? req.files["student_marksheet"][0]
     : null;
-
- 
 
   // Generate file paths
   const profileImagePath = studentProfileImage
@@ -449,7 +445,6 @@ const updateStudentProfile = asyncHandler(async (req, res) => {
     student.student_marksheet = marksheetPath;
   }
 
-
   // Save the updated student profile
   await student.save();
 
@@ -459,7 +454,51 @@ const updateStudentProfile = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, student, "Profile updated successfully"));
 });
 
+const updateStudentPassword = asyncHandler(async (req, res) => {
+  // Assuming student ID is extracted from JWT or session
+  const studentId = req.student;
 
+  // Extract passwords from request body
+  const { currentPassword, newPassword } = req.body;
+
+  console.log(currentPassword, newPassword);
+  // Validate input fields
+  if ([currentPassword, newPassword].some((field) => field?.trim() === "")) {
+    throw new ApiError(
+      400,
+      "Both current password and new password are required"
+    );
+  }
+
+  console.log(studentId);
+
+  // Find password record for the student
+  const passwordRecord = await Password.findOne({ student_id: studentId.student_id });
+
+  if (!passwordRecord) {
+    throw new ApiError(404, "Password record not found");
+  }
+
+  // Verify current password
+  const isPasswordValid = await passwordRecord.isPasswordCorrect(
+    currentPassword
+  );
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Incorrect current password");
+  }
+
+  // Update password
+  passwordRecord.password = newPassword;
+
+  // Save updated password record
+  await passwordRecord.save();
+
+  // Send response
+  res
+    .status(200)
+    .json(new ApiResponse(200, null, "Password updated successfully"));
+});
 
 const reGenerateAccessToken = asyncHandler(async (req, res) => {
   // Access cookies using req.cookies
@@ -566,5 +605,6 @@ export {
   getStudentDetailsById,
   updateStudentProfile,
   reGenerateAccessToken,
+  updateStudentPassword,
   getProfile,
 };
