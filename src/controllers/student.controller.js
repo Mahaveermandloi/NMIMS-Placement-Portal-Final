@@ -3,6 +3,8 @@ import Password from "../models/password.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import jwt from "jsonwebtoken";
+import ms from "ms";
 
 // Register Student
 const registerStudent = asyncHandler(async (req, res) => {
@@ -116,6 +118,27 @@ const registerStudent = asyncHandler(async (req, res) => {
     throw new ApiError(400, "SAP No and Roll No are required");
   }
 
+  // Prepare file paths
+  const studentProfileImage = req.files["student_profile_image"]
+    ? req.files["student_profile_image"][0]
+    : null;
+  const studentCV = req.files["student_cv"] ? req.files["student_cv"][0] : null;
+  const studentMarksheet = req.files["student_marksheet"]
+    ? req.files["student_marksheet"][0]
+    : null;
+
+  const profileImagePath = studentProfileImage
+    ? `/uploads/Student/ProfileImage/${studentProfileImage.filename}`
+    : null;
+
+  const cvPath = studentCV
+    ? `/uploads/Student/Resume/${studentCV.filename}`
+    : null;
+
+  const marksheetPath = studentMarksheet
+    ? `/uploads/Student/Marksheets/${studentMarksheet.filename}`
+    : null;
+
   // Check if the student already exists
   const existingStudent = await Student.findOne({ student_sap_no });
   if (existingStudent) {
@@ -226,6 +249,9 @@ const registerStudent = asyncHandler(async (req, res) => {
     reason_for_gap_or_drop_during_engineering,
     cv_uploaded_in_nmims_format,
     documents_uploaded,
+    student_profile_image: profileImagePath,
+    student_cv: cvPath,
+    student_marksheet: marksheetPath,
   });
 
   await student.save();
@@ -257,9 +283,6 @@ const registerStudent = asyncHandler(async (req, res) => {
     );
 });
 
-// Login Student
-
-// Login Student
 const loginStudent = asyncHandler(async (req, res) => {
   const { student_sap_no, password } = req.body;
 
@@ -283,16 +306,38 @@ const loginStudent = asyncHandler(async (req, res) => {
   // Check if the provided password is correct
   const isMatch = await passwordRecord.isPasswordCorrect(password);
   if (!isMatch) {
-    throw new ApiError(401, "Invalid password");
+    throw new ApiError(401, "Incorrect password");
   }
 
-  // Generate access token
+  // Generate access token and refresh token
   const accessToken = passwordRecord.generateAccessToken();
+  const refreshToken = passwordRecord.generateRefreshToken();
 
-  // Return success response with token
+  // Save the tokens to the password record
+  passwordRecord.accessToken = accessToken;
+  passwordRecord.refreshToken = refreshToken;
+  await passwordRecord.save();
+
+  // Set cookies with the tokens
+  // Set cookies
+  res.cookie("accessToken", accessToken, {
+    secure: false,
+    maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
+    sameSite: "Lax",
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    secure: false,
+    maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
+    sameSite: "Lax",
+  });
+
+  // Return success response with tokens
   res
     .status(200)
-    .json(new ApiResponse(200, { accessToken }, "Login successful"));
+    .json(
+      new ApiResponse(200, { accessToken, refreshToken }, "Login successful")
+    );
 });
 
 const getAllStudentDetails = asyncHandler(async (req, res) => {
@@ -344,9 +389,222 @@ const getStudentDetailsById = asyncHandler(async (req, res) => {
   }
 });
 
+const updateStudentProfile = asyncHandler(async (req, res) => {
+  const { student_email_id } = req.body;
+
+  const studentProfileImage = req.files["student_profile_image"]
+    ? req.files["student_profile_image"][0]
+    : null;
+  const studentCV = req.files["student_cv"] ? req.files["student_cv"][0] : null;
+  const studentMarksheet = req.files["student_marksheet"]
+    ? req.files["student_marksheet"][0]
+    : null;
+
+  // Generate file paths
+  const profileImagePath = studentProfileImage
+    ? `/uploads/Student/ProfileImage/${studentProfileImage.filename}`
+    : null;
+  const cvPath = studentCV
+    ? `/uploads/Student/Resume/${studentCV.filename}`
+    : null;
+  const marksheetPath = studentMarksheet
+    ? `/uploads/Student/Marksheets/${studentMarksheet.filename}`
+    : null;
+
+  // Get student ID from the request (set by middleware)
+  const { student_id } = req.student;
+
+  // Find the student by ID
+  const student = await Student.findById(student_id);
+
+  if (!student) {
+    throw new ApiError(404, "Student not found");
+  }
+
+  // Update email if a new email is provided
+  if (student_email_id && student_email_id !== student.student_email_id) {
+    const emailExists = await Student.findOne({ student_email_id });
+    if (emailExists) {
+      throw new ApiError(409, "Email already in use by another student");
+    }
+    student.student_email_id = student_email_id.toLowerCase();
+  }
+
+  // Update profile image if a new image is uploaded
+  if (profileImagePath) {
+    student.student_profile_image = profileImagePath;
+  }
+
+  // Update CV if a new CV is uploaded
+  if (cvPath) {
+    student.student_cv = cvPath;
+  }
+
+  // Update marksheet if a new marksheet is uploaded
+  if (marksheetPath) {
+    student.student_marksheet = marksheetPath;
+  }
+
+  // Save the updated student profile
+  await student.save();
+
+  // Return the updated student profile in the response
+  res
+    .status(200)
+    .json(new ApiResponse(200, student, "Profile updated successfully"));
+});
+
+const updateStudentPassword = asyncHandler(async (req, res) => {
+  // Assuming student ID is extracted from JWT or session
+  const studentId = req.student;
+
+  // Extract passwords from request body
+  const { currentPassword, newPassword } = req.body;
+
+  console.log(currentPassword, newPassword);
+  // Validate input fields
+  if ([currentPassword, newPassword].some((field) => field?.trim() === "")) {
+    throw new ApiError(
+      400,
+      "Both current password and new password are required"
+    );
+  }
+
+  console.log(studentId);
+
+  // Find password record for the student
+  const passwordRecord = await Password.findOne({ student_id: studentId.student_id });
+
+  if (!passwordRecord) {
+    throw new ApiError(404, "Password record not found");
+  }
+
+  // Verify current password
+  const isPasswordValid = await passwordRecord.isPasswordCorrect(
+    currentPassword
+  );
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Incorrect current password");
+  }
+
+  // Update password
+  passwordRecord.password = newPassword;
+
+  // Save updated password record
+  await passwordRecord.save();
+
+  // Send response
+  res
+    .status(200)
+    .json(new ApiResponse(200, null, "Password updated successfully"));
+});
+
+const reGenerateAccessToken = asyncHandler(async (req, res) => {
+  // Access cookies using req.cookies
+  const { refreshToken } = req.cookies;
+
+  if (!refreshToken) {
+    throw new ApiError(400, "Refresh token is required");
+  }
+
+  // Verify refresh token
+
+  jwt.verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET,
+    async (err, decoded) => {
+      if (err) {
+        throw new ApiError(401, "Invalid refresh token");
+      }
+
+      // Find password record with the refresh token
+      const passwordRecord = await Password.findOne({
+        _id: decoded._id,
+        refreshToken,
+      });
+
+      if (!passwordRecord) {
+        throw new ApiError(401, "Invalid refresh token");
+      }
+
+      const student = await Student.findById(passwordRecord.student_id);
+
+      if (!student) {
+        throw new ApiError(404, "Student not found");
+      }
+
+      const accessToken = passwordRecord.generateAccessToken();
+
+      res.cookie("accessToken", accessToken, {
+        secure: false,
+        maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
+        sameSite: "Lax",
+      });
+
+      res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            { accessToken },
+            "Access token regenerated successfully"
+          )
+        );
+    }
+  );
+});
+
+const getProfile = asyncHandler(async (req, res) => {
+  // Get student from req.student (set by authentication middleware)
+  const { student_id } = req.student;
+
+  const student = await Student.findById({ _id: student_id });
+
+  if (!student) {
+    throw new ApiError(404, "Student not found");
+  }
+
+  // Extract specific fields from the student object
+  const {
+    name_of_student,
+    student_mobile_no,
+    student_email_id,
+    student_alternate_email_id,
+    student_sap_no,
+    cv_uploaded_in_nmims_format,
+    student_profile_image,
+    student_marksheet,
+    student_cv,
+  } = student;
+
+  // Return the extracted fields in the response
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        name_of_student,
+        student_mobile_no,
+        student_email_id,
+        student_alternate_email_id,
+        student_sap_no,
+        cv_uploaded_in_nmims_format,
+        student_profile_image,
+        student_marksheet,
+        student_cv,
+      },
+      "Profile fetched successfully"
+    )
+  );
+});
+
 export {
   registerStudent,
   loginStudent,
   getAllStudentDetails,
   getStudentDetailsById,
+  updateStudentProfile,
+  reGenerateAccessToken,
+  updateStudentPassword,
+  getProfile,
 };

@@ -94,48 +94,13 @@ export const verifyOtp = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, null, "OTP verified successfully"));
 });
 
-// Update password
-// export const updatePassword = asyncHandler(async (req, res) => {
-//   const { email } = req.params; // Get email from URL parameters
-//   const { password } = req.body; // Get new password from request body
 
-//   console.log(email, password);
-
-//   // Validate the input
-//   if (!email || !password) {
-//     throw new ApiError(400, "Email and password are required");
-//   }
-
-//   // Find the admin or student by email
-//   const admin = await Admin.findOne({ email });
-//   const student = await Student.findOne({
-//     $or: [{ student_email_id: email }, { student_alternate_email_id: email }],
-//   });
-
-//   if (!admin && !student) {
-//     throw new ApiError(404, "No account found");
-//   }
-
-//   // Update the password in the appropriate collection
-//   if (admin) {
-//     admin.password = password; // The `pre` save hook will handle hashing
-//     await admin.save();
-//   } else if (student) {
-//     student.password = password; // Assuming students also have passwords
-//     await student.save();
-//   }
-
-//   // Send response
-//   res
-//     .status(200)
-//     .json(new ApiResponse(200, null, "Password updated successfully"));
-// });
 
 export const updatePassword = asyncHandler(async (req, res) => {
   const { email } = req.params; // Get email from URL parameters
   const { password } = req.body; // Get new password from request body
 
-  console.log(email, password);
+
 
   // Validate the input
   if (!email || !password) {
@@ -149,9 +114,7 @@ export const updatePassword = asyncHandler(async (req, res) => {
   });
 
 
-  console.log(admin );
-  console.log(student );
-
+  
   if (!admin && !student) {
     throw new ApiError(404, "No account found");
   }
