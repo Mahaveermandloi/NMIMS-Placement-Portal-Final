@@ -73,6 +73,7 @@ import OTPPage from "../Auth/OTPPage.jsx";
 import UpdatePassword from "../Auth/UpdatePassword.jsx";
 import ChangePassword from "../Pages/User/Profile/ChangePassword.jsx";
 import UpdateProfile from "../Pages/User/Profile/UpdateProfile.jsx";
+import CompanyDetail from "../Pages/Admin/Companies/CompanyDetail.jsx";
 
 // const UserRoutes = () => {
 //   const isAuthenticated = localStorage.getItem("accessToken") !== null;
@@ -177,7 +178,13 @@ const UserRoutes = () => {
               <Sidebar userRole="student">
                 <Routes>
                   <Route path="dashboard" element={<Dashboard />} />
+
                   <Route path="companies" element={<Companies />} />
+                  <Route
+                    path="company-detail/:id"
+                    element={<CompanyDetail />}
+                  />
+
                   <Route path="job-listings" element={<JobListings />} />
                   <Route
                     path="shortlisted-students"

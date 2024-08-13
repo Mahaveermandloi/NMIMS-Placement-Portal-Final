@@ -104,9 +104,9 @@ const getApi2 = async (data, route) => {
 // PUT API
 const putApi = async (data, route) => {
   try {
-    console.log(data);
+    
     const formData = toFormData(data);
-    // Log the FormData contents
+     
     console.log("FormData contents:");
     formData.forEach((value, key) => {
       console.log(`${key}:`, value);
@@ -114,7 +114,7 @@ const putApi = async (data, route) => {
     const response = await api.put(route, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        ...getHeaders(), // Include custom headers
+        ...getHeaders(),  
       },
     });
     return response.data;

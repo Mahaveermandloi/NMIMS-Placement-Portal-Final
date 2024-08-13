@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import adminRoutes from "../src/routes/admin.routes.js";
 import userRoutes from "../src/routes/student.routes.js";
+import companyRoutes from "../src/routes/company.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -26,7 +27,10 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // CORS configuration
-const allowedOrigins = ["http://localhost:5173"]; // Adjust as needed
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://nmimsplacementportal.netlify.app",
+];
 
 app.use(
   cors({
@@ -46,6 +50,8 @@ app.use(
 app.use("/api/admin", adminRoutes);
 
 app.use("/api/student", userRoutes);
+
+app.use("/api/company", companyRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

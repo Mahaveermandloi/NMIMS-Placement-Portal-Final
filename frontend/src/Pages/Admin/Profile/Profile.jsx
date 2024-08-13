@@ -171,6 +171,8 @@ const ProfilePage = () => {
   const [profileImage, setProfileImage] = useState("");
   const [loading, setLoading] = useState(true);
 
+  
+
   useEffect(() => {
     const fetchAdminDetails = async () => {
       try {
@@ -201,12 +203,17 @@ const ProfilePage = () => {
       <div className="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
         <div className="flex flex-col items-center mb-8">
           <div className="w-32 h-32 rounded-full overflow-hidden mb-4">
-            <img
+            {/* <img
               src={
                 profileImage
                   ? `${SERVER_URL}${profileImage}`
                   : "https://i.imgur.com/gE97qYj.jpg"
               }
+              alt="Profile"
+              className="w-full h-full object-cover"
+            /> */}
+            <img
+              src="https://media.licdn.com/dms/image/C4D03AQGHME97R94JlQ/profile-displayphoto-shrink_200_200/0/1661392392680?e=2147483647&v=beta&t=ba2v62QjNbgX8DTPxr8l7WTeUnx195a_NVUb8fqBm4k"
               alt="Profile"
               className="w-full h-full object-cover"
             />

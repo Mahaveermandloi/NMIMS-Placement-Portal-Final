@@ -49,9 +49,9 @@ const UploadStudentData = () => {
             Download Excel Template
           </button>
         </div>
-
+{/* 
         <div className="grid grid-cols-2 gap-4 mb-4">
-          {/* Dropdowns */}
+          
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Programme:
@@ -126,7 +126,7 @@ const UploadStudentData = () => {
               <option value="Bangalore">Bangalore</option>
             </select>
           </div>
-        </div>
+        </div> */}
 
         {/* File Upload */}
         <div className="mb-4">
