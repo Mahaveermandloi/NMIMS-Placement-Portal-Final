@@ -7,6 +7,10 @@ import adminRoutes from "../src/routes/admin.routes.js";
 import userRoutes from "../src/routes/student.routes.js";
 import companyRoutes from "../src/routes/company.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import joblistingRoutes from "../src/routes/joblisting.routes.js";
+import branchRoutes from "../src/routes/branch.routes.js";
+import placedstudentsRoutes from "../src/routes/placedstudents.routes.js";
+import shortlistedstudentsRoutes from "../src/routes/shortlistedstudents.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,6 +56,13 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/student", userRoutes);
 
 app.use("/api/company", companyRoutes);
+
+app.use("/api", branchRoutes);
+
+
+app.use("/api", joblistingRoutes);
+app.use("/api", placedstudentsRoutes);
+app.use("/api", shortlistedstudentsRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

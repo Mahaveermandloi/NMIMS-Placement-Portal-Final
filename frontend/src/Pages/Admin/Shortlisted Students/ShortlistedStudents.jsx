@@ -2,73 +2,89 @@ import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import CustomPaginationActionsTable from "../../../Components/TablePaginationActions.jsx";
 import { useNavigate } from "react-router-dom";
-import { ADMIN_PATH } from "../../../Utils/URLPath.jsx";
+import { ADMIN_PATH, SERVER_URL } from "../../../Utils/URLPath.jsx";
+import { getApi } from "../../../Utils/API.js";
+import { toast } from "react-toastify";
 
 const ShortlistedStudents = () => {
   const [students, setStudents] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [years, setYears] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [branches, setBranches] = useState([]);
 
   const [year, setYear] = useState("");
   const [company, setCompany] = useState("");
-  const [campus, setCampus] = useState("");
+  const [branch, setBranch] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Setting dummy data instead of fetching from API
-    const dummyData = [
-      {
-        student_sap_no: "S123456",
-        name_of_student: "John Doe",
-        company: "Company1",
-        job_role: "Software Engineer",
-        shortlisted_date: "2024-08-01",
-        year: 2024,
-        campus: "Mumbai",
-      },
-      {
-        student_sap_no: "S123457",
-        name_of_student: "Jane Smith",
-        company: "Company2",
-        job_role: "Data Scientist",
-        shortlisted_date: "2024-07-15",
-        year: 2024,
-        campus: "Shirpur",
-      },
-      {
-        student_sap_no: "S123458",
-        name_of_student: "Alice Johnson",
-        company: "Company1",
-        job_role: "UI/UX Designer",
-        shortlisted_date: "2023-12-01",
-        year: 2023,
-        campus: "Mumbai",
-      },
-      {
-        student_sap_no: "S123459",
-        name_of_student: "Bob Brown",
-        company: "Company3",
-        job_role: "Product Manager",
-        shortlisted_date: "2024-01-10",
-        year: 2024,
-        campus: "Shirpur",
-      },
-    ];
-    setStudents(dummyData);
+    const fetchStudents = async () => {
+      try {
+        const response = await getApi(`${SERVER_URL}/api/shortlistedstudents`);
+
+        console.log(response);
+        if (response.statusCode === 200) {
+          const data = response.data.map((student) => ({
+            id: student._id, // Ensure the student ID is included
+            student_sap_no: student.student_sap_no,
+            name_of_student: student.name_of_student,
+            company: student.company_name,
+            job_role: student.job_title,
+            branch: student.engineering_specialization || "Unknown", // Set branch field here
+            year: student.year,
+          }));
+
+          setStudents(data);
+        } else {
+          toast.error(response.message);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch data");
+      }
+    };
+
+    const fetchAdditionalData = async () => {
+      try {
+        const companiesResponse = await getApi(
+          `${SERVER_URL}/api/company/get-all-companies`
+        );
+        const branchesResponse = await getApi(`${SERVER_URL}/api/branch`);
+
+        if (companiesResponse.statusCode === 200) {
+          setCompanies(companiesResponse.data);
+        }
+        if (branchesResponse.statusCode === 200) {
+          setBranches(branchesResponse.data);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch additional data");
+      }
+    };
+
+    fetchStudents();
+    fetchAdditionalData();
+
+    const currentYear = new Date().getFullYear();
+    const previousYears = [...Array(4).keys()].map((i) => currentYear - i);
+    setYears(previousYears);
   }, []);
 
   useEffect(() => {
     let data = students;
     if (year) data = data.filter((student) => student.year === Number(year));
     if (company) data = data.filter((student) => student.company === company);
-    if (campus) data = data.filter((student) => student.campus === campus);
+    if (branch) data = data.filter((student) => student.branch === branch);
     setFilteredData(data);
-  }, [year, company, campus, students]);
+  }, [year, company, branch, students]);
 
   const columns = [
     { id: "name_of_student", label: "Name", align: "left" },
     { id: "company", label: "Company", align: "left" },
     { id: "job_role", label: "Job Role", align: "left" },
-    { id: "shortlisted_date", label: "Shortlisted Date", align: "left" },
+
+    { id: "branch", label: "Branch", align: "left" }, // Ensure column ID is branch
     {
       id: "actions",
       label: "Actions",
@@ -78,7 +94,10 @@ const ShortlistedStudents = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => handleInfo(row)}
+            onClick={
+              () =>
+                navigate(`${ADMIN_PATH}/shortlisted-student-details/${row.id}`) // Use student ID for navigation
+            }
           >
             Info
           </Button>
@@ -87,21 +106,27 @@ const ShortlistedStudents = () => {
     },
   ];
 
-  const handleInfo = (student) => {
-    navigate(`${ADMIN_PATH}/student-details/${student.student_sap_no}`);
-  };
-
   return (
     <>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Shortlisted Students</h1>
-        <button
-          type="button"
-          onClick={() => navigate(`${ADMIN_PATH}/add-shortlisted-student`)}
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-        >
-          Add Student Shortlisted
-        </button>
+
+        <div>
+          <button
+            type="button"
+            onClick={() => navigate(`${ADMIN_PATH}/add-shortlisted-student`)}
+            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+          >
+            Add Student Shortlisted
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate(`${ADMIN_PATH}/upload-shortlisted-students`)}
+            className="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
+          >
+            Upload Excel
+          </button>
+        </div>
       </div>
 
       <div className="mb-4">
@@ -120,10 +145,11 @@ const ShortlistedStudents = () => {
               className="block w-full p-2 border rounded"
             >
               <option value="">Select Year</option>
-              <option value="2021">2021</option>
-              <option value="2022">2022</option>
-              <option value="2023">2023</option>
-              <option value="2024">2024</option>
+              {years.map((yr) => (
+                <option key={yr} value={yr}>
+                  {yr}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -141,28 +167,33 @@ const ShortlistedStudents = () => {
               className="block w-full p-2 border rounded"
             >
               <option value="">Select Company</option>
-              <option value="Company1">Company1</option>
-              <option value="Company2">Company2</option>
-              <option value="Company3">Company3</option>
+              {companies.map((comp) => (
+                <option key={comp._id} value={comp.company_name}>
+                  {comp.company_name}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="flex-1">
             <label
-              htmlFor="campus"
+              htmlFor="branch"
               className="block text-sm font-medium text-gray-700"
             >
-              Campus
+              Branch
             </label>
             <select
-              id="campus"
-              value={campus}
-              onChange={(e) => setCampus(e.target.value)}
+              id="branch"
+              value={branch}
+              onChange={(e) => setBranch(e.target.value)}
               className="block w-full p-2 border rounded"
             >
-              <option value="">Select Campus</option>
-              <option value="Shirpur">Shirpur</option>
-              <option value="Mumbai">Mumbai</option>
+              <option value="">Select Branch</option>
+              {branches.map((branch) => (
+                <option key={branch._id} value={branch.branch_name}>
+                  {branch.branch_name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -170,12 +201,11 @@ const ShortlistedStudents = () => {
         <div className="lg:w-full w-full">
           <CustomPaginationActionsTable
             data={filteredData.map((student) => ({
+              id: student.id,
               name_of_student: student.name_of_student,
               company: student.company,
               job_role: student.job_role,
-              shortlisted_date: new Date(
-                student.shortlisted_date
-              ).toLocaleDateString(), // Formatting date
+              branch: student.branch,
               actions: columns
                 .find((col) => col.id === "actions")
                 .render(student),

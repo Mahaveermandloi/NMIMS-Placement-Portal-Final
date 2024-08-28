@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaRegEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "../Components/Loader.jsx";
 import { Toast } from "../Components/Toast.jsx";
@@ -31,9 +31,12 @@ const Login = () => {
       const response = await postApi(data, `${SERVER_URL}/api/student/login`);
       console.log(response.data);
 
-      if (response.statusCode === 200) {
-        const { accessToken } = response.data;
 
+
+      if (response.statusCode === 200) {
+        const { accessToken  } = response.data;
+
+     
         localStorage.setItem("accessToken", accessToken);
 
         console.log(accessToken);
@@ -151,13 +154,15 @@ const Login = () => {
                     ></label>
                   </div>
                 </div>
-                <a
-                  href={`/forget-password`}
+
+                <Link
+                  to="/forget-password"
                   className="text-sm font-medium text-blue-700"
                 >
                   Forgot password?
-                </a>
+                </Link>
               </div>
+
               <button
                 type="submit"
                 className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"

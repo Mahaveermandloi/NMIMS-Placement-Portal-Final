@@ -1,119 +1,139 @@
 import React, { useState, useEffect } from "react";
-import Button from "@mui/material/Button";
-import CustomPaginationActionsTable from "../../../Components/TablePaginationActions.jsx";
+import PlacedStudentCard from "./Components/PlacedStudentCard";
+import Loader from "../../../Components/Loader";
+import { getApi } from "../../../Utils/API";
+import { Toast } from "../../../Components/Toast";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { ADMIN_PATH } from "../../../Utils/URLPath.jsx";
+import nodata from "../../../../public/images/no-data.png";
+import { ADMIN_PATH } from "../../../Utils/URLPath";
 
 const PlacedStudents = () => {
   const [students, setStudents] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-
+  const [branches, setBranches] = useState([]);
+  const [companies, setCompanies] = useState([]);
   const [year, setYear] = useState("");
   const [company, setCompany] = useState("");
-  const [campus, setCampus] = useState("");
   const [branch, setBranch] = useState("");
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
+  // State for dropdown filters
+  const [years, setYears] = useState([]);
+
   useEffect(() => {
-    // Setting dummy data instead of fetching from API
-    const dummyData = [
-      {
-        student_sap_no: "P123456",
-        name_of_student: "John Doe",
-        company: "Company1",
-        job_role: "Software Engineer",
-        package: "10 LPA",
-        campus: "Mumbai",
-        branch: "Computer Science",
-        year: 2024,
-      },
-      {
-        student_sap_no: "P123457",
-        name_of_student: "Jane Smith",
-        company: "Company2",
-        job_role: "Data Scientist",
-        package: "12 LPA",
-        campus: "Shirpur",
-        branch: "Information Technology",
-        year: 2024,
-      },
-      {
-        student_sap_no: "P123458",
-        name_of_student: "Alice Johnson",
-        company: "Company1",
-        job_role: "UI/UX Designer",
-        package: "8 LPA",
-        campus: "Mumbai",
-        branch: "Design",
-        year: 2023,
-      },
-      {
-        student_sap_no: "P123459",
-        name_of_student: "Bob Brown",
-        company: "Company3",
-        job_role: "Product Manager",
-        package: "15 LPA",
-        campus: "Shirpur",
-        branch: "Management",
-        year: 2024,
-      },
-    ];
-    setStudents(dummyData);
+    // Fetch placed students data
+    const fetchStudents = async () => {
+      try {
+        const response = await getApi(`/api/placedstudents`);
+        console.log(response);
+
+        if (response.statusCode === 200) {
+          setStudents(response.data);
+          setFilteredData(response.data);
+        } else {
+          toast.error("Failed to fetch placed students data");
+        }
+      } catch (error) {
+        console.error("Error fetching placed students data:", error);
+        toast.error("Error fetching placed students data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Fetch branches data
+    const fetchBranches = async () => {
+      try {
+        const response = await getApi(`/api/branch`);
+        
+
+        if (response.statusCode === 200) {
+          setBranches(response.data);
+        } else {
+          toast.error("Failed to fetch branches data");
+        }
+      } catch (error) {
+        console.error("Error fetching branches data:", error);
+        toast.error("Error fetching branches data");
+      }
+    };
+
+    // Fetch companies data
+    const fetchCompanies = async () => {
+      try {
+        const response = await getApi(`/api/company/get-all-companies`);
+       
+        if (response.statusCode === 200) {
+          setCompanies(response.data);
+        } else {
+          toast.error("Failed to fetch companies data");
+        }
+      } catch (error) {
+        console.error("Error fetching companies data:", error);
+        toast.error("Error fetching companies data");
+      }
+    };
+
+    // Initialize the component by fetching data
+    fetchStudents();
+    fetchBranches();
+    fetchCompanies();
+
+    const currentYear = new Date().getFullYear();
+    const previousYears = Array.from(
+      { length: 4 },
+      (_, index) => currentYear - index
+    );
+    setYears(previousYears);
   }, []);
 
   useEffect(() => {
-    let data = students;
-    if (year) data = data.filter((student) => student.year === Number(year));
-    if (company) data = data.filter((student) => student.company === company);
-    if (campus) data = data.filter((student) => student.campus === campus);
-    if (branch) data = data.filter((student) => student.branch === branch);
-    setFilteredData(data);
-  }, [year, company, campus, branch, students]);
+    const applyFilters = () => {
+      let filtered = students;
 
-  const columns = [
-    { id: "name_of_student", label: "Name", align: "left" },
-    { id: "company", label: "Company", align: "left" },
-    { id: "job_role", label: "Role", align: "left" },
-    { id: "package", label: "Package", align: "left" },
-    { id: "campus", label: "Campus", align: "left" },
-    { id: "branch", label: "Branch", align: "left" },
-    {
-      id: "actions",
-      label: "Actions",
-      align: "center",
-      render: (row) => (
-        <div style={{ display: "flex", justifyContent: "center", gap: "8px" }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleInfo(row)}
-          >
-            Info
-          </Button>
-        </div>
-      ),
-    },
-  ];
+      if (year) {
+        filtered = filtered.filter(
+          (student) => student.year.toString() === year
+        );
+      }
 
-  const handleInfo = (student) => {
-    navigate(`${ADMIN_PATH}/student-details/${student.student_sap_no}`);
-  };
+      if (company) {
+        filtered = filtered.filter(
+          (student) => student.company_name === company
+        );
+      }
+
+      if (branch) {
+        filtered = filtered.filter(
+          (student) => student.engineering_specialization === branch
+        );
+      }
+
+      setFilteredData(filtered);
+    };
+
+    applyFilters();
+  }, [year, company, branch, students]);
 
   return (
     <>
+      <Toast />
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Placed Students</h1>
         <button
           type="button"
-          onClick={() => navigate(`${ADMIN_PATH}/add-student`)}
+          onClick={() => navigate(`${ADMIN_PATH}/add-placed-student`)}
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         >
           Add Student Placement
         </button>
       </div>
 
-      <div className="mb-4">
-        <div className="flex gap-4 mb-4">
+      <div className="mb-7">
+        <div className="flex lg:flex-row flex-col gap-4 mb-4">
           <div className="flex-1">
             <label
               htmlFor="year"
@@ -128,10 +148,11 @@ const PlacedStudents = () => {
               className="block w-full p-2 border rounded"
             >
               <option value="">Select Year</option>
-              <option value="2021">2021</option>
-              <option value="2022">2022</option>
-              <option value="2023">2023</option>
-              <option value="2024">2024</option>
+              {years.map((yr) => (
+                <option key={yr} value={yr}>
+                  {yr}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -149,28 +170,11 @@ const PlacedStudents = () => {
               className="block w-full p-2 border rounded"
             >
               <option value="">Select Company</option>
-              <option value="Company1">Company1</option>
-              <option value="Company2">Company2</option>
-              <option value="Company3">Company3</option>
-            </select>
-          </div>
-
-          <div className="flex-1">
-            <label
-              htmlFor="campus"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Campus
-            </label>
-            <select
-              id="campus"
-              value={campus}
-              onChange={(e) => setCampus(e.target.value)}
-              className="block w-full p-2 border rounded"
-            >
-              <option value="">Select Campus</option>
-              <option value="Shirpur">Shirpur</option>
-              <option value="Mumbai">Mumbai</option>
+              {companies.map((comp) => (
+                <option key={comp._id} value={comp.company_name}>
+                  {comp.company_name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -188,31 +192,33 @@ const PlacedStudents = () => {
               className="block w-full p-2 border rounded"
             >
               <option value="">Select Branch</option>
-              <option value="Computer Science">Computer Science</option>
-              <option value="Information Technology">Information Technology</option>
-              <option value="Design">Design</option>
-              <option value="Management">Management</option>
+              {branches.map((br) => (
+                <option key={br._id} value={br.branch_name}>
+                  {br.branch_name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
-
-        <div className="lg:w-full w-full">
-          <CustomPaginationActionsTable
-            data={filteredData.map((student) => ({
-              name_of_student: student.name_of_student,
-              company: student.company,
-              job_role: student.job_role,
-              package: student.package,
-              campus: student.campus,
-              branch: student.branch,
-              actions: columns
-                .find((col) => col.id === "actions")
-                .render(student),
-            }))}
-            columns={columns}
-          />
-        </div>
       </div>
+
+      {loading ? (
+        <Loader message="Loading..." />
+      ) : (
+        <div className="grid lg:grid-cols-3 gap-3 lg:gap-5">
+          {filteredData.length > 0 ? (
+            filteredData.map((student) => (
+              <PlacedStudentCard key={student._id} student={student} />
+            ))
+          ) : (
+            <>
+              <div className="flex justify-center">
+                <img src={nodata} alt="" />
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </>
   );
 };

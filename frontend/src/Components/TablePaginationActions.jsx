@@ -112,7 +112,7 @@ export default function CustomPaginationActionsTable({ data, columns }) {
           <TableRow >
             {columns.map((column) => (
               <TableCell key={column.id} align={column.align || "left" } className="font-bold">
-                <p className="font-bold text-xl">
+                <p className="font-bold text-lg">
                 {column.label}
 
                 </p>

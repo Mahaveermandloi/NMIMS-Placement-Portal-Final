@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Toast } from "../../../Components/Toast.jsx";
 import Loader from "../../../Components/Loader.jsx"; // Adjust import if needed
-import { getApi } from "../../../Utils/API.js";
+import { getApi, postApi } from "../../../Utils/API.js";
 import { SERVER_URL } from "../../../Utils/URLPath.jsx";
 
 const AddShortlistedStudent = () => {
@@ -19,7 +19,13 @@ const AddShortlistedStudent = () => {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState("");
+  const [selectedStudent, setSelectedStudent] = useState("");
+  const [studentSapNo, setStudentSapNo] = useState(""); // New state for student SAP number
   const [loading, setLoading] = useState(true);
+
+  // Calculate current year and previous four years
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 4 }, (_, i) => currentYear - i);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,6 +40,8 @@ const AddShortlistedStudent = () => {
         const studentResponse = await getApi(
           `${SERVER_URL}/api/student/get-all-student-details`
         );
+
+        console.log(studentResponse);
         setStudents(studentResponse.data);
         setFilteredStudents(studentResponse.data);
 
@@ -66,13 +74,25 @@ const AddShortlistedStudent = () => {
     setValue("branch", branch); // Update the form value
   };
 
-  const onSubmit = async (data) => {
-    console.log(data);
-    // Add your form submission logic here
+  const handleStudentChange = (event) => {
+    const studentName = event.target.value;
+    setSelectedStudent(studentName);
+    setValue("studentName", studentName); // Update the form value
+
+    // Find the student SAP number
+    const selectedStudentData = students.find(
+      (student) => student.name_of_student === studentName
+    );
+    setStudentSapNo(
+      selectedStudentData ? selectedStudentData.student_sap_no : ""
+    );
   };
 
-  if (loading) return <Loader />; // Display a loader while data is being fetched
+  const onSubmit = async (data) => {
+    console.log(data);
+  };
 
+  if (loading) return <Loader message="Loading..." />;
   return (
     <div className="">
       <Toast />
@@ -91,14 +111,16 @@ const AddShortlistedStudent = () => {
             <select
               id="year"
               {...register("year", { required: "Year is required" })}
-              className={`block w-full p-2 border rounded ${
+              className={`w-full p-2 border rounded ${
                 errors.year ? "border-red-500" : "border-gray-300"
               }`}
             >
               <option value="">Select Year</option>
-              <option value={2022}>2022</option>
-              <option value={2023}>2023</option>
-              <option value={2024}>2024</option>
+              {years.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
             </select>
             {errors.year && (
               <p className="text-red-500 text-sm">{errors.year.message}</p>
@@ -117,7 +139,7 @@ const AddShortlistedStudent = () => {
               {...register("companyName", {
                 required: "Company name is required",
               })}
-              className={`block w-full p-2 border rounded ${
+              className={`w-full p-2 border rounded ${
                 errors.companyName ? "border-red-500" : "border-gray-300"
               }`}
             >
@@ -145,7 +167,7 @@ const AddShortlistedStudent = () => {
             <select
               id="jobRole"
               {...register("jobRole", { required: "Job role is required" })}
-              className={`block w-full p-2 border rounded ${
+              className={`w-full p-2 border rounded ${
                 errors.jobRole ? "border-red-500" : "border-gray-300"
               }`}
             >
@@ -172,7 +194,7 @@ const AddShortlistedStudent = () => {
               id="branch"
               value={selectedBranch}
               onChange={handleBranchChange}
-              className={`block w-full p-2 border rounded ${
+              className={`w-full p-2 border rounded ${
                 errors.branch ? "border-red-500" : "border-gray-300"
               }`}
             >
@@ -203,7 +225,8 @@ const AddShortlistedStudent = () => {
               {...register("studentName", {
                 required: "Student name is required",
               })}
-              className={`block w-full p-2 border rounded ${
+              onChange={handleStudentChange}
+              className={`w-full p-2 border rounded ${
                 errors.studentName ? "border-red-500" : "border-gray-300"
               }`}
             >
@@ -223,6 +246,23 @@ const AddShortlistedStudent = () => {
 
           <div>
             <label
+              htmlFor="studentSapNo"
+              className="block text-md font-bold text-gray-700 mb-1"
+            >
+              Student SAP Number
+            </label>
+            <input
+              type="text"
+              id="studentSapNo"
+              value={studentSapNo}
+              readOnly
+              className="w-full p-2 border rounded bg-gray-100"
+              placeholder="SAP Number will appear here"
+            />
+          </div>
+
+          <div>
+            <label
               htmlFor="packageAmount"
               className="block text-md font-bold text-gray-700 mb-1"
             >
@@ -234,7 +274,7 @@ const AddShortlistedStudent = () => {
               {...register("packageAmount", {
                 required: "Package amount is required",
               })}
-              className={`block w-full p-2 border rounded ${
+              className={`w-full p-2 border rounded ${
                 errors.packageAmount ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="Enter package amount"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -28,10 +28,11 @@ import { LuListChecks } from "react-icons/lu";
 import { FaUsers } from "react-icons/fa6";
 import { IoIosGitBranch } from "react-icons/io";
 import Dropdown from "./Dropdown";
-import { ADMIN_PATH, STUDENT_PATH } from "../Utils/URLPath.jsx";
+import { ADMIN_PATH, SERVER_URL, STUDENT_PATH } from "../Utils/URLPath.jsx";
 import { AdminTokenManager } from "./AdminTokenManager.jsx";
 import { StudentTokenManager } from "./StudentTokenManager.jsx";
 import { LuLayoutDashboard } from "react-icons/lu";
+import { getApi } from "../Utils/API.js";
 
 const drawerWidth = 240;
 
@@ -40,6 +41,24 @@ const Sidebar = (props) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [studentOpen, setStudentOpen] = useState(false); // State for controlling the student dropdown
+  const [profileImage, setProfileImage] = useState("");
+
+  useEffect(() => {
+    if (userRole === "student") {
+      const getProfile = async () => {
+        try {
+          const response = await getApi("/api/student/get-profile-image");
+          setProfileImage(response.data.student_profile_image);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      getProfile();
+    } else {
+      // Use a static image for non-student roles
+      setProfileImage("/images/static-profile.png");
+    }
+  }, [userRole]);
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -265,8 +284,29 @@ const Sidebar = (props) => {
             />
 
             <Box sx={{ ml: "auto" }}>
+              {/* <Dropdown>
+                <img
+                  src={`${SERVER_URL}${profileImage}`}
+                  alt="User"
+                  className="h-10 w-10 rounded-full"
+                />
+              </Dropdown> */}
+
               <Dropdown>
-                <img src={user} alt="User" className="h-10" />
+                {/* Conditionally render the profile image based on the userRole */}
+                {userRole === "student" ? (
+                  <img
+                    src={`${SERVER_URL}${profileImage}`}
+                    alt="User"
+                    className="h-10 w-10 rounded-full"
+                  />
+                ) : (
+                  <img
+                    src={user} // Replace with the path to your static image
+                    alt="Static"
+                    className="h-10 w-10 rounded-full"
+                  />
+                )}
               </Dropdown>
             </Box>
           </Typography>

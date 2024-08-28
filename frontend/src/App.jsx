@@ -29,9 +29,9 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Admin routes with token manager */}
+       
         <Route
-          path="/admin/*"
+          path="/nmims/admin/*"
           element={
             <>
               {/* <AdminTokenManager /> */}

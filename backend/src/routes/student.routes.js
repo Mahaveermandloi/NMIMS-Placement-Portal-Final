@@ -10,6 +10,8 @@ import {
   updateStudentProfile,
   getProfile,
   updateStudentPassword,
+  getStudentDetailsByBranch,
+  getProfileImage,
 } from "../controllers/student.controller.js";
 import { verifyAPIKey, verifyJWT } from "../middleware/auth.middleware.js";
 import handleFormData from "../middleware/handleFormData.js";
@@ -39,9 +41,9 @@ const handleConditionalFileUploads = (req, res, next) => {
 router.post(
   "/register",
   uploadStudentFiles.fields([
-    { name: "student_profile_image", maxCount: 3 }, // Multiple profile images allowed
+    { name: "student_profile_image", maxCount: 1 }, // Multiple profile images allowed
     { name: "student_cv", maxCount: 1 }, // Single CV allowed
-    { name: "student_marksheet", maxCount: 3 }, // Multiple marksheets allowed
+    { name: "student_marksheet", maxCount: 8 }, // Multiple marksheets allowed
   ]),
   registerStudent
 );
@@ -78,8 +80,10 @@ router.put(
   updateStudentPassword
 );
 
-
+router.get("/get-student-by-branch", verifyJWT, getStudentDetailsByBranch);
 
 router.get("/get-profile", verifyJWT, verifyAPIKey, getProfile);
+
+router.get("/get-profile-image", verifyJWT, verifyAPIKey, getProfileImage);
 
 export default router;

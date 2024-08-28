@@ -1,52 +1,73 @@
-// import React from "react";
-// import PlacedStudentCard from "./Components/PlacedStudentCard";
-
-// const PlacedStudents = () => {
-//   return (
-//     <>
-//       <div className="flex justify-between items-center">
-//         <div>
-//           <h1 className="text-3xl font-bold mb-4">Placed Students</h1>
-//         </div>
-//       </div>
-
-//       <div>{/* dropdown filter year  wise , company wise */}</div>
-//       <div className="lg:grid  lg:grid-cols-3  gap-10">
-//         <PlacedStudentCard />
-//         <PlacedStudentCard />
-//         <PlacedStudentCard />
-//         <PlacedStudentCard />
-//         <PlacedStudentCard />
-//         <PlacedStudentCard />
-//         <PlacedStudentCard />
-//         <PlacedStudentCard />
-//       </div>
-//     </>
-//   );
-// };
-
-// export default PlacedStudents;
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PlacedStudentCard from "./Components/PlacedStudentCard";
-
+import nodata from "../../../../public/images/no-data.png";
+import Loader from "../../../Components/Loader.jsx";
+import { getApi } from "../../../Utils/API.js";
+import { SERVER_URL } from "../../../Utils/URLPath.jsx";
 const PlacedStudents = () => {
   // State for dropdown filters
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("");
+  const [placedStudents, setPlacedStudents] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Sample data for dropdown options
-  const years = ["2021", "2022", "2023", "2024"];
-  const companies = ["Company A", "Company B", "Company C"];
+  // Generate the last 4 years
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 4 }, (_, i) => currentYear - i);
 
-  // Handle filter changes
-  const handleYearChange = (event) => {
-    setSelectedYear(event.target.value);
+  // Fetch placed student data
+
+  const fetchPlacedStudents = async () => {
+    setLoading(true);
+    try {
+      const response = await getApi(`${SERVER_URL}/api/placedstudents`);
+
+  
+
+      if (response.statusCode === 200) {
+        setPlacedStudents(response.data);
+      } else {
+        setError("Failed to fetch placed students");
+      }
+    } catch (err) {
+      setError("Error fetching placed students");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCompanyChange = (event) => {
-    setSelectedCompany(event.target.value);
+  // Fetch companies for the dropdown
+  const fetchCompanies = async () => {
+    try {
+      const response = await getApi(
+        `${SERVER_URL}/api/company/get-all-companies`
+      );
+
+      if (response.statusCode === 200) {
+        setCompanies(response.data);
+      } else {
+        setError("Failed to fetch companies");
+      }
+    } catch (err) {
+      setError("Error fetching companies");
+    }
   };
+
+  useEffect(() => {
+    fetchPlacedStudents();
+    fetchCompanies();
+  }, []);
+
+  // Filter the placed students based on selected year and company
+
+  const filteredStudents = placedStudents.filter((student) => {
+    return (
+      (selectedYear === "" || student.year.toString() === selectedYear) &&
+      (selectedCompany === "" || student.company_name === selectedCompany)
+    );
+  });
 
   return (
     <>
@@ -56,11 +77,10 @@ const PlacedStudents = () => {
 
       <div className="flex gap-4 mb-6">
         <div>
-          
           <select
             id="year-filter"
             value={selectedYear}
-            onChange={handleYearChange}
+            onChange={(e) => setSelectedYear(e.target.value)}
             className="p-2 border border-gray-300 rounded"
           >
             <option value="">All Years</option>
@@ -73,34 +93,46 @@ const PlacedStudents = () => {
         </div>
 
         <div>
-          
           <select
             id="company-filter"
             value={selectedCompany}
-            onChange={handleCompanyChange}
+            onChange={(e) => setSelectedCompany(e.target.value)}
             className="p-2 border border-gray-300 rounded"
           >
             <option value="">All Companies</option>
             {companies.map((company) => (
-              <option key={company} value={company}>
-                {company}
+              <option key={company._id} value={company.company_name}>
+                {company.company_name}
               </option>
             ))}
           </select>
         </div>
       </div>
 
-      <div className="lg:grid lg:grid-cols-3 gap-10">
-        {/* Filtered PlacedStudentCards */}
-        <PlacedStudentCard />
-        <PlacedStudentCard />
-        <PlacedStudentCard />
-        <PlacedStudentCard />
-        <PlacedStudentCard />
-        <PlacedStudentCard />
-        <PlacedStudentCard />
-        <PlacedStudentCard />
-      </div>
+      {loading ? (
+        <Loader message="Loading..." />
+      ) : error ? (
+        <div className="flex justify-center items-center h-96">
+          <p className="text-red-500">{error}</p>
+        </div>
+      ) : filteredStudents.length === 0 ? (
+        <div className="flex justify-center items-center h-96">
+          <img
+            src={nodata}
+            alt="No data found"
+            className="w-64 h-64 object-contain"
+          />
+        </div>
+      ) : (
+        <div className="lg:grid lg:grid-cols-3 gap-10">
+          {filteredStudents.map((student) => (
+            <>
+              <PlacedStudentCard key={student._id} student={student} />
+      
+            </>
+          ))}
+        </div>
+      )}
     </>
   );
 };

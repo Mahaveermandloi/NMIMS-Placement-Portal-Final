@@ -44,7 +44,7 @@ const UpdateProfile = () => {
   }, [setValue]);
 
   const onSubmit = async (data) => {
-    console.log(data);
+  
     setLoading(true);
 
     try {
@@ -68,7 +68,7 @@ const UpdateProfile = () => {
         setProfile(updatedProfile.data);
 
         setTimeout(() => {
-          // navigate(`${STUDENT_PATH}/profile`);
+          navigate(`${STUDENT_PATH}/profile`);
         }, 2000);
       } else {
         toast.error("Update Failed!!");
@@ -81,7 +81,7 @@ const UpdateProfile = () => {
   };
 
   const handleFileChange = (e) => {
-    console.log(e);
+   
     const { id, files: selectedFiles } = e.target;
     const file = selectedFiles[0];
     if (file) {

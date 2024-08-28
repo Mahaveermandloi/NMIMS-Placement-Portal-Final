@@ -72,11 +72,10 @@ const CompanyCard = ({ company }) => {
 
   return (
     <>
-      
       <div className="flex flex-col  items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row md:max-w-md dark:border-gray-700">
         <div className="w-32 h-32 flex items-center  overflow-hidden">
           <img
-            className="object-cover w-96"
+            className="object-cover w-96 rounded-xl"
             src={`${SERVER_URL}${company.company_logo}`}
             alt="Company Logo"
           />
@@ -89,16 +88,11 @@ const CompanyCard = ({ company }) => {
           <p className="text-sm font-medium text-gray-700 dark:text-gray-400">
             Year: {company.year}
           </p>
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-400">
-            Designation: {company.designation}
-          </p>
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-400">
-            Rounds: {company.selection_rounds}
-          </p>
 
           <div className="flex mt-3 space-x-2">
-            <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm"
-               onClick={() =>
+            <button
+              className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm"
+              onClick={() =>
                 navigate(`${ADMIN_PATH}/company-detail/${company._id}`)
               }
             >
@@ -109,7 +103,6 @@ const CompanyCard = ({ company }) => {
               onClick={() =>
                 navigate(`${ADMIN_PATH}/edit-company-details/${company._id}`)
               }
-              
             >
               Edit
             </button>
