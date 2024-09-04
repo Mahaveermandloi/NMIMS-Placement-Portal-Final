@@ -15,6 +15,9 @@ import ChangePassword from "../Pages/User/Profile/ChangePassword.jsx";
 import UpdateProfile from "../Pages/User/Profile/UpdateProfile.jsx";
 import CompanyDetail from "../Pages/Admin/Companies/CompanyDetail.jsx";
 import JobDetailsPage from "../Pages/User/Job Listing/Components/JobDetailsPage.jsx";
+// import Register from "../Pages/User/Register/Register.jsx";
+import FormPage from "../Pages/User/Register/FormPage.jsx";
+// import OtherDetails from "../Pages/User/Register/OtherDetails.jsx";
 
 const UserRoutes = () => {
   const navigate = useNavigate();
@@ -61,6 +64,12 @@ const UserRoutes = () => {
           <>
             <Route path="/student/login" element={<UserLogin />} />
             <Route path="/forget-password" element={<ForgetPassword />} />
+
+            <Route path="/register" element={<FormPage />} />
+          
+            {/* <Route path="/register/files" element={<OtherDetails />} /> */}
+           
+           
             <Route path="/otp-page/:email" element={<OTPPage />} />
             <Route
               path="/update-password/:email"

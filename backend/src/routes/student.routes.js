@@ -19,12 +19,13 @@ import handleFormData from "../middleware/handleFormData.js";
 const router = Router();
 
 const handleConditionalFileUploads = (req, res, next) => {
+ 
   const fields = [
     { name: "student_cv", maxCount: 1 },
     { name: "student_profile_image", maxCount: 1 },
-    { name: "student_marksheet", maxCount: 1 },
+    { name: "student_marksheet", maxCount: 6 },
   ];
-
+  
   const upload = uploadStudentFiles.fields(fields);
 
   upload(req, res, (err) => {
@@ -43,7 +44,7 @@ router.post(
   uploadStudentFiles.fields([
     { name: "student_profile_image", maxCount: 1 }, // Multiple profile images allowed
     { name: "student_cv", maxCount: 1 }, // Single CV allowed
-    { name: "student_marksheet", maxCount: 8 }, // Multiple marksheets allowed
+    { name: "student_marksheet", maxCount: 6 }, // Multiple marksheets allowed
   ]),
   registerStudent
 );

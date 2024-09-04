@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { ADMIN_PATH, SERVER_URL } from "../../../Utils/URLPath.jsx";
 import { getApi } from "../../../Utils/API.js";
 import { toast } from "react-toastify";
+import Loader from "../../../Components/Loader.jsx";
 
 const ShortlistedStudents = () => {
   const [students, setStudents] = useState([]);
@@ -16,15 +17,16 @@ const ShortlistedStudents = () => {
   const [year, setYear] = useState("");
   const [company, setCompany] = useState("");
   const [branch, setBranch] = useState("");
+  const [loading, setLoading] = useState(true); // Add loading state
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStudents = async () => {
+      setLoading(true); // Start loading
       try {
         const response = await getApi(`${SERVER_URL}/api/shortlistedstudents`);
 
-        console.log(response);
         if (response.statusCode === 200) {
           const data = response.data.map((student) => ({
             id: student._id, // Ensure the student ID is included
@@ -42,6 +44,8 @@ const ShortlistedStudents = () => {
         }
       } catch (error) {
         toast.error("Failed to fetch data");
+      } finally {
+        setLoading(false); // Stop loading
       }
     };
 
@@ -83,7 +87,6 @@ const ShortlistedStudents = () => {
     { id: "name_of_student", label: "Name", align: "left" },
     { id: "company", label: "Company", align: "left" },
     { id: "job_role", label: "Job Role", align: "left" },
-
     { id: "branch", label: "Branch", align: "left" }, // Ensure column ID is branch
     {
       id: "actions",
@@ -108,6 +111,7 @@ const ShortlistedStudents = () => {
 
   return (
     <>
+      {loading && <Loader />} {/* Show loader while loading */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Shortlisted Students</h1>
 
@@ -121,14 +125,15 @@ const ShortlistedStudents = () => {
           </button>
           <button
             type="button"
-            onClick={() => navigate(`${ADMIN_PATH}/upload-shortlisted-students`)}
+            onClick={() =>
+              navigate(`${ADMIN_PATH}/upload-shortlisted-students`)
+            }
             className="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
           >
             Upload Excel
           </button>
         </div>
       </div>
-
       <div className="mb-4">
         <div className="flex gap-4 mb-4">
           <div className="flex-1">

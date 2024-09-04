@@ -35,13 +35,17 @@ import AddPlacedStudent from "../Pages/Admin/Placed Students/AddPlacedStudent.js
 import ShortlistedStudentDetails from "../Pages/Admin/Shortlisted Students/ShortlistedStudentDetails.jsx";
 import UploadExcel from "../Pages/Admin/Shortlisted Students/UploadExcel.jsx";
 
+
+
 const AdminRoutes = () => {
+  
   const navigate = useNavigate();
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
+    
     // console.log("Document Cookies:", document.cookie); // Log all cookies
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
@@ -54,6 +58,7 @@ const AdminRoutes = () => {
     const checkAuthentication = () => {
       const refreshToken = getCookie("refreshToken");
 
+      
       if (refreshToken) {
         setIsAdminAuthenticated(true);
       } else {
@@ -146,9 +151,8 @@ const AdminRoutes = () => {
 
                   <Route
                     path="upload-shortlisted-students"
-                    element={<UploadExcel/>}
+                    element={<UploadExcel />}
                   />
-
 
                   <Route path="placed-students" element={<PlacedStudents />} />
 

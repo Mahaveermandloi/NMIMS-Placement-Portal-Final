@@ -21,7 +21,9 @@ const toFormData = (data) => {
       } else if (data[key] instanceof File) {
         formData.append(key, data[key]);
       } else if (Array.isArray(data[key])) {
-        data[key].forEach((item, index) => formData.append(`${key}[${index}]`, item));
+        data[key].forEach((item, index) =>
+          formData.append(`${key}[${index}]`, item)
+        );
       } else if (data[key] && typeof data[key] === "object") {
         formData.append(key, JSON.stringify(data[key]));
       } else {
@@ -29,7 +31,7 @@ const toFormData = (data) => {
       }
     }
   }
-  
+
   return formData;
 };
 
@@ -59,7 +61,7 @@ const getHeaders = () => {
   };
 };
 
-// POST API
+
 const postApi = async (data, route) => {
   try {
     const formData = toFormData(data);
@@ -104,9 +106,8 @@ const getApi2 = async (data, route) => {
 // PUT API
 const putApi = async (data, route) => {
   try {
-    
     const formData = toFormData(data);
-     
+
     console.log("FormData contents:");
     formData.forEach((value, key) => {
       console.log(`${key}:`, value);
@@ -114,7 +115,7 @@ const putApi = async (data, route) => {
     const response = await api.put(route, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        ...getHeaders(),  
+        ...getHeaders(),
       },
     });
     return response.data;

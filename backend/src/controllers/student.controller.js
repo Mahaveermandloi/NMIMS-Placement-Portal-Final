@@ -113,6 +113,10 @@ const registerStudent = asyncHandler(async (req, res) => {
     documents_uploaded,
   } = req.body;
 
+  console.log(req.body);
+
+  console.log(req.files);
+
   // Validate required fields
   if ([student_sap_no, student_roll_no].some((field) => field?.trim() === "")) {
     throw new ApiError(400, "SAP No and Roll No are required");
@@ -122,7 +126,11 @@ const registerStudent = asyncHandler(async (req, res) => {
   const studentProfileImage = req.files["student_profile_image"]
     ? req.files["student_profile_image"][0]
     : null;
+
+  
+
   const studentCV = req.files["student_cv"] ? req.files["student_cv"][0] : null;
+
   const studentMarksheet = req.files["student_marksheet"]
     ? req.files["student_marksheet"][0]
     : null;
@@ -141,6 +149,7 @@ const registerStudent = asyncHandler(async (req, res) => {
 
   // Check if the student already exists
   const existingStudent = await Student.findOne({ student_sap_no });
+
   if (existingStudent) {
     throw new ApiError(409, "Student with this SAP No already exists");
   }

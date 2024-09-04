@@ -31,12 +31,9 @@ const Login = () => {
       const response = await postApi(data, `${SERVER_URL}/api/student/login`);
       console.log(response.data);
 
-
-
       if (response.statusCode === 200) {
-        const { accessToken  } = response.data;
+        const { accessToken } = response.data;
 
-     
         localStorage.setItem("accessToken", accessToken);
 
         console.log(accessToken);
@@ -145,9 +142,9 @@ const Login = () => {
                 )}
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center ">
                 <div className="flex items-start">
-                  <div className="ml-3 text-sm">
+                  <div className=" text-sm">
                     <label
                       htmlFor="remember"
                       className="text-gray-500 dark:text-gray-300"
@@ -169,6 +166,15 @@ const Login = () => {
               >
                 Sign in
               </button>
+
+              <div className="mt-5">
+                <Link
+                  to="/register"
+                  className="text-sm font-medium text-blue-700"
+                >
+                  Dont have account ? Register Now
+                </Link>
+              </div>
             </form>
           )}
         </div>

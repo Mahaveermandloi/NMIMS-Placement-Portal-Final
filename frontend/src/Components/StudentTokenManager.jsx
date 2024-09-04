@@ -136,10 +136,10 @@ export const StudentTokenManager = () => {
   return (
     <div className="token-countdown">
       <div className="text-sm text-red-500">
-        Access Token Expiry: {formatTime(timeLeft.accessToken)}
+        {/* Access Token Expiry: {formatTime(timeLeft.accessToken)} */}
       </div>
       <div className="text-sm text-red-500">
-        Refresh Token Expiry: {formatTime(timeLeft.refreshToken)}
+        {/* Refresh Token Expiry: {formatTime(timeLeft.refreshToken)} */}
       </div>
     </div>
   );
