@@ -64,6 +64,10 @@ app.use("/api", joblistingRoutes);
 app.use("/api", placedstudentsRoutes);
 app.use("/api", shortlistedstudentsRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the backend server!");
+});
+
 // Error handling middleware
 app.use(errorHandler);
 
