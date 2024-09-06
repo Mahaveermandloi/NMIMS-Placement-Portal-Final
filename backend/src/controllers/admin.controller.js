@@ -210,6 +210,7 @@ const verifyRefreshToken = asyncHandler(async (req, res) => {
   // Retrieve the refresh token from cookies
   const refreshToken = req.cookies.refreshToken;
 
+  console.log(refreshToken);
   // Check if the refresh token is present
   if (!refreshToken) {
     throw new ApiError(401, "Refresh token is required.");
