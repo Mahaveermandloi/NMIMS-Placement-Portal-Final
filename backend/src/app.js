@@ -32,8 +32,10 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // CORS configuration
 const allowedOrigins = [
-  "http://localhost:5173",
-  "https://nmimsplacementportal.netlify.app",
+  "http://localhost:5173", // For local development
+  "https://nmims-placement-website.vercel.app", // Production frontend URL
+  "https://nmims-placement-website-git-main-mahaveermandlois-projects.vercel.app", // Preview URL if needed
+  "https://nmims-placement-website-gshbl80qj-mahaveermandlois-projects.vercel.app", // Another preview URL if needed
 ];
 
 app.use(

@@ -11,7 +11,6 @@ import { postApi } from "../Utils/API.js";
 import { SERVER_URL, ADMIN_PATH } from "../Utils/URLPath.jsx";
 import logo from "../../public/images/nmimslogo.png";
 
- 
 const Login = () => {
   const {
     register,
@@ -32,6 +31,8 @@ const Login = () => {
     try {
       const response = await postApi(data, `${SERVER_URL}/api/admin/login`);
       console.log(response.data);
+
+      console.log(response);
 
       if (response.statusCode === 200) {
         const { accessToken, refreshToken } = response.data;
@@ -171,8 +172,6 @@ const Login = () => {
           )}
         </div>
       </section>
-
-     
     </>
   );
 };

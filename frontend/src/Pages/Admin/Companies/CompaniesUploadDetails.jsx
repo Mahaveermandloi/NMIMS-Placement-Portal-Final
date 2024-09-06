@@ -42,7 +42,7 @@ const UploadCompaniesDetails = () => {
         }, 1000);
       }
 
-      console.log("Server Response:", response);
+      // console.log("Server Response:", response);
     } catch (error) {
       toast.error("Failed to upload company data");
       console.error("Error uploading company data:", error);
@@ -53,7 +53,7 @@ const UploadCompaniesDetails = () => {
 
   const onSubmitExcel = (data) => {
     setLoadingExcel(true); // Show loader
-    console.log("Upload Excel Data:", data);
+    // console.log("Upload Excel Data:", data);
     toast.success("Excel data uploaded successfully");
     setLoadingExcel(false); // Hide loader
   };

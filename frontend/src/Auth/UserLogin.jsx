@@ -29,16 +29,14 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await postApi(data, `${SERVER_URL}/api/student/login`);
-      console.log(response.data);
 
       if (response.statusCode === 200) {
         const { accessToken } = response.data;
 
         localStorage.setItem("accessToken", accessToken);
 
-        console.log(accessToken);
-
         toast.success("Login successful");
+        alert("ksdndfkn");
 
         setTimeout(() => {
           navigate(`${STUDENT_PATH}/dashboard`);

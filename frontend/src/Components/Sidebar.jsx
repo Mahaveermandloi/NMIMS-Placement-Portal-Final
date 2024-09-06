@@ -856,7 +856,7 @@ const Sidebar = (props) => {
       const getProfile = async () => {
         try {
           const response = await getApi("/api/student/get-profile-image");
-          console.log(response.data);
+          // console.log(response.data);
           setProfileImage(response.data.student_profile_image);
         } catch (error) {
           console.log(error);

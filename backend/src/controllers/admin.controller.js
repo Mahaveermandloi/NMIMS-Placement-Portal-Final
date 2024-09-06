@@ -75,8 +75,6 @@ const loginAdmin = asyncHandler(async (req, res) => {
   // Validate password
   const isPasswordValid = await admin.isPasswordCorrect(password);
 
-
-
   if (!isPasswordValid) {
     throw new ApiError(401, "Incorrect Password");
   }
@@ -89,7 +87,17 @@ const loginAdmin = asyncHandler(async (req, res) => {
   admin.refreshToken = refreshToken;
   await admin.save();
 
-  // Set cookies
+  // res.cookie("accessToken", accessToken, {
+  //   secure: process.env.NODE_ENV === "production", // true in production, false in development
+  //   maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
+  //   sameSite: "Lax",
+  // });
+  // res.cookie("refreshToken", refreshToken, {
+  //   secure: process.env.NODE_ENV === "production", // true in production, false in development
+  //   maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
+  //   sameSite: "Lax",
+  // });
+
   res.cookie("accessToken", accessToken, {
     secure: false,
     maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
@@ -192,6 +200,44 @@ const reGenerateAccessToken = asyncHandler(async (req, res) => {
             200,
             { accessToken },
             "Access token regenerated successfully"
+          )
+        );
+    }
+  );
+});
+
+const verifyRefreshToken = asyncHandler(async (req, res) => {
+  // Retrieve the refresh token from cookies
+  const refreshToken = req.cookies.refreshToken;
+
+  // Check if the refresh token is present
+  if (!refreshToken) {
+    throw new ApiError(401, "Refresh token is required.");
+  }
+
+  jwt.verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET,
+    async (err, decoded) => {
+      if (err) {
+        throw new ApiError(403, "Invalid or expired refresh token.");
+      }
+
+      // Find the admin with the provided ID and matching refresh token in the database
+      const admin = await Admin.findOne({ _id: decoded._id, refreshToken });
+
+      if (!admin) {
+        throw new ApiError(401, "Admin not found or refresh token mismatch.");
+      }
+
+      // If the refresh token is valid and matches the database record, return a positive response
+      res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            { refreshToken: refreshToken, authenticated: true },
+            "Refresh token verified successfully."
           )
         );
     }
@@ -327,4 +373,5 @@ export {
   getAdminDetails,
   updateProfile,
   updateNewPassword,
+  verifyRefreshToken,
 };

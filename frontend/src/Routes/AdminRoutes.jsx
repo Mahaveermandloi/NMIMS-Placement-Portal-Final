@@ -1,5 +1,5 @@
 // AdminRoutes.jsx
-
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
 import Sidebar from "../Components/Sidebar.jsx";
@@ -12,7 +12,7 @@ import PlacedStudents from "../Pages/Admin/Placed Students/PlacedStudents.jsx";
 import Branch from "../Pages/Admin/Branch/Branch.jsx";
 import Profile from "../Pages/Admin/Profile/Profile.jsx";
 import Dashboard from "../Pages/Admin/Dashboard/Dashboard.jsx";
-import { ADMIN_PATH } from "../Utils/URLPath.jsx";
+import { ADMIN_PATH, SERVER_URL } from "../Utils/URLPath.jsx";
 import OTPPage from "../Auth/OTPPage.jsx";
 import UpdatePassword from "../Auth/UpdatePassword.jsx";
 import ChangePassword from "../Pages/Admin/Profile/ChangePassword.jsx";
@@ -35,18 +35,17 @@ import AddPlacedStudent from "../Pages/Admin/Placed Students/AddPlacedStudent.js
 import ShortlistedStudentDetails from "../Pages/Admin/Shortlisted Students/ShortlistedStudentDetails.jsx";
 import UploadExcel from "../Pages/Admin/Shortlisted Students/UploadExcel.jsx";
 
-
-
 const AdminRoutes = () => {
-  
   const navigate = useNavigate();
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
-    
-    // console.log("Document Cookies:", document.cookie); // Log all cookies
+
+    console.log(document.cookie);
+
+    console.log("Document Cookies:", document.cookie); // Log all cookies
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
       return parts.pop().split(";").shift();
@@ -54,18 +53,46 @@ const AdminRoutes = () => {
     return null; // Return null if cookie not found
   };
 
-  useEffect(() => {
-    const checkAuthentication = () => {
-      const refreshToken = getCookie("refreshToken");
+  // useEffect(() => {
+  //   const checkAuthentication = () => {
+  //     const refreshToken = getCookie("refreshToken");
 
-      
-      if (refreshToken) {
-        setIsAdminAuthenticated(true);
-      } else {
+  //     console.log(refreshToken);
+
+  //     if (refreshToken) {
+  //       setIsAdminAuthenticated(true);
+  //     } else {
+  //       setIsAdminAuthenticated(false);
+  //       navigate(`${ADMIN_PATH}/login`);
+  //     }
+  //     setLoading(false);
+  //   };
+
+  //   checkAuthentication();
+  // }, []);
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        const response = await axios.get(`${SERVER_URL}/api/admin/auth-token`, {
+          withCredentials: true,
+        });
+
+        const refreshToken = response.data.data.refreshToken;
+
+        if (refreshToken) {
+          setIsAdminAuthenticated(true);
+        } else {
+          setIsAdminAuthenticated(false);
+          navigate(`${ADMIN_PATH}/login`);
+        }
+      } catch (error) {
+        console.error("Error checking authentication:", error);
         setIsAdminAuthenticated(false);
         navigate(`${ADMIN_PATH}/login`);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     checkAuthentication();
