@@ -135,7 +135,7 @@ const AdditionalDetails = () => {
               accept="image/png, image/jpeg"
             />
             <FormInput
-              id="student_marksheets"
+              id="student_marksheet"
               label="Student Marksheet(s)"
               type="file"
               placeholder="Upload Marksheet(s)"

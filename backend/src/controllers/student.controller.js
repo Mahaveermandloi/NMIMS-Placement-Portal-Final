@@ -114,6 +114,7 @@ const registerStudent = asyncHandler(async (req, res) => {
   } = req.body;
 
   console.log(req.body);
+  console.log("ksnfksn")
 
   console.log(req.files);
 

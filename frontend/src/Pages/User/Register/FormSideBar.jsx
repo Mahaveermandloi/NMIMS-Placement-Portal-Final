@@ -16,7 +16,6 @@ const FormSideBar = ({ currentPage, setPage }) => {
     { title: "Class 12th", page: 2 },
     { title: "Diploma", page: 3 },
     { title: "Additional Details", page: 4 },
-    { title: "Other Details", page: 4 },
   ];
 
   return (
