@@ -6,7 +6,7 @@ import Password from "../models/password.model.js";
 
 export const verifyJWT = async (req, res, next) => {
   try {
-    // Extract token from Authorization header
+    
     const token = req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
@@ -46,6 +46,7 @@ export const verifyJWT = async (req, res, next) => {
 
     throw new ApiError(401, "Invalid token access");
   } catch (error) {
+    console.log(error?.message);
     next(new ApiError(401, error?.message || "Invalid access token"));
   }
 };

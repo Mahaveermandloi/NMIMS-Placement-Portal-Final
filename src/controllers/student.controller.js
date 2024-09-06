@@ -113,6 +113,11 @@ const registerStudent = asyncHandler(async (req, res) => {
     documents_uploaded,
   } = req.body;
 
+  console.log(req.body);
+  console.log("ksnfksn")
+
+  console.log(req.files);
+
   // Validate required fields
   if ([student_sap_no, student_roll_no].some((field) => field?.trim() === "")) {
     throw new ApiError(400, "SAP No and Roll No are required");
@@ -122,7 +127,11 @@ const registerStudent = asyncHandler(async (req, res) => {
   const studentProfileImage = req.files["student_profile_image"]
     ? req.files["student_profile_image"][0]
     : null;
+
+  
+
   const studentCV = req.files["student_cv"] ? req.files["student_cv"][0] : null;
+
   const studentMarksheet = req.files["student_marksheet"]
     ? req.files["student_marksheet"][0]
     : null;
@@ -141,6 +150,7 @@ const registerStudent = asyncHandler(async (req, res) => {
 
   // Check if the student already exists
   const existingStudent = await Student.findOne({ student_sap_no });
+
   if (existingStudent) {
     throw new ApiError(409, "Student with this SAP No already exists");
   }
@@ -319,7 +329,6 @@ const loginStudent = asyncHandler(async (req, res) => {
   await passwordRecord.save();
 
   // Set cookies with the tokens
-  // Set cookies
   res.cookie("accessToken", accessToken, {
     secure: false,
     maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
@@ -332,12 +341,18 @@ const loginStudent = asyncHandler(async (req, res) => {
     sameSite: "Lax",
   });
 
-  // Return success response with tokens
-  res
-    .status(200)
-    .json(
-      new ApiResponse(200, { accessToken, refreshToken }, "Login successful")
-    );
+  // Return success response with tokens and student profile image
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        accessToken,
+        refreshToken,
+        studentProfileImage: student.student_profile_image, // Include profile image URL
+      },
+      "Login successful"
+    )
+  );
 });
 
 const getAllStudentDetails = asyncHandler(async (req, res) => {
@@ -380,6 +395,50 @@ const getStudentDetailsById = asyncHandler(async (req, res) => {
       .status(200)
       .json(
         new ApiResponse(200, student, "Student details retrieved successfully")
+      );
+  } catch (error) {
+    throw new ApiError(
+      500,
+      error.message || "An error occurred while retrieving student details"
+    );
+  }
+});
+
+const getStudentDetailsByBranch = asyncHandler(async (req, res) => {
+  try {
+    const { engineering_specialization } = req.query; // Access query parameters
+
+    if (!engineering_specialization) {
+      throw new ApiError(400, "No Branch Provided");
+    }
+
+    // Find students with the given engineering_specialization
+    const students = await Student.find({ engineering_specialization });
+
+    // Check if students are found
+    if (!students.length) {
+      // Adjust to check for an array length
+      throw new ApiError(404, "Students not found");
+    }
+
+    // Map students to only include the required fields
+    const studentDetails = students.map((student) => ({
+      name_of_student: student.name_of_student,
+      student_roll_no: student.student_roll_no,
+      engineering_specialization: student.engineering_specialization,
+      student_sap_no: student.student_sap_no,
+      student_email_id: student.student_email_id,
+      student_mobile_no: student.student_mobile_no,
+    }));
+
+    res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          studentDetails,
+          "Students details retrieved successfully"
+        )
       );
   } catch (error) {
     throw new ApiError(
@@ -473,7 +532,9 @@ const updateStudentPassword = asyncHandler(async (req, res) => {
   console.log(studentId);
 
   // Find password record for the student
-  const passwordRecord = await Password.findOne({ student_id: studentId.student_id });
+  const passwordRecord = await Password.findOne({
+    student_id: studentId.student_id,
+  });
 
   if (!passwordRecord) {
     throw new ApiError(404, "Password record not found");
@@ -598,6 +659,30 @@ const getProfile = asyncHandler(async (req, res) => {
   );
 });
 
+const getProfileImage = asyncHandler(async (req, res) => {
+  const { student_id } = req.student;
+
+  const student = await Student.findById({ _id: student_id });
+
+  if (!student) {
+    throw new ApiError(404, "Student not found");
+  }
+
+  // Extract specific fields from the student object
+  const { student_profile_image } = student;
+
+  // Return the extracted fields in the response
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        student_profile_image,
+      },
+      "Profile Image fetched successfully"
+    )
+  );
+});
+
 export {
   registerStudent,
   loginStudent,
@@ -607,4 +692,6 @@ export {
   reGenerateAccessToken,
   updateStudentPassword,
   getProfile,
+  getStudentDetailsByBranch,
+  getProfileImage,
 };
