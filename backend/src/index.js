@@ -32,6 +32,7 @@ const startServer = async () => {
     app.listen(PORT, () => {
       console.log(`Server is running at port: ${PORT}`);
     });
+    
   } catch (error) {
     console.error("Failed to start the server: ", error.message);
     console.error("Error stack:", error.stack);
