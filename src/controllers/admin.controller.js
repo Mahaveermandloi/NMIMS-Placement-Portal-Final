@@ -87,28 +87,28 @@ const loginAdmin = asyncHandler(async (req, res) => {
   admin.refreshToken = refreshToken;
   await admin.save();
 
-  res.cookie("accessToken", accessToken, {
-    secure: process.env.NODE_ENV === "production", // true in production, false in development
-    maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
-    sameSite: "Lax",
-  });
-  res.cookie("refreshToken", refreshToken, {
-    secure: process.env.NODE_ENV === "production", // true in production, false in development
-    maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
-    sameSite: "Lax",
-  });
-
   // res.cookie("accessToken", accessToken, {
-  //   secure: false,
+  //   secure: process.env.NODE_ENV === "production", // true in production, false in development
   //   maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
   //   sameSite: "Lax",
   // });
-
   // res.cookie("refreshToken", refreshToken, {
-  //   secure: false,
+  //   secure: process.env.NODE_ENV === "production", // true in production, false in development
   //   maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
   //   sameSite: "Lax",
   // });
+
+  res.cookie("accessToken", accessToken, {
+    secure: false,
+    maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
+    sameSite: "Lax",
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    secure: false,
+    maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
+    sameSite: "Lax",
+  });
 
   // Send response
   res
