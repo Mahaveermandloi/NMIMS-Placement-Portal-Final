@@ -30,17 +30,21 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await postApi(data, `${SERVER_URL}/api/admin/login`);
+
       console.log(response.data);
 
-      console.log(response);
-
       if (response.statusCode === 200) {
-        const { accessToken, refreshToken } = response.data;
+        const { accessToken, expiresIn } = response.data;
 
+        console.log(expiresIn);
+        // Store tokens and expiration time
         localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
+        sessionStorage.setItem("accessToken", accessToken);
 
-        console.log(accessToken, refreshToken);
+        localStorage.setItem("expiresIn", expiresIn);
+        sessionStorage.setItem("expiresIn", expiresIn);
+
+        console.log(accessToken);
 
         toast.success("Login successful");
 
@@ -63,6 +67,42 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  // const onSubmit = async (data) => {
+  //   setLoading(true);
+  //   try {
+  //     // Include credentials with the request to ensure cookies are sent/received properly
+  //     const response = await postApi(data, `${SERVER_URL}/api/admin/login`, {
+  //       withCredentials: true,
+  //     });
+
+  //     if (response.statusCode === 200) {
+  //       // Ensure checking for status code 200
+  //       const { accessToken, refreshToken } = response.data;
+
+  //       // Optionally, store tokens in localStorage for additional use (if needed)
+  //       localStorage.setItem("accessToken", accessToken);
+  //       localStorage.setItem("refreshToken", refreshToken);
+
+  //       toast.success("Login successful");
+
+  //       // Navigate after ensuring cookies are set properly
+  //       setTimeout(() => {
+  //         navigate(`${ADMIN_PATH}/dashboard`);
+  //         window.location.reload();
+  //       }, 1000);
+  //     }
+  //   } catch (error) {
+  //     if (error.response) {
+  //       const { message } = error.response.data;
+  //       toast.error(message || "An error occurred. Please try again.");
+  //     } else {
+  //       toast.error("An error occurred. Please try again.");
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <>

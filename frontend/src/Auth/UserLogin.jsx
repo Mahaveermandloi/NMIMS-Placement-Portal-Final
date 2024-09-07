@@ -36,7 +36,6 @@ const Login = () => {
         localStorage.setItem("accessToken", accessToken);
 
         toast.success("Login successful");
-        alert("ksdndfkn");
 
         setTimeout(() => {
           navigate(`${STUDENT_PATH}/dashboard`);

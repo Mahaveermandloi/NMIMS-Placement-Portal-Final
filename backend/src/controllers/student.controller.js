@@ -114,7 +114,7 @@ const registerStudent = asyncHandler(async (req, res) => {
   } = req.body;
 
   console.log(req.body);
-  console.log("ksnfksn")
+  console.log("ksnfksn");
 
   console.log(req.files);
 
@@ -127,8 +127,6 @@ const registerStudent = asyncHandler(async (req, res) => {
   const studentProfileImage = req.files["student_profile_image"]
     ? req.files["student_profile_image"][0]
     : null;
-
-  
 
   const studentCV = req.files["student_cv"] ? req.files["student_cv"][0] : null;
 
@@ -326,17 +324,36 @@ const loginStudent = asyncHandler(async (req, res) => {
   // Save the tokens to the password record
   passwordRecord.accessToken = accessToken;
   passwordRecord.refreshToken = refreshToken;
+
+  const refreshTokenExpiry = ms(process.env.REFRESH_TOKEN_EXPIRY); // Duration in milliseconds
+  const expiresIn = Math.floor(refreshTokenExpiry / 1000); // Convert milliseconds to seconds
+
   await passwordRecord.save();
 
   // Set cookies with the tokens
+  // res.cookie("accessToken", accessToken, {
+  //   secure: false,
+  //   maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
+  //   sameSite: "Lax",
+  // });
+
+  // res.cookie("refreshToken", refreshToken, {
+  //   secure: false,
+  //   maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
+  //   sameSite: "Lax",
+  // });
+
   res.cookie("accessToken", accessToken, {
-    secure: false,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
     maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
     sameSite: "Lax",
   });
 
+  // Optionally store the refreshToken in an HTTP-only cookie (not sent back to the user)
   res.cookie("refreshToken", refreshToken, {
-    secure: false,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // Use true in production
     maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
     sameSite: "Lax",
   });
@@ -347,7 +364,7 @@ const loginStudent = asyncHandler(async (req, res) => {
       200,
       {
         accessToken,
-        refreshToken,
+        expiresIn,
         studentProfileImage: student.student_profile_image, // Include profile image URL
       },
       "Login successful"
@@ -561,59 +578,190 @@ const updateStudentPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Password updated successfully"));
 });
 
+// const reGenerateAccessToken = asyncHandler(async (req, res) => {
+//   // Access cookies using req.cookies
+//   const { refreshToken } = req.cookies;
+
+//   if (!refreshToken) {
+//     throw new ApiError(400, "Refresh token is required");
+//   }
+
+//   // Verify refresh token
+
+//   jwt.verify(
+//     refreshToken,
+//     process.env.REFRESH_TOKEN_SECRET,
+//     async (err, decoded) => {
+//       if (err) {
+//         throw new ApiError(401, "Invalid refresh token");
+//       }
+
+//       // Find password record with the refresh token
+//       const passwordRecord = await Password.findOne({
+//         _id: decoded._id,
+//         refreshToken,
+//       });
+
+//       if (!passwordRecord) {
+//         throw new ApiError(401, "Invalid refresh token");
+//       }
+
+//       const student = await Student.findById(passwordRecord.student_id);
+
+//       if (!student) {
+//         throw new ApiError(404, "Student not found");
+//       }
+
+//       const accessToken = passwordRecord.generateAccessToken();
+
+//       res.cookie("accessToken", accessToken, {
+//         secure: false,
+//         maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
+//         sameSite: "Lax",
+//       });
+
+//       res
+//         .status(200)
+//         .json(
+//           new ApiResponse(
+//             200,
+//             { accessToken },
+//             "Access token regenerated successfully"
+//           )
+//         );
+//     }
+//   );
+// });
+
 const reGenerateAccessToken = asyncHandler(async (req, res) => {
-  // Access cookies using req.cookies
   const { refreshToken } = req.cookies;
 
   if (!refreshToken) {
-    throw new ApiError(400, "Refresh token is required");
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Refresh token is required"));
   }
 
-  // Verify refresh token
+  try {
+    // Verify refresh token (this will check the expiration as well)
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
-    async (err, decoded) => {
-      if (err) {
-        throw new ApiError(401, "Invalid refresh token");
-      }
+    const student = await Password.findOne({ _id: decoded._id, refreshToken });
 
-      // Find password record with the refresh token
-      const passwordRecord = await Password.findOne({
-        _id: decoded._id,
-        refreshToken,
-      });
-
-      if (!passwordRecord) {
-        throw new ApiError(401, "Invalid refresh token");
-      }
-
-      const student = await Student.findById(passwordRecord.student_id);
-
-      if (!student) {
-        throw new ApiError(404, "Student not found");
-      }
-
-      const accessToken = passwordRecord.generateAccessToken();
-
-      res.cookie("accessToken", accessToken, {
-        secure: false,
-        maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
-        sameSite: "Lax",
-      });
-
-      res
-        .status(200)
-        .json(
-          new ApiResponse(
-            200,
-            { accessToken },
-            "Access token regenerated successfully"
-          )
-        );
+    if (!student) {
+      await Password.updateOne(
+        { refreshToken },
+        { $unset: { refreshToken: 1 } }
+      );
+      throw new ApiError(401, "Invalid refresh token");
     }
-  );
+
+    // Generate new access token
+    const accessToken = student.generateAccessToken();
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIRY) * 1000, // Convert seconds to milliseconds
+    });
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { accessToken },
+          "Access token regenerated successfully"
+        )
+      );
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      // When token is expired, we won't get the decoded object, so remove by refreshToken directly
+      await Password.updateOne(
+        { refreshToken },
+        { $unset: { refreshToken: 1 } }
+      );
+      return res
+        .status(401)
+        .json(new ApiResponse(401, null, "Refresh token expired"));
+    }
+
+    // Handle other errors (e.g., invalid token)
+    return res
+      .status(401)
+      .json(new ApiResponse(401, null, "Invalid refresh token"));
+  }
+});
+
+// -------------------------------------------------------
+const verifyRefreshToken = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  if (!refreshToken) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Refresh token is required"));
+  }
+
+  try {
+    // Verify the refresh token
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+    const student = await Password.findOne({ _id: decoded._id, refreshToken });
+
+    if (!student) {
+      await Password.updateOne(
+        { _id: decoded._id },
+        { $unset: { refreshToken: 1 } }
+      );
+      return res
+        .status(401)
+        .json(new ApiResponse(401, null, "Invalid refresh token"));
+    }
+
+    // Calculate remaining time until the token expires
+    const currentTime = Date.now(); // Current time in milliseconds
+    const expiryTime = decoded.exp * 1000; // Convert expiry time from seconds to milliseconds
+    const remainingTime = expiryTime - currentTime;
+
+    if (remainingTime <= 0) {
+      throw new Error("TokenExpiredError");
+    }
+
+    const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+    const minutes = Math.floor(
+      (remainingTime % (1000 * 60 * 60)) / (1000 * 60)
+    );
+    const formattedRemainingTime = `${String(hours).padStart(2, "0")}:${String(
+      minutes
+    ).padStart(2, "0")}`;
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { message: "Token Valid", remainingTime: formattedRemainingTime },
+          "Refresh token is valid"
+        )
+      );
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      // When the refresh token is expired, remove it from the database
+      await Password.updateOne(
+        { refreshToken },
+        { $unset: { refreshToken: 1 } }
+      );
+      return res
+        .status(401)
+        .json(new ApiResponse(401, null, "Refresh token expired"));
+    }
+
+    // Handle other errors
+    return res
+      .status(401)
+      .json(new ApiResponse(401, null, "Invalid refresh token"));
+  }
 });
 
 const getProfile = asyncHandler(async (req, res) => {
@@ -689,9 +837,10 @@ export {
   getAllStudentDetails,
   getStudentDetailsById,
   updateStudentProfile,
-  reGenerateAccessToken,
   updateStudentPassword,
   getProfile,
   getStudentDetailsByBranch,
   getProfileImage,
+  verifyRefreshToken,
+  reGenerateAccessToken,
 };

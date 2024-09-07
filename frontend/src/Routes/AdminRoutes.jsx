@@ -34,73 +34,39 @@ import EditPlacedStudent from "../Pages/Admin/Placed Students/EditPlacedStudent.
 import AddPlacedStudent from "../Pages/Admin/Placed Students/AddPlacedStudent.jsx";
 import ShortlistedStudentDetails from "../Pages/Admin/Shortlisted Students/ShortlistedStudentDetails.jsx";
 import UploadExcel from "../Pages/Admin/Shortlisted Students/UploadExcel.jsx";
-
+import { removeTokensAndRedirectForAdminRoutes } from "../Components/AdminTokenManager.jsx";
+import { getApi } from "../Utils/API.js";
 const AdminRoutes = () => {
+
   const navigate = useNavigate();
+
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  
 
-  const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
+  const verifyRefreshToken = async () => {
+    try {
+      const response = await getApi(
+        `${SERVER_URL}/api/admin/verify-refresh-token`
+      );
 
-    console.log(document.cookie);
-
-    console.log("Document Cookies:", document.cookie); // Log all cookies
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-      return parts.pop().split(";").shift();
+      if (response && response.statusCode === 200) {
+        const data = response.data;
+        localStorage.setItem("expiresIn", data.expiresIn);
+   
+        setIsAdminAuthenticated(true);
+      } else {
+        throw new Error("Failed to verify refresh token");
+      }
+    } catch (error) {
+      console.log("Error verifying refresh token:", error.message);
+      setIsAdminAuthenticated(false);
+      removeTokensAndRedirectForAdminRoutes(navigate);
     }
-    return null; // Return null if cookie not found
   };
 
-  // useEffect(() => {
-  //   const checkAuthentication = () => {
-  //     const refreshToken = getCookie("refreshToken");
-
-  //     console.log(refreshToken);
-
-  //     if (refreshToken) {
-  //       setIsAdminAuthenticated(true);
-  //     } else {
-  //       setIsAdminAuthenticated(false);
-  //       navigate(`${ADMIN_PATH}/login`);
-  //     }
-  //     setLoading(false);
-  //   };
-
-  //   checkAuthentication();
-  // }, []);
-
   useEffect(() => {
-    const checkAuthentication = async () => {
-      try {
-        const response = await axios.get(`${SERVER_URL}/api/admin/auth-token`, {
-          withCredentials: true,
-        });
-
-        const refreshToken = response.data.data.refreshToken;
-
-        if (refreshToken) {
-          setIsAdminAuthenticated(true);
-        } else {
-          setIsAdminAuthenticated(false);
-          navigate(`${ADMIN_PATH}/login`);
-        }
-      } catch (error) {
-        console.error("Error checking authentication:", error);
-        setIsAdminAuthenticated(false);
-        navigate(`${ADMIN_PATH}/login`);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuthentication();
+    verifyRefreshToken();
   }, []);
-
-  if (loading) {
-    return <div>Loading...</div>; // Display loading indicator while checking authentication
-  }
 
   return (
     <Routes>

@@ -18,44 +18,38 @@ import JobDetailsPage from "../Pages/User/Job Listing/Components/JobDetailsPage.
 // import Register from "../Pages/User/Register/Register.jsx";
 import FormPage from "../Pages/User/Register/FormPage.jsx";
 // import OtherDetails from "../Pages/User/Register/OtherDetails.jsx";
-
+import { removeTokensAndRedirectForUserRoutes } from "../Components/AdminTokenManager.jsx";
+import { getApi } from "../Utils/API.js";
+import { SERVER_URL } from "../Utils/URLPath.jsx";
 const UserRoutes = () => {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  // Function to get cookie by name
-  const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-      return parts.pop().split(";").shift();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const verifyRefreshToken = async () => {
+    try {
+      const response = await getApi(
+        `${SERVER_URL}/api/student/verify-refresh-token`
+      );
+
+      if (response && response.statusCode === 200) {
+        const data = response.data;
+        localStorage.setItem("expiresIn", data.expiresIn);
+
+        setIsAuthenticated(true);
+      } else {
+        throw new Error("Failed to verify refresh token");
+      }
+    } catch (error) {
+      console.log("Error verifying refresh token:", error.message);
+      setIsAuthenticated(false);
+      removeTokensAndRedirectForUserRoutes(navigate);
     }
-    return null;
   };
 
   useEffect(() => {
-    const checkAuthentication = () => {
-      const refreshToken = getCookie("refreshToken");
-
-      if (refreshToken) {
-        // Optionally, you could verify the refreshToken with the server
-        // to ensure it's valid and hasn't expired.
-        // For simplicity, assuming the token is valid if it's present.
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-        // navigate("/student/login");
-      }
-      setLoading(false);
-    };
-
-    checkAuthentication();
-  }, [navigate]);
-
-  if (loading) {
-    return <div>Loading...</div>; // Display loading indicator while checking authentication
-  }
+    verifyRefreshToken();
+  }, []);
 
   return (
     <>
@@ -66,10 +60,9 @@ const UserRoutes = () => {
             <Route path="/forget-password" element={<ForgetPassword />} />
 
             <Route path="/register" element={<FormPage />} />
-          
+
             {/* <Route path="/register/files" element={<OtherDetails />} /> */}
-           
-           
+
             <Route path="/otp-page/:email" element={<OTPPage />} />
             <Route
               path="/update-password/:email"

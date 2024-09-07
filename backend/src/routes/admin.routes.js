@@ -30,7 +30,7 @@ router.post("/register", uploadAdminProfileImage, registerAdmin);
 
 router.post("/login", handleFormData, loginAdmin);
 
-router.get("/auth-token", verifyRefreshToken);
+router.get("/verify-refresh-token", verifyRefreshToken);
 
 router.post("/logout", verifyJWT, logoutAdmin);
 
