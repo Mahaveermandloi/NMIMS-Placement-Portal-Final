@@ -41,7 +41,7 @@ const AddShortlistedStudent = () => {
           `${SERVER_URL}/api/student/get-all-student-details`
         );
 
-        console.log(studentResponse);
+      
         setStudents(studentResponse.data);
         setFilteredStudents(studentResponse.data);
 
@@ -89,7 +89,7 @@ const AddShortlistedStudent = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log(data);
+   
   };
 
   if (loading) return <Loader message="Loading..." />;

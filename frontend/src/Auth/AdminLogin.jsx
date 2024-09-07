@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaRegEye, FaEyeSlash } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "../Components/Loader.jsx";
 import { Toast } from "../Components/Toast.jsx";
@@ -31,12 +31,11 @@ const Login = () => {
     try {
       const response = await postApi(data, `${SERVER_URL}/api/admin/login`);
 
-      console.log(response.data);
+     
 
       if (response.statusCode === 200) {
-        const { accessToken, expiresIn } = response.data;
+        const { accessToken, refreshToken, expiresIn } = response.data;
 
-      
         localStorage.setItem("accessToken", accessToken);
         sessionStorage.setItem("refreshToken", accessToken);
 
@@ -46,7 +45,7 @@ const Login = () => {
         localStorage.setItem("expiresIn", expiresIn);
         sessionStorage.setItem("expiresIn", expiresIn);
 
-        console.log(accessToken);
+       
 
         toast.success("Login successful");
 
@@ -197,12 +196,13 @@ const Login = () => {
                     ></label>
                   </div>
                 </div>
-                <a
-                  href={`/forget-password`}
+
+                <Link
+                  to={"/forget-password"}
                   className="text-sm font-medium text-blue-700"
                 >
                   Forgot password?
-                </a>
+                </Link>
               </div>
               <button
                 type="submit"

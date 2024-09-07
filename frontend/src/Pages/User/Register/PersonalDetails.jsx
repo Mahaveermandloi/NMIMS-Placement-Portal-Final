@@ -30,7 +30,7 @@ const PersonalDetails = () => {
       data.passport_expiry_date = "";
     }
 
-    console.log(data);
+    
     toast.success("Form submitted successfully!");
   };
 

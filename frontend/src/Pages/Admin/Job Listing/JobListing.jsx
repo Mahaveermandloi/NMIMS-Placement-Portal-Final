@@ -41,7 +41,7 @@ const Companies = () => {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        toast.error("Error fetching data");
+        
       } finally {
         setLoading(false);
       }

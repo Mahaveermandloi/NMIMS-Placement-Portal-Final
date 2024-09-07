@@ -31,6 +31,7 @@ export const AdminTokenManager = () => {
       let accessExpiry = 0;
 
       if (accessToken) {
+        
         try {
           accessExpiry = calculateExpiry(accessToken);
         } catch (error) {
@@ -135,6 +136,7 @@ export const AdminTokenManager = () => {
   };
 
   const verifyRefreshToken = async () => {
+    alert("Session Expired");
     try {
       const response = await getApi(
         `${SERVER_URL}/api/admin/verify-refresh-token`
@@ -158,6 +160,20 @@ export const AdminTokenManager = () => {
       console.log("Error verifying refresh token:", error.message);
       removeTokensAndRedirect();
     }
+  };
+
+  const removeTokensAndRedirect = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
+    });
+    setTimeout(() => {
+      navigate(`${ADMIN_PATH}/login`);
+      window.location.reload();
+    }, 2000);
   };
 
   return (
@@ -190,7 +206,6 @@ export const removeTokensAndRedirectForAdminRoutes = (navigate) => {
   }, 2000);
 };
 
-
 export const removeTokensAndRedirectForUserRoutes = (navigate) => {
   localStorage.clear();
   sessionStorage.clear();
@@ -204,4 +219,3 @@ export const removeTokensAndRedirectForUserRoutes = (navigate) => {
     // window.location.reload();
   }, 2000);
 };
-

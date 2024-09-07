@@ -17,7 +17,7 @@ const CompaniesDetail = () => {
         const response = await getApi(
           `${SERVER_URL}/api/company/get-company-by-id/${id}`
         );
-        console.log(response.data);
+      
         setCompany(response.data);
       } catch (error) {
         console.error("Failed to fetch company:", error);

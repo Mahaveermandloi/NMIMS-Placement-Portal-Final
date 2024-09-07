@@ -28,7 +28,7 @@ const PlacedStudents = () => {
     const fetchStudents = async () => {
       try {
         const response = await getApi(`/api/placedstudents`);
-        console.log(response);
+        
 
         if (response.statusCode === 200) {
           setStudents(response.data);
@@ -69,11 +69,11 @@ const PlacedStudents = () => {
         if (response.statusCode === 200) {
           setCompanies(response.data);
         } else {
-          toast.error("Failed to fetch companies data");
+          // toast.error("Failed to fetch companies data");
         }
       } catch (error) {
         console.error("Error fetching companies data:", error);
-        toast.error("Error fetching companies data");
+        // toast.error("Error fetching companies data");
       }
     };
 

@@ -15,7 +15,7 @@ const StudentCompleteDetails = () => {
         const response = await getApi(
           `/api/student/get-student-details-by-id/${student_sap_no}`
         );
-        console.log(response.data);
+         
         setStudentData(response.data);
       } catch (error) {
         setError("Failed to fetch student data");

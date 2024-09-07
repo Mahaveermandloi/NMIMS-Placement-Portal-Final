@@ -52,7 +52,7 @@ const ChangePassword = () => {
         `${SERVER_URL}/api/student/update-student-password` // Updated URL for students
       );
 
-      console.log(response.data);
+     
 
       if (response.success) {
         toast.success("Password updated successfully!");

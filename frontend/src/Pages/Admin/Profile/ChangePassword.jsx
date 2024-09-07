@@ -52,8 +52,7 @@ const ChangePassword = () => {
         `${SERVER_URL}/api/admin/update-new-password`
       );
 
-      console.log(response.data);
-
+ 
       if (response.success) {
         toast.success("Password updated successfully!");
         setTimeout(() => {

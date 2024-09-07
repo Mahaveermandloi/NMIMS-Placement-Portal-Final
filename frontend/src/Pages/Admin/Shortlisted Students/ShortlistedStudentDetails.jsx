@@ -25,7 +25,7 @@ const ShortlistedStudentDetails = () => {
     const fetchStudentData = async () => {
       try {
         const response = await getApi(`/api/shortlistedstudents/${id}`);
-        console.log(response);
+        
         if (response.statusCode === 200) {
           setStudent(response.data);
         } else {

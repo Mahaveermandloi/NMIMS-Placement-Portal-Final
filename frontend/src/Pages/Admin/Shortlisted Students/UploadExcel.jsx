@@ -50,8 +50,7 @@ const UploadExcel = () => {
   }, []);
 
   const onSubmit = async (data) => {
-    console.log(data);
-
+     
     if (!data.company_name) {
       toast.error("Please select a company");
       return;
@@ -66,7 +65,7 @@ const UploadExcel = () => {
 
     setLoading(true);
 
-    console.log(data);
+    
 
     try {
       const response = await postApi(

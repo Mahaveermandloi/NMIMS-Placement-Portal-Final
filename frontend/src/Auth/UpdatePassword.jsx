@@ -46,7 +46,7 @@ const UpdatePassword = () => {
         `${SERVER_URL}/api/admin/update-password/${email}`
       );
 
-      console.log(response.data);
+
 
       if (response.success) {
         toast.success("Password updated successfully!");

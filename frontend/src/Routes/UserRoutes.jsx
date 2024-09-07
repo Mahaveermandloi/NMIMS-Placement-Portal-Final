@@ -19,8 +19,8 @@ import JobDetailsPage from "../Pages/User/Job Listing/Components/JobDetailsPage.
 import FormPage from "../Pages/User/Register/FormPage.jsx";
 // import OtherDetails from "../Pages/User/Register/OtherDetails.jsx";
 import { removeTokensAndRedirectForUserRoutes } from "../Components/AdminTokenManager.jsx";
-import { getApi } from "../Utils/API.js";
-import { SERVER_URL } from "../Utils/URLPath.jsx";
+import { STUDENT_PATH } from "../Utils/URLPath.jsx";
+
 const UserRoutes = () => {
   const navigate = useNavigate();
 
@@ -30,15 +30,12 @@ const UserRoutes = () => {
     const checkAuthentication = () => {
       const refreshToken = localStorage.getItem("refreshToken");
 
-      console.log(refreshToken);
-
       if (refreshToken) {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
-        navigate(`${ADMIN_PATH}/login`);
+        navigate(`${STUDENT_PATH}/login`);
       }
-      setLoading(false);
     };
 
     checkAuthentication();

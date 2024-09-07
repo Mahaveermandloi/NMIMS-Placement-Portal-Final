@@ -16,7 +16,7 @@ const ProfilePage = () => {
     const fetchAdminDetails = async () => {
       try {
         const response = await getApi("/api/admin/get-admin-details");
-        console.log(response.data);
+       
         if (response.data) {
           setName(response.data.name || "N/A");
           setEmail(response.data.email || "N/A");

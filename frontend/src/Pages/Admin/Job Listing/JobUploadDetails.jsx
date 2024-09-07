@@ -57,7 +57,7 @@ const JobUploadDetails = () => {
 
     try {
       const response = await postApi(jobData, `${SERVER_URL}/api/joblisting`);
-      console.log(response);
+   
       if (response.statusCode === 201) {
         toast.success("Job data uploaded successfully");
         setTimeout(() => {

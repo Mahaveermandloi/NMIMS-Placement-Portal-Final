@@ -46,15 +46,13 @@ const AdminRoutes = () => {
     const checkAuthentication = () => {
       const refreshToken = localStorage.getItem("refreshToken");
 
-      console.log(refreshToken);
-
       if (refreshToken) {
         setIsAdminAuthenticated(true);
       } else {
         setIsAdminAuthenticated(false);
         navigate(`${ADMIN_PATH}/login`);
       }
-      setLoading(false);
+      
     };
 
     checkAuthentication();
