@@ -38,11 +38,6 @@ const registerAdmin = asyncHandler(async (req, res) => {
 
   await admin.save();
 
-  const refreshToken = admin.generateRefreshToken();
-  admin.refreshToken = refreshToken;
-
-  await admin.save();
-
   // Fetch the created admin excluding the password and refresh token fields
   const createdAdmin = await Admin.findById(admin._id).select(
     "-password -refreshToken"
@@ -56,6 +51,76 @@ const registerAdmin = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(201, createdAdmin, "Admin registered successfully"));
 });
+
+// const loginAdmin = asyncHandler(async (req, res) => {
+//   const { adminID, password } = req.body;
+
+//   // Validate input
+//   if ([adminID, password].some((field) => field?.trim() === "")) {
+//     throw new ApiError(400, "Admin ID and password are required");
+//   }
+
+//   // Find admin by adminID
+//   const admin = await Admin.findOne({ adminID });
+
+//   if (!admin) {
+//     throw new ApiError(401, "Invalid Admin ID or password");
+//   }
+
+//   // Validate password
+//   const isPasswordValid = await admin.isPasswordCorrect(password);
+
+//   if (!isPasswordValid) {
+//     throw new ApiError(401, "Incorrect Password");
+//   }
+
+//   // Generate tokens
+//   const accessToken = admin.generateAccessToken();
+//   const refreshToken = admin.generateRefreshToken();
+
+//   // Store refresh token in the database
+//   admin.refreshToken = refreshToken;
+//   await admin.save();
+
+//   // res.cookie("accessToken", accessToken, {
+//   //   // httpOnly: true, // Makes the cookie inaccessible to JavaScript
+//   //   secure: process.env.NODE_ENV === "production", // true in production, false in development
+//   //   maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY), // Expiry in milliseconds
+//   //   sameSite: "Lax", // Helps to prevent CSRF attacks
+//   // });
+
+//   // res.cookie("refreshToken", refreshToken, {
+//   //   // httpOnly: true,
+//   //   secure: process.env.NODE_ENV === "production",
+//   //   maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
+//   //   sameSite: "Lax",
+//   // });
+
+//   res.cookie("accessToken", accessToken, {
+//     secure: false,
+//     maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
+//     sameSite: "Lax",
+//   });
+
+//   res.cookie("refreshToken", refreshToken, {
+//     secure: false,
+//     maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
+//     sameSite: "Lax",
+//   });
+
+//   // Send response
+//   res
+//     .status(200)
+//     .json(
+//       new ApiResponse(
+//         200,
+//         { accessToken, refreshToken },
+//         "Admin logged in successfully"
+//       )
+//     );
+// });
+
+// Logout Admin
 
 const loginAdmin = asyncHandler(async (req, res) => {
   const { adminID, password } = req.body;
@@ -87,42 +152,37 @@ const loginAdmin = asyncHandler(async (req, res) => {
   admin.refreshToken = refreshToken;
   await admin.save();
 
-  // res.cookie("accessToken", accessToken, {
-  //   secure: process.env.NODE_ENV === "production", // true in production, false in development
-  //   maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
-  //   sameSite: "Lax",
-  // });
-  // res.cookie("refreshToken", refreshToken, {
-  //   secure: process.env.NODE_ENV === "production", // true in production, false in development
-  //   maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
-  //   sameSite: "Lax",
-  // });
+  const refreshTokenExpiry = ms(process.env.REFRESH_TOKEN_EXPIRY); // Duration in milliseconds
+  const expiresIn = Math.floor(refreshTokenExpiry / 1000); // Convert milliseconds to seconds
 
+  // Send cookies with only accessToken to the user
   res.cookie("accessToken", accessToken, {
-    secure: false,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
     maxAge: ms(process.env.ACCESS_TOKEN_EXPIRY),
     sameSite: "Lax",
   });
 
+  // Optionally store the refreshToken in an HTTP-only cookie (not sent back to the user)
   res.cookie("refreshToken", refreshToken, {
-    secure: false,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // Use true in production
     maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
     sameSite: "Lax",
   });
 
-  // Send response
+  // Send response with only accessToken and expiration time
   res
     .status(200)
     .json(
       new ApiResponse(
         200,
-        { accessToken, refreshToken },
+        { accessToken, expiresIn },
         "Admin logged in successfully"
       )
     );
 });
 
-// Logout Admin
 const logoutAdmin = asyncHandler(async (req, res) => {
   const { refreshToken } = req.cookies;
 
@@ -158,54 +218,134 @@ const logoutAdmin = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Admin logged out successfully"));
 });
 
-// Re-generate Access Token
+// -------------------------------------------------------------------
+
 const reGenerateAccessToken = asyncHandler(async (req, res) => {
-  // Access cookies using req.cookies
   const { refreshToken } = req.cookies;
 
   if (!refreshToken) {
-    throw new ApiError(400, "Refresh token is required");
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Refresh token is required"));
   }
 
-  // Verify refresh token
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
-    async (err, decoded) => {
-      if (err) {
-        throw new ApiError(401, "Invalid refresh token");
-      }
+  try {
+    // Verify refresh token (this will check the expiration as well)
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-      // Find admin with the refresh token
-      const admin = await Admin.findOne({ _id: decoded._id, refreshToken });
+    const admin = await Admin.findOne({ _id: decoded._id, refreshToken });
 
-      if (!admin) {
-        throw new ApiError(401, "Invalid refresh token");
-      }
-
-      // Generate new access token
-      const accessToken = admin.generateAccessToken();
-
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIRY) * 1000, // Convert seconds to milliseconds
-      });
-
-      // Send response
-      res
-        .status(200)
-        .json(
-          new ApiResponse(
-            200,
-            { accessToken },
-            "Access token regenerated successfully"
-          )
-        );
+    if (!admin) {
+      // If no admin found, remove the refresh token from the database
+      await Admin.updateOne({ refreshToken }, { $unset: { refreshToken: 1 } });
+      throw new ApiError(401, "Invalid refresh token");
     }
-  );
+
+    // Generate new access token
+    const accessToken = admin.generateAccessToken();
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIRY) * 1000, // Convert seconds to milliseconds
+    });
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { accessToken },
+          "Access token regenerated successfully"
+        )
+      );
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      // When token is expired, we won't get the decoded object, so remove by refreshToken directly
+      await Admin.updateOne({ refreshToken }, { $unset: { refreshToken: 1 } });
+      return res
+        .status(401)
+        .json(new ApiResponse(401, null, "Refresh token expired"));
+    }
+
+    // Handle other errors (e.g., invalid token)
+    return res
+      .status(401)
+      .json(new ApiResponse(401, null, "Invalid refresh token"));
+  }
 });
 
+// -------------------------------------------------------
+const verifyRefreshToken = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  if (!refreshToken) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Refresh token is required"));
+  }
+
+  try {
+    // Verify the refresh token
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+    // Find admin with the refresh token
+    const admin = await Admin.findOne({ _id: decoded._id, refreshToken });
+
+    if (!admin) {
+      // If no admin found, remove the refresh token from the database
+      await Admin.updateOne(
+        { _id: decoded._id },
+        { $unset: { refreshToken: 1 } }
+      );
+      return res
+        .status(401)
+        .json(new ApiResponse(401, null, "Invalid refresh token"));
+    }
+
+    // Calculate remaining time until the token expires
+    const currentTime = Date.now(); // Current time in milliseconds
+    const expiryTime = decoded.exp * 1000; // Convert expiry time from seconds to milliseconds
+    const remainingTime = expiryTime - currentTime;
+
+    if (remainingTime <= 0) {
+      throw new Error("TokenExpiredError");
+    }
+
+    const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+    const minutes = Math.floor(
+      (remainingTime % (1000 * 60 * 60)) / (1000 * 60)
+    );
+    const formattedRemainingTime = `${String(hours).padStart(2, "0")}:${String(
+      minutes
+    ).padStart(2, "0")}`;
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { message: "Token Valid", remainingTime: formattedRemainingTime },
+          "Refresh token is valid"
+        )
+      );
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      // When the refresh token is expired, remove it from the database
+      await Admin.updateOne({ refreshToken }, { $unset: { refreshToken: 1 } });
+      return res
+        .status(401)
+        .json(new ApiResponse(401, null, "Refresh token expired"));
+    }
+
+    // Handle other errors
+    return res
+      .status(401)
+      .json(new ApiResponse(401, null, "Invalid refresh token"));
+  }
+});
+
+// =============================================================================
 const getAdminDetails = asyncHandler(async (req, res) => {
   const adminId = req.admin;
 
@@ -335,4 +475,5 @@ export {
   getAdminDetails,
   updateProfile,
   updateNewPassword,
+  verifyRefreshToken,
 };

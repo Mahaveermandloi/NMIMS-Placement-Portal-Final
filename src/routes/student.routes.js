@@ -12,6 +12,7 @@ import {
   updateStudentPassword,
   getStudentDetailsByBranch,
   getProfileImage,
+  verifyRefreshToken,
 } from "../controllers/student.controller.js";
 import { verifyAPIKey, verifyJWT } from "../middleware/auth.middleware.js";
 import handleFormData from "../middleware/handleFormData.js";
@@ -19,13 +20,12 @@ import handleFormData from "../middleware/handleFormData.js";
 const router = Router();
 
 const handleConditionalFileUploads = (req, res, next) => {
- 
   const fields = [
     { name: "student_cv", maxCount: 1 },
     { name: "student_profile_image", maxCount: 1 },
     { name: "student_marksheet", maxCount: 6 },
   ];
-  
+
   const upload = uploadStudentFiles.fields(fields);
 
   upload(req, res, (err) => {
@@ -66,6 +66,9 @@ router.get(
 );
 
 router.get("/refresh-token", reGenerateAccessToken);
+
+router.get("/verify-refresh-token", verifyRefreshToken);
+
 
 router.put(
   "/update-profile",

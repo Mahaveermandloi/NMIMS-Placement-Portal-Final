@@ -6,6 +6,7 @@ import {
   reGenerateAccessToken,
   getAdminDetails,
   updateProfile,
+  verifyRefreshToken,
 } from "../controllers/admin.controller.js";
 import {
   sendOtp,
@@ -29,12 +30,16 @@ router.post("/register", uploadAdminProfileImage, registerAdmin);
 
 router.post("/login", handleFormData, loginAdmin);
 
+router.get("/verify-refresh-token", verifyRefreshToken);
+
 router.post("/logout", verifyJWT, logoutAdmin);
 
 router.get("/refresh-token", reGenerateAccessToken);
 
 router.post("/forget-password", handleFormData, sendOtp);
+
 router.post("/verify-otp", handleFormData, verifyOtp);
+
 router.post("/resend-otp", handleFormData, resendOtp);
 
 router.post("/update-password/:email", handleFormData, updatePassword);
