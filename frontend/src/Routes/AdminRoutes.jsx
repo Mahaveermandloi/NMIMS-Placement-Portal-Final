@@ -42,31 +42,47 @@ const AdminRoutes = () => {
 
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   
+ useEffect(() => {
+    const checkAuthentication = () => {
+      const refreshToken = localStorage.getItem("refreshToken");
 
-  const verifyRefreshToken = async () => {
-    try {
-      const response = await getApi(
-        `${SERVER_URL}/api/admin/verify-refresh-token`
-      );
+      console.log(refreshToken);
 
-      if (response && response.statusCode === 200) {
-        const data = response.data;
-        localStorage.setItem("expiresIn", data.expiresIn);
-   
+      if (refreshToken) {
         setIsAdminAuthenticated(true);
       } else {
-        throw new Error("Failed to verify refresh token");
+        setIsAdminAuthenticated(false);
+        navigate(`${ADMIN_PATH}/login`);
       }
-    } catch (error) {
-      console.log("Error verifying refresh token:", error.message);
-      setIsAdminAuthenticated(false);
-      removeTokensAndRedirectForAdminRoutes(navigate);
-    }
-  };
+      setLoading(false);
+    };
 
-  useEffect(() => {
-    verifyRefreshToken();
+    checkAuthentication();
   }, []);
+
+
+  // const verifyRefreshToken = async () => {
+  //   try {
+  //     const response = await getApi(
+  //       `${SERVER_URL}/api/admin/verify-refresh-token`
+  //     );
+
+  //     if (response.statusCode === 200) {
+  //       const data = response.data;
+  //       localStorage.setItem("expiresIn", data.expiresIn);
+   
+  //       setIsAdminAuthenticated(true);
+  //     } else {
+  //       throw new Error("Failed to verify refresh token");
+  //     }
+  //   } catch (error) {
+  //     console.log("Error verifying refresh token:", error.message);
+  //     setIsAdminAuthenticated(false);
+  //     removeTokensAndRedirectForAdminRoutes(navigate);
+  //   }
+  // };
+
+  
 
   return (
     <Routes>

@@ -177,7 +177,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        { accessToken, expiresIn },
+        { accessToken, refreshToken, expiresIn },
         "Admin logged in successfully"
       )
     );

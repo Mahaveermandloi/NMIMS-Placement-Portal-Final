@@ -31,9 +31,10 @@ const Login = () => {
       const response = await postApi(data, `${SERVER_URL}/api/student/login`);
 
       if (response.statusCode === 200) {
-        const { accessToken } = response.data;
+        const { accessToken, refreshToken } = response.data;
 
         localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
 
         toast.success("Login successful");
 

@@ -36,10 +36,12 @@ const Login = () => {
       if (response.statusCode === 200) {
         const { accessToken, expiresIn } = response.data;
 
-        console.log(expiresIn);
-        // Store tokens and expiration time
+      
         localStorage.setItem("accessToken", accessToken);
-        sessionStorage.setItem("accessToken", accessToken);
+        sessionStorage.setItem("refreshToken", accessToken);
+
+        localStorage.setItem("refreshToken", refreshToken);
+        sessionStorage.setItem("refreshToken", refreshToken);
 
         localStorage.setItem("expiresIn", expiresIn);
         sessionStorage.setItem("expiresIn", expiresIn);

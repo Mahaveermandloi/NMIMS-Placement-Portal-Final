@@ -364,6 +364,7 @@ const loginStudent = asyncHandler(async (req, res) => {
       200,
       {
         accessToken,
+        refreshToken,
         expiresIn,
         studentProfileImage: student.student_profile_image, // Include profile image URL
       },
@@ -696,6 +697,8 @@ const reGenerateAccessToken = asyncHandler(async (req, res) => {
 // -------------------------------------------------------
 const verifyRefreshToken = asyncHandler(async (req, res) => {
   const { refreshToken } = req.cookies;
+
+  
 
   if (!refreshToken) {
     return res

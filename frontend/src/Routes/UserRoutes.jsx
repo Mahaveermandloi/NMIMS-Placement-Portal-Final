@@ -26,29 +26,22 @@ const UserRoutes = () => {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const verifyRefreshToken = async () => {
-    try {
-      const response = await getApi(
-        `${SERVER_URL}/api/student/verify-refresh-token`
-      );
+  useEffect(() => {
+    const checkAuthentication = () => {
+      const refreshToken = localStorage.getItem("refreshToken");
 
-      if (response && response.statusCode === 200) {
-        const data = response.data;
-        localStorage.setItem("expiresIn", data.expiresIn);
+      console.log(refreshToken);
 
+      if (refreshToken) {
         setIsAuthenticated(true);
       } else {
-        throw new Error("Failed to verify refresh token");
+        setIsAuthenticated(false);
+        navigate(`${ADMIN_PATH}/login`);
       }
-    } catch (error) {
-      console.log("Error verifying refresh token:", error.message);
-      setIsAuthenticated(false);
-      removeTokensAndRedirectForUserRoutes(navigate);
-    }
-  };
+      setLoading(false);
+    };
 
-  useEffect(() => {
-    verifyRefreshToken();
+    checkAuthentication();
   }, []);
 
   return (
