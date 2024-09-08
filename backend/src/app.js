@@ -54,10 +54,21 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 
 
+
 // CORS configuration
+const allowedOrigins = [
+  "https://nmims-placement-portal.vercel.app", // Replace with your specific frontend URL
+];
+
 app.use(
   cors({
-    origin: '*', // Allow all origins
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   })
 );
