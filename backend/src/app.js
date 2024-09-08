@@ -31,26 +31,38 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // CORS configuration
-const allowedOrigins = [
-  "http://localhost:5173", // For local development
-  "https://nmims-placement-website.vercel.app", // Production frontend URL
-  "https://nmims-placement-website-git-main-mahaveermandlois-projects.vercel.app", // Preview URL if needed
-  "https://nmims-placement-website-gshbl80qj-mahaveermandlois-projects.vercel.app", // Another preview URL if needed
-];
+// const allowedOrigins = [
+//   "http://localhost:5173", // For local development
+//   "https://nmims-placement-website.vercel.app", // Production frontend URL
+//   "https://nmims-placement-website-git-main-mahaveermandlois-projects.vercel.app", // Preview URL if needed
+//   "https://nmims-placement-website-gshbl80qj-mahaveermandlois-projects.vercel.app", // Another preview URL if needed
+// ];
 
+// app.use(
+//   cors({
+//     origin: function (origin, callback) {
+//       if (!origin || allowedOrigins.includes(origin)) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error("Not allowed by CORS"));
+//       }
+//     },
+
+//     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+//   })
+// );
+
+
+
+// CORS configuration
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-
+    origin: '*', // Allow all origins
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   })
 );
+
+
 
 // Register admin routes
 app.use("/api/admin", adminRoutes);
