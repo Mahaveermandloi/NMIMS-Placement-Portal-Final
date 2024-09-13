@@ -1,26 +1,62 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import CustomPaginationActionsTable from "../../../Components/TablePaginationActions.jsx"; // Import the custom table component
+import Loader from "../../../Components/Loader.jsx";
+import { Toast } from "../../../Components/Toast.jsx";
+import { toast } from "react-toastify";
+import { getApi, putApi, deleteApi2 } from "../../../Utils/API.js";
+import { ADMIN_PATH, SERVER_URL } from "../../../Utils/URLPath.jsx";
+import { useNavigate } from "react-router-dom";
 
 const StudentRequest = () => {
-  // Dummy data for demonstration
-  const studentData = [
-    { sapId: "1001", name: "John Doe", class: "10A" },
-    { sapId: "1002", name: "Jane Smith", class: "10B" },
-    { sapId: "1003", name: "Sam Wilson", class: "10C" },
-    { sapId: "1004", name: "Emma Brown", class: "10D" },
-    { sapId: "1005", name: "Michael Green", class: "10E" },
-    { sapId: "1006", name: "Olivia White", class: "10F" },
-    { sapId: "1007", name: "Sophia Blue", class: "10G" },
-    { sapId: "1008", name: "Liam Black", class: "10H" },
-    { sapId: "1009", name: "Noah Purple", class: "10I" },
-  ];
+  const [studentData, setStudentData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Column definitions
+  const navigate= useNavigate();
+  
+
+  // Fetch student data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(`${SERVER_URL}/api/student-request`);
+        setStudentData(response.data); // Assuming 'message' contains the list of students
+        setLoading(false);
+      } catch (error) {
+        toast.error("Failed to fetch student data");
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Define the columns to display
   const columns = [
-    { id: "sapId", label: "SAP ID", align: "left" },
-    { id: "name", label: "Name", align: "left" },
-    { id: "class", label: "Class", align: "left" },
+    { id: "student_sap_no", label: "SAP ID", align: "left" },
+    { id: "name_of_student", label: "Name", align: "left" },
+    { id: "program", label: "Program", align: "left" },
+    {
+      id: "engineering_specialization",
+      label: "Specialization",
+      align: "left",
+    },
+    { id: "student_email_id", label: "Email", align: "left" },
+    {
+      id: "status",
+      label: "Status",
+      align: "left",
+      render: (row) => (
+        <span
+          style={{
+            color: row.status.toLowerCase() === "pending" ? "white" : "black",
+            background: "#fcba03",
+          }}
+        >
+          {row.status}
+        </span>
+      ),
+    },
     {
       id: "actions",
       label: "Actions",
@@ -53,39 +89,80 @@ const StudentRequest = () => {
     },
   ];
 
-  // Handler functions for buttons
-  const handleAccept = (row) => {
-    alert(`Accepted: ${row.name}`);
-    // Add your accept logic here
+  // Handlers for actions
+  const handleAccept = async (row) => {
+    try {
+      const response = await putApi(
+        {
+          student_sap_no: row.student_sap_no,
+        },
+        `${SERVER_URL}/api/student-request`
+      );
+
+      if (response.statusCode === 200) {
+        toast.success(`Accepted: ${row.name_of_student}`);
+        // Update studentData to remove the accepted student
+        setStudentData((prevData) =>
+          prevData.filter(
+            (student) => student.student_sap_no !== row.student_sap_no
+          )
+        );
+      }
+    } catch (error) {
+      toast.error("Failed to accept request");
+    }
   };
 
-  const handleReject = (row) => {
-    alert(`Rejected: ${row.name}`);
-    // Add your reject logic here
+  const handleReject = async (row) => {
+    try {
+      const response = await deleteApi2(
+        {
+          student_sap_no: row.student_sap_no,
+        },
+        `${SERVER_URL}/api/student-request`
+      );
+
+      if (response.statusCode === 200) {
+        toast.success(`Rejected: ${row.name_of_student}`);
+        // Update studentData to remove the rejected student
+        setStudentData((prevData) =>
+          prevData.filter(
+            (student) => student.student_sap_no !== row.student_sap_no
+          )
+        );
+      }
+    } catch (error) {
+      toast.error("Failed to reject request");
+    }
   };
 
   const handleInfo = (row) => {
-    alert(`Info for: ${row.name}`);
-    // Add your info logic here
+    navigate(`${ADMIN_PATH}/student-request/${row.student_sap_no}`)
   };
 
+
+  if (loading) {
+    return <Loader />; // Display the loader while fetching data
+  }
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-4">Student Request</h1>
-      <div className="lg:w-full w-[340px]  ">
-        {" "}
-        {/* Enable horizontal scrolling */}
-        <CustomPaginationActionsTable
-          data={studentData.map((student) => ({
-            ...student,
-            actions: columns
-              .find((col) => col.id === "actions")
-              .render(student), // Add actions dynamically
-          }))}
-          columns={columns}
-        />
+    <>
+      <Toast />
+      <div>
+        <h1 className="text-3xl font-bold mb-4">Student Request</h1>
+        <div className="lg:w-full w-[340px]">
+          <CustomPaginationActionsTable
+            data={studentData.map((student) => ({
+              ...student,
+              actions: columns
+                .find((col) => col.id === "actions")
+                .render(student), // Add actions dynamically
+            }))}
+            columns={columns}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -5,7 +5,6 @@ import { states } from "../../../Components/States";
 import { FormInput } from "./FormInput";
 
 const PersonalDetails = () => {
-  
   const {
     register,
     formState: { errors },
@@ -30,7 +29,6 @@ const PersonalDetails = () => {
       data.passport_expiry_date = "";
     }
 
-    
     toast.success("Form submitted successfully!");
   };
 
@@ -96,10 +94,10 @@ const PersonalDetails = () => {
                 }}
                 errors={errors}
                 options={[
-                  { value: "btech", label: "B.Tech" },
-                  { value: "bca", label: "BCA" },
-                  { value: "mca", label: "MCA" },
-                  { value: "mba_tech", label: "MBA Tech" },
+                  { value: "B.Tech", label: "B.Tech" },
+                  { value: "BCA", label: "BCA" },
+                  { value: "MCA", label: "MCA" },
+                  { value: "MBA Tech", label: "MBA Tech" },
                 ]}
               />
 
@@ -113,17 +111,17 @@ const PersonalDetails = () => {
                 }}
                 errors={errors}
                 options={[
-                  { value: "computer_science", label: "Computer Science" },
+                  { value: "Computer Science", label: "Computer Science" },
                   {
-                    value: "information_technology",
+                    value: "Information Technology",
                     label: "Information Technology",
                   },
                   {
-                    value: "computer_engineering",
+                    value: "Computer Engineering",
                     label: "Computer Engineering",
                   },
                   {
-                    value: "ai_ml",
+                    value: "Artificial Intelligence and Machine Learning",
                     label: "Artificial Intelligence and Machine Learning",
                   },
                 ]}
@@ -212,9 +210,9 @@ const PersonalDetails = () => {
                 }}
                 errors={errors}
                 options={[
-                  { value: "male", label: "Male" },
-                  { value: "female", label: "Female" },
-                  { value: "others", label: "Others" },
+                  { value: "Male", label: "Male" },
+                  { value: "Female", label: "Female" },
+                  { value: "Others", label: "Others" },
                 ]}
               />
 
@@ -445,8 +443,8 @@ const PersonalDetails = () => {
                 }}
                 errors={errors}
                 options={[
-                  { value: "yes", label: "Yes" },
-                  { value: "no", label: "No" },
+                  { value: "Yes", label: "Yes" },
+                  { value: "No", label: "No" },
                 ]}
               />
 
@@ -454,6 +452,7 @@ const PersonalDetails = () => {
                 <FormInput
                   id="pan_card_no"
                   label="PAN Card Number"
+                 
                   placeholder="Enter your PAN card number"
                   register={register}
                   validation={{
@@ -477,8 +476,8 @@ const PersonalDetails = () => {
                 }}
                 errors={errors}
                 options={[
-                  { value: "yes", label: "Yes" },
-                  { value: "no", label: "No" },
+                  { value: "Yes", label: "Yes" },
+                  { value: "No", label: "No" },
                 ]}
               />
 

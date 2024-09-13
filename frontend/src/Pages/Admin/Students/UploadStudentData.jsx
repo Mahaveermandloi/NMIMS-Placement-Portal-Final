@@ -1,13 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { postApi, getApi } from "../../../Utils/API";
+import Loader from "../../../Components/Loader";
+import { toast } from "react-toastify";
+import { SERVER_URL } from "../../../Utils/URLPath";
 
 const UploadStudentData = () => {
-  // State to manage dropdown selections
-  const [programme, setProgramme] = useState("");
-  const [branch, setBranch] = useState("");
-  const [year, setYear] = useState("");
-  const [campus, setCampus] = useState("");
   const [file, setFile] = useState(null);
   const [isFileSelected, setIsFileSelected] = useState(false);
+  const [todayDate, setTodayDate] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [loadingFiles, setLoadingFiles] = useState(false);
+
+  // Get today's date on component mount
+  useEffect(() => {
+    const currentDate = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    setTodayDate(currentDate);
+    fetchUploadedFiles();
+  }, []);
+
+  // Fetch uploaded files from the server
+  const fetchUploadedFiles = async () => {
+    setLoadingFiles(true);
+    try {
+      const response = await getApi("/api/student/get-all-excel");
+      console.log(response);
+      if (response.statusCode === 200) {
+        setUploadedFiles(response.data);
+      } else {
+        toast.error("Failed to fetch uploaded files.");
+      }
+    } catch (error) {
+      toast.error("An error occurred while fetching the uploaded files.");
+    } finally {
+      setLoadingFiles(false);
+    }
+  };
 
   // Handle file change
   const handleFileChange = (e) => {
@@ -20,19 +48,50 @@ const UploadStudentData = () => {
       setFile(selectedFile);
       setIsFileSelected(true);
     } else {
-      alert("Please upload a valid Excel file.");
+      toast.error("Please upload a valid Excel file.");
       setIsFileSelected(false);
     }
   };
 
   // Handle submit
-  const handleSubmit = () => {
-    if (file && programme && branch && year && campus) {
-      // Implement your form submission logic here
-      alert("Form submitted successfully!");
+  const handleSubmit = async () => {
+    if (file && isFileSelected) {
+      setLoading(true);
+
+      const payload = {
+        student_excel_file: file,
+        date: todayDate,
+      };
+
+      console.log(payload);
+
+      try {
+        const response = await postApi(
+          payload,
+          "/api/student/upload-student-file"
+        );
+
+        if (response.statusCode === 200) {
+          toast.success("Student data uploaded successfully!");
+        } else {
+          toast.error("Failed to upload student data.");
+        }
+      } catch (error) {
+        toast.error("An error occurred while uploading the file.");
+      } finally {
+        setLoading(false);
+      }
     } else {
-      alert("Please complete all fields and select a file.");
+      toast.error("Please select a file to upload.");
     }
+  };
+
+  // Handle file download
+  const handleDownload = (filePath) => {
+    const link = document.createElement("a");
+    link.href = `${SERVER_URL}${filePath}`; // Assuming files are served from this path
+    link.download = filePath.split("/").pop(); // Extract the file name from the path
+    link.click();
   };
 
   return (
@@ -40,95 +99,16 @@ const UploadStudentData = () => {
       <div className="">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-3xl font-bold">Upload Student Data</h1>
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-            onClick={() =>
-              alert("Download functionality is not implemented yet.")
-            }
+          <a
+            href="../../../../public/TemplateFile.xlsx" // File located in public folder
+            download // This attribute triggers the download
           >
-            Download Excel Template
-          </button>
+            <button className="bg-blue-500 text-white px-4 py-2 rounded">
+              Download Excel Template
+            </button>
+          </a>
         </div>
-{/* 
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Programme:
-            </label>
-            <select
-              value={programme}
-              onChange={(e) => setProgramme(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
-            >
-              <option value="">Select Programme</option>
-              <option value="B.Tech">B.Tech</option>
-              <option value="MCA">MCA</option>
-              <option value="BTI">BTI</option>
-              <option value="MBATech">MBATech</option>
-            </select>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Branch:
-            </label>
-            <select
-              value={branch}
-              onChange={(e) => setBranch(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
-            >
-              <option value="">Select Branch</option>
-              <option value="Computer Science">Computer Science</option>
-              <option value="Computer Engineering">Computer Engineering</option>
-              <option value="Information Technology">
-                Information Technology
-              </option>
-              <option value="Artificial Intelligence">
-                Artificial Intelligence
-              </option>
-              <option value="Data Science">Data Science</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Year:
-            </label>
-            <select
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
-            >
-              <option value="">Select Year</option>
-              <option value="2021">2021</option>
-              <option value="2022">2022</option>
-              <option value="2023">2023</option>
-              <option value="2024">2024</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Campus:
-            </label>
-            <select
-              value={campus}
-              onChange={(e) => setCampus(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded"
-            >
-              <option value="">Select Campus</option>
-              <option value="Mumbai">Mumbai</option>
-              <option value="Shirpur">Shirpur</option>
-              <option value="Chandigarh">Chandigarh</option>
-              <option value="Hyderabad">Hyderabad</option>
-              <option value="Bhubaneswar">Bhubaneswar</option>
-              <option value="Bangalore">Bangalore</option>
-            </select>
-          </div>
-        </div> */}
-
-        {/* File Upload */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
             Upload File:
@@ -141,16 +121,67 @@ const UploadStudentData = () => {
           />
         </div>
 
-        {/* Submit Button */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Date (Today's Date):
+          </label>
+          <input
+            type="date"
+            value={todayDate}
+            disabled
+            className="mt-1 block w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed"
+          />
+        </div>
+
         <button
           onClick={handleSubmit}
-          disabled={!isFileSelected}
+          disabled={!isFileSelected || loading}
           className={`mt-4 bg-green-500 text-white px-4 py-2 rounded ${
-            !isFileSelected ? "opacity-50 cursor-not-allowed" : ""
+            !isFileSelected || loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
-          Submit
+          {loading ? <Loader /> : "Submit"}
         </button>
+
+        {/* Display uploaded files */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Uploaded Files</h2>
+          {loadingFiles ? (
+            <Loader />
+          ) : uploadedFiles.length > 0 ? (
+            <table className="min-w-full bg-white border">
+              <thead>
+                <tr>
+                  <th className="py-2 px-4 border">Date</th>
+                  <th className="py-2 px-4 border">File Name</th>
+                  <th className="py-2 px-4 border">Download</th>
+                </tr>
+              </thead>
+              <tbody>
+                {uploadedFiles.map((file) => (
+                  <tr key={file._id}>
+                    <td className="py-2 px-4 border">
+                      {new Date(file.date).toLocaleDateString()}
+                    </td>
+                    <td className="py-2 px-4 border">
+                      {file.filePath.split("/").pop()}
+                    </td>
+                    <td className="py-2 px-4 border">
+                      <button
+                        onClick={() => handleDownload(file.filePath)}
+                        className="bg-blue-500 text-white px-4 py-1 rounded"
+                      >
+                        Download
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>No files uploaded yet.</p>
+          )}
+        </div>
       </div>
     </>
   );

@@ -63,7 +63,7 @@ const AddPlacedStudent = () => {
           const studentResponse = await getApi(
             `/api/student/get-student-by-branch?engineering_specialization=${selectedBranch}`
           );
-   
+
           if (studentResponse.statusCode === 200) {
             setStudents(studentResponse.data);
           }
@@ -80,7 +80,7 @@ const AddPlacedStudent = () => {
 
   const onSubmit = async (data) => {
     const requestData = {
-      student_sap_no: data.student.student_sap_no, // Assuming the SAP number is sent as student_name
+      student_sap_no: data.student_sap_no, // Assuming the SAP number is sent as student_name
       name_of_student: data.student_name,
       student_email_id: data.email,
       company_name: data.company_name,
@@ -91,11 +91,8 @@ const AddPlacedStudent = () => {
     };
 
     try {
-      const response = await postApi(
-        requestData,
-        "/api/placedstudents"
-      );
-    
+      const response = await postApi(requestData, "/api/placedstudents");
+
       if (response.statusCode === 201) {
         toast.success("Student placed successfully");
         setTimeout(() => {
@@ -105,8 +102,8 @@ const AddPlacedStudent = () => {
         toast.error("Failed to place student");
       }
     } catch (error) {
-      console.error("Error placing student:", error);
-      toast.error("An error occurred while placing student");
+      toast.error(error.response.data.message);
+      // toast.error("An error occurred while placing student");
     }
   };
 

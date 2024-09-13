@@ -11,7 +11,7 @@ import joblistingRoutes from "../src/routes/joblisting.routes.js";
 import branchRoutes from "../src/routes/branch.routes.js";
 import placedstudentsRoutes from "../src/routes/placedstudents.routes.js";
 import shortlistedstudentsRoutes from "../src/routes/shortlistedstudents.routes.js";
-
+import studentrequest from "../src/routes/studentrequest.routes.js"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -52,13 +52,13 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 //   })
 // );
 
-
-
-
 // CORS configuration
 const allowedOrigins = [
   "https://nmims-placement-portal.vercel.app",
-  "https://nmims-placement-portal.netlify.app"
+  "https://nmims-placement-portal.netlify.app",
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "http://192.168.166.62:3000",
   // Replace with your specific frontend URL
 ];
 
@@ -75,8 +75,6 @@ app.use(
   })
 );
 
-
-
 // Register admin routes
 app.use("/api/admin", adminRoutes);
 
@@ -86,10 +84,16 @@ app.use("/api/company", companyRoutes);
 
 app.use("/api", branchRoutes);
 
+app.use("/api",  studentrequest);
+
 
 app.use("/api", joblistingRoutes);
 app.use("/api", placedstudentsRoutes);
 app.use("/api", shortlistedstudentsRoutes);
+
+
+
+
 
 app.get("/", (req, res) => {
   res.send("Welcome to the backend server!");

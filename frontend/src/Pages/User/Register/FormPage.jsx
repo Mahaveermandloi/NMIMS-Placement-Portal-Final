@@ -6,6 +6,8 @@ import Class10th from "./Forms/Class10th.jsx";
 import Class12th from "./Forms/Class12th.jsx";
 import Diploma from "./Forms/Diploma.jsx";
 import AdditionalDetails from "./Forms/AdditionalDetails.jsx";
+import College from "./Forms/College.jsx";
+
 // import OtherDetails from "./OtherDetails.jsx";
 import logo from "./../../../../public/images/nmimslogo.png";
 import { IoArrowBackCircleOutline } from "react-icons/io5";
@@ -38,6 +40,8 @@ const FormPage = () => {
       case 3:
         return <Diploma />;
       case 4:
+        return <College />;
+      case 5:
         return <AdditionalDetails />;
       default:
         return <PersonalDetails />;
@@ -51,20 +55,20 @@ const FormPage = () => {
   const onSubmit = async (data) => {
     setLoading(true);
 
+    console.log(data);
+
     try {
       const response = await postApi(
         data,
-        `${SERVER_URL}/api/student/register`,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+        `${SERVER_URL}/api/student/register`
       );
 
       if (response.statusCode === 200) {
+        toast.success("Request Sent Successfully");
+
         setTimeout(() => {
-          toast.success("Registration successful");
+          navigate(`${STUDENT_PATH}/login`);
         }, 1000);
-        navigate(`${STUDENT_PATH}/login`);
       }
     } catch (error) {
       console.log(error);
@@ -79,7 +83,7 @@ const FormPage = () => {
     const isValid = await methods.trigger(); // Validate the current page
 
     if (isValid) {
-      if (currentPage === 4) {
+      if (currentPage === 5) {
         handleSubmit(onSubmit)(); // Trigger the form submission on the last page
       } else {
         setPage((prev) => prev + 1);
@@ -124,7 +128,6 @@ const FormPage = () => {
           {loading ? (
             <>
               <Loader />
-              ader/
             </>
           ) : (
             <>
@@ -150,7 +153,7 @@ const FormPage = () => {
                       }`}
                       disabled={loading}
                     >
-                      {currentPage === 4 ? "Submit" : "Next"}
+                      {currentPage === 5 ? "Submit" : "Next"}
                     </button>
                   </div>
                 </div>

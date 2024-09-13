@@ -61,7 +61,6 @@
 //   };
 // };
 
-
 // const postApi = async (data, route) => {
 //   try {
 //     const formData = toFormData(data);
@@ -138,8 +137,6 @@
 
 // export { postApi, getApi, getApi2, putApi, deleteApi };
 
-
-
 import axios from "axios";
 import { SERVER_URL } from "./URLPath.jsx";
 
@@ -155,7 +152,7 @@ const api = axios.create({
 // Function to convert data to FormData if needed
 const toFormData = (data) => {
   const formData = new FormData();
-  
+
   for (const key in data) {
     if (data.hasOwnProperty(key)) {
       if (data[key] instanceof FileList) {
@@ -253,7 +250,7 @@ const putApi = async (data, route) => {
     formData.forEach((value, key) => {
       console.log(`${key}:`, value);
     });
-    
+
     const response = await api.put(route, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -278,4 +275,27 @@ const deleteApi = async (route) => {
   }
 };
 
-export { postApi, getApi, getApi2, putApi, deleteApi };
+const deleteApi2 = async (data, route) => {
+  try {
+    const formData = toFormData(data);
+
+    // Log FormData contents for debugging
+    console.log("FormData contents for DELETE:");
+    formData.forEach((value, key) => {
+      console.log(`${key}:`, value);
+    });
+
+    const response = await api.delete(route, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        ...getHeaders(),
+      },
+      data: formData,
+    });
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+export { postApi, getApi, getApi2, putApi, deleteApi, deleteApi2 };

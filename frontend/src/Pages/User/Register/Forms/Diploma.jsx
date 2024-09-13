@@ -123,7 +123,7 @@ const Diploma = () => {
 
                 <FormInput
                   id="diploma_year_of_passing"
-                  label="Diploma Year of Passing"
+                  label="Year of Passing Diploma"
                   type="select"
                   placeholder="Enter Year of Passing"
                   register={register}
@@ -304,6 +304,34 @@ const Diploma = () => {
                   register={register}
                   validation={{
                     required: "Fourth Year Percentage is required",
+                    min: { value: 0, message: "Minimum value is 0" },
+                    max: { value: 100, message: "Maximum value is 100" },
+                  }}
+                  errors={errors}
+                />
+
+                <FormInput
+                  id="final_percentage_diploma"
+                  label="Final Percentage Diploma"
+                  type="number"
+                  placeholder="Enter Final Percentage Diploma"
+                  register={register}
+                  validation={{
+                    required: "Final Percentage Diploma is required",
+                    min: { value: 0, message: "Minimum value is 0" },
+                    max: { value: 100, message: "Maximum value is 100" },
+                  }}
+                  errors={errors}
+                />
+
+                <FormInput
+                  id="aggregate_percentage_diploma"
+                  label="Aggregate Percentage Diploma"
+                  type="number"
+                  placeholder="Enter Aggregate Percentage Diploma"
+                  register={register}
+                  validation={{
+                    required: "Aggregate Percentage Diploma is required",
                     min: { value: 0, message: "Minimum value is 0" },
                     max: { value: 100, message: "Maximum value is 100" },
                   }}

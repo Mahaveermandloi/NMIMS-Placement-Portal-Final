@@ -36,6 +36,9 @@ import ShortlistedStudentDetails from "../Pages/Admin/Shortlisted Students/Short
 import UploadExcel from "../Pages/Admin/Shortlisted Students/UploadExcel.jsx";
 import { removeTokensAndRedirectForAdminRoutes } from "../Components/AdminTokenManager.jsx";
 import { getApi } from "../Utils/API.js";
+import Announcements from "../Pages/Admin/Announcements/Announcements.jsx";
+import AddAnnouncements from "../Pages/Admin/Announcements/AddAnnouncements.jsx";
+import RequestedStudentInfo from "../Pages/Admin/Students/RequestedStudentInfo.jsx";
 const AdminRoutes = () => {
 
   const navigate = useNavigate();
@@ -102,11 +105,15 @@ const AdminRoutes = () => {
 
                   <Route path="student-request" element={<StudentRequest />} />
 
+                  <Route path="student-request/:student_sap_no" element={<RequestedStudentInfo />} />
+
+
                   <Route path="student-details" element={<StudentDetails />} />
                   <Route
                     path="student-details/:student_sap_no"
                     element={<StudentCompleteDetails />}
                   />
+
 
                   <Route
                     path="upload-student-details"
@@ -119,6 +126,13 @@ const AdminRoutes = () => {
                   />
 
                   <Route path="companies" element={<Companies />} />
+              
+                  <Route path="announcements" element={<Announcements />} />
+
+                  <Route path="add-announcement" element={<AddAnnouncements />} />
+
+
+
 
                   <Route
                     path="company-detail/:id"
