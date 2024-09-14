@@ -8,6 +8,8 @@ import jwt from "jsonwebtoken";
 import StudentExcel from "../models/studentfiles.model.js";
 import ms from "ms";
 import XLSX from "xlsx";
+import { sendEmail } from "../utils/SendEmail.js";
+// import emailQueue from "../utils/SendEmail.js";
 
 // Register Student
 // const registerStudent = asyncHandler(async (req, res) => {
@@ -403,7 +405,6 @@ const registerStudent = asyncHandler(async (req, res) => {
   } = req.body;
 
   console.log(req.body);
- 
 
   console.log(req.files);
 
@@ -816,8 +817,6 @@ const updateStudentProfile = asyncHandler(async (req, res) => {
   const studentMarksheet = req.files["student_marksheet"]
     ? req.files["student_marksheet"][0]
     : null;
-
-    
 
   // Generate file paths
   const profileImagePath = studentProfileImage
@@ -1430,10 +1429,308 @@ const getProfileImage = asyncHandler(async (req, res) => {
 //     .json(new ApiResponse(200, null, "Student data processed successfully"));
 // });
 
+// const uploadStudentDataViaExcel = asyncHandler(async (req, res) => {
+//   const { date } = req.body;
+
+//   console.log(date);
+
+//   if (!date) {
+//     throw new ApiError(400, "Date is required");
+//   }
+
+//   const file = req.file;
+//   if (!file) {
+//     throw new ApiError(400, "Excel file is required");
+//   }
+
+//   // Parse the Excel file
+//   const workbook = XLSX.readFile(file.path);
+//   const sheetNames = workbook.SheetNames;
+//   const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetNames[0]]);
+
+//   console.log(file);
+
+//   const excelFilePath = file ? `/uploads/Student/Excel/${file.filename}` : null;
+
+//   const StudentExcelFile = new StudentExcel({
+//     date: date,
+//     filePath: excelFilePath,
+//   });
+
+//   await StudentExcelFile.save();
+
+//   const emailPromises = [];
+
+//   console.log(excelFilePath);
+
+//   // Iterate through each row in the Excel file
+//   for (const row of data) {
+//     const {
+//       student_sap_no,
+//       student_roll_no,
+//       campus,
+//       program,
+//       engineering_specialization,
+//       first_name,
+//       middle_name,
+//       last_name,
+//       name_of_student,
+//       fathers_name,
+//       mothers_name,
+//       date_of_birth,
+//       gender,
+//       local_address,
+//       local_address_city,
+//       local_address_state,
+//       permanent_address,
+//       permanent_address_postal_code,
+//       home_town,
+//       permanent_address_city,
+//       permanent_address_state,
+//       permanent_address_country,
+//       student_mobile_no,
+//       alternate_student_mobile_no,
+//       fathers_mobile_no,
+//       mothers_mobile_no,
+//       home_landline_no,
+//       home_mobile_no,
+//       student_email_id,
+//       student_alternate_email_id,
+//       fathers_email_id,
+//       mothers_email_id,
+//       has_pan_card,
+//       pan_card_no,
+//       aadhar_card_no,
+//       has_passport,
+//       passport_no,
+//       passport_expiry_date,
+//       tenth_standard_percentage,
+//       year_of_passing_tenth,
+//       board_of_passing_tenth,
+//       tenth_school,
+//       tenth_passing_state,
+//       tenth_passing_country,
+//       twelfth_standard_percentage,
+//       year_of_passing_twelfth,
+//       board_of_passing_twelfth,
+//       twelfth_school,
+//       twelfth_school_city,
+//       twelfth_passing_state,
+//       twelfth_passing_country,
+//       diploma_stream,
+//       diploma_passing_state,
+//       diploma_passing_country,
+//       diploma_college,
+//       diploma_board_of_passing,
+//       diploma_year_of_passing,
+//       first_year_first_semester_percentage_diploma,
+//       first_year_second_semester_percentage_diploma,
+//       first_year_percentage_diploma,
+//       second_year_third_semester_percentage_diploma,
+//       second_year_fourth_semester_percentage_diploma,
+//       second_year_percentage_diploma,
+//       third_year_fifth_semester_percentage_diploma,
+//       third_year_sixth_semester_percentage_diploma,
+//       third_year_percentage_diploma,
+//       fourth_year_seventh_semester_percentage_diploma,
+//       fourth_year_eighth_semester_percentage_diploma,
+//       fourth_year_percentage_diploma,
+//       final_percentage_diploma,
+//       aggregate_percentage_diploma,
+//       year_of_passing_diploma,
+//       gpa_first_semester_first_year,
+//       cgpa_first_semester_first_year,
+//       academic_year_clearing_sem1,
+//       gpa_second_semester_first_year,
+//       cgpa_second_semester_first_year,
+//       academic_year_clearing_sem2,
+//       gpa_third_semester_second_year,
+//       cgpa_third_semester_second_year,
+//       academic_year_clearing_sem3,
+//       gpa_fourth_semester_second_year,
+//       cgpa_fourth_semester_second_year,
+//       academic_year_clearing_sem4,
+//       gpa_fifth_semester_third_year,
+//       cgpa_fifth_semester_third_year,
+//       academic_year_clearing_sem5,
+//       gpa_sixth_semester_third_year,
+//       cgpa_sixth_semester_third_year,
+//       academic_year_clearing_sem6,
+//       total_dead_kts,
+//       total_live_kts,
+//       last_received_marksheet,
+//       has_year_drop_or_gap,
+//       year_drop_between_tenth_and_beginning_of_engineering,
+//       years_of_gap,
+//       reason_for_gap_or_drop_before_engineering,
+//       year_drop_between_engineering,
+//       years_of_gap_during_engineering,
+//       reason_for_gap_or_drop_during_engineering,
+//       cv_uploaded_in_nmims_format,
+//       documents_uploaded,
+//     } = row;
+
+//     // Check if student_sap_no already exists
+//     const existingStudent = await Student.findOne({ student_sap_no });
+
+//     console.log(existingStudent);
+
+//     if (existingStudent) {
+//       console.log(
+//         `Student with SAP no. ${student_sap_no} already exists, skipping...`
+//       );
+//       continue; // Skip this entry if the SAP number already exists
+//     }
+
+//     // Create a new student entry
+//     const newStudent = new Student({
+//       student_sap_no,
+//       student_roll_no,
+//       campus,
+//       program,
+//       engineering_specialization,
+//       first_name,
+//       middle_name,
+//       last_name,
+//       name_of_student,
+//       fathers_name,
+//       mothers_name,
+//       date_of_birth,
+//       gender,
+//       local_address,
+//       local_address_city,
+//       local_address_state,
+//       permanent_address,
+//       permanent_address_postal_code,
+//       home_town,
+//       permanent_address_city,
+//       permanent_address_state,
+//       permanent_address_country,
+//       student_mobile_no,
+//       alternate_student_mobile_no,
+//       fathers_mobile_no,
+//       mothers_mobile_no,
+//       home_landline_no,
+//       home_mobile_no,
+//       student_email_id,
+//       student_alternate_email_id,
+//       fathers_email_id,
+//       mothers_email_id,
+//       has_pan_card,
+//       pan_card_no,
+//       aadhar_card_no,
+//       has_passport,
+//       passport_no,
+//       passport_expiry_date,
+//       tenth_standard_percentage,
+//       year_of_passing_tenth,
+//       board_of_passing_tenth,
+//       tenth_school,
+//       tenth_passing_state,
+//       tenth_passing_country,
+//       twelfth_standard_percentage,
+//       year_of_passing_twelfth,
+//       board_of_passing_twelfth,
+//       twelfth_school,
+//       twelfth_school_city,
+//       twelfth_passing_state,
+//       twelfth_passing_country,
+//       diploma_stream,
+//       diploma_passing_state,
+//       diploma_passing_country,
+//       diploma_college,
+//       diploma_board_of_passing,
+//       diploma_year_of_passing,
+//       first_year_first_semester_percentage_diploma,
+//       first_year_second_semester_percentage_diploma,
+//       first_year_percentage_diploma,
+//       second_year_third_semester_percentage_diploma,
+//       second_year_fourth_semester_percentage_diploma,
+//       second_year_percentage_diploma,
+//       third_year_fifth_semester_percentage_diploma,
+//       third_year_sixth_semester_percentage_diploma,
+//       third_year_percentage_diploma,
+//       fourth_year_seventh_semester_percentage_diploma,
+//       fourth_year_eighth_semester_percentage_diploma,
+//       fourth_year_percentage_diploma,
+//       final_percentage_diploma,
+//       aggregate_percentage_diploma,
+//       year_of_passing_diploma,
+//       gpa_first_semester_first_year,
+//       cgpa_first_semester_first_year,
+//       academic_year_clearing_sem1,
+//       gpa_second_semester_first_year,
+//       cgpa_second_semester_first_year,
+//       academic_year_clearing_sem2,
+//       gpa_third_semester_second_year,
+//       cgpa_third_semester_second_year,
+//       academic_year_clearing_sem3,
+//       gpa_fourth_semester_second_year,
+//       cgpa_fourth_semester_second_year,
+//       academic_year_clearing_sem4,
+//       gpa_fifth_semester_third_year,
+//       cgpa_fifth_semester_third_year,
+//       academic_year_clearing_sem5,
+//       gpa_sixth_semester_third_year,
+//       cgpa_sixth_semester_third_year,
+//       academic_year_clearing_sem6,
+//       total_dead_kts,
+//       total_live_kts,
+//       last_received_marksheet,
+//       has_year_drop_or_gap,
+//       year_drop_between_tenth_and_beginning_of_engineering,
+//       years_of_gap,
+//       reason_for_gap_or_drop_before_engineering,
+//       year_drop_between_engineering,
+//       years_of_gap_during_engineering,
+//       reason_for_gap_or_drop_during_engineering,
+//       cv_uploaded_in_nmims_format,
+//       documents_uploaded,
+//     });
+
+//     await newStudent.save();
+
+//     // Create the email content for this student
+
+//     // Create a corresponding password entry for the student
+//     const newPassword = new Password({
+//       student_id: newStudent._id,
+//       password: student_sap_no, // Using student_sap_no as the initial password
+//     });
+
+//     await newPassword.save();
+
+//     const emailSubject = "Your NMIMS Student Portal Account";
+//     const emailText = `Dear Student,\n\nYour account has been created at NMIMS Student Portal.\n\nSAP ID: ${student_sap_no}\nPassword: ${student_sap_no}\n\nPlease log in to the portal and change your password as soon as possible.\n\nBest regards,\nNMIMS Admin`;
+
+//     emailPromises.push(sendEmail(student_email_id, emailSubject, emailText));
+//   }
+
+//   await Promise.all(emailPromises);
+
+//   const chunkArray = (arr, chunkSize) => {
+//     const results = [];
+//     for (let i = 0; i < arr.length; i += chunkSize) {
+//       results.push(arr.slice(i, i + chunkSize));
+//     }
+//     return results;
+//   };
+
+//   // Send emails in chunks of 50 (you can adjust the chunk size)
+//   const emailChunks = chunkArray(emailPromises, 50);
+
+//   for (const chunk of emailChunks) {
+//     await Promise.all(chunk); // Wait for the batch to finish sending
+//     await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay 1 second between batches
+//   }
+
+//   res
+//     .status(200)
+//     .json(new ApiResponse(200, null, "Student data processed successfully"));
+// });
+
 const uploadStudentDataViaExcel = asyncHandler(async (req, res) => {
   const { date } = req.body;
-
-  console.log(date);
 
   if (!date) {
     throw new ApiError(400, "Date is required");
@@ -1460,7 +1757,10 @@ const uploadStudentDataViaExcel = asyncHandler(async (req, res) => {
 
   await StudentExcelFile.save();
 
-  console.log(excelFilePath);
+  const emailArray = []; // Array to store email addresses
+
+  const emailSubject = "Your NMIMS Student Portal Account";
+  const emailText = `Dear Student,\n\nYour account has been created at NMIMS Student Portal.\n\nSAP ID:  Your Respective SAP ID \nPassword: Your SAP ID \n\nPlease log in to the portal and change your password as soon as possible.\n\nBest regards,\nNMIMS Admin`;
 
   // Iterate through each row in the Excel file
   for (const row of data) {
@@ -1689,22 +1989,34 @@ const uploadStudentDataViaExcel = asyncHandler(async (req, res) => {
 
     await newStudent.save();
 
-    // Create a corresponding password entry for the student
+    // Create the corresponding password entry for the student
     const newPassword = new Password({
       student_id: newStudent._id,
       password: student_sap_no, // Using student_sap_no as the initial password
     });
 
     await newPassword.save();
+
+    emailArray.push(student_email_id);
   }
 
-  res
-    .status(200)
-    .json(new ApiResponse(200, null, "Student data processed successfully"));
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        emailText,
+        emailSubject,
+        emailArray,
+      },
+      "Student data processed successfully"
+    )
+  );
 });
 
 const deleteStudent = asyncHandler(async (req, res) => {
-  const { student_sap_no } = req.body;
+  const { student_sap_no } = req.params;
+
+  console.log(student_sap_no);
 
   // Validate that student_sap_no is provided
   if (!student_sap_no) {

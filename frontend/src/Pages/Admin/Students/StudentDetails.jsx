@@ -5,30 +5,46 @@ import SearchBar from "./Components/SearchBar.jsx";
 import { deleteApi, deleteApi2, getApi } from "../../../Utils/API.js";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_PATH } from "../../../Utils/URLPath.jsx";
-import Loader from "../../../Components/Loader.jsx"; // Import the Loader component
+import Loader from "../../../Components/Loader.jsx";
 import { Toast } from "../../../Components/Toast.jsx";
 import { toast } from "react-toastify";
+
 const StudentDetails = () => {
   const [studentData, setStudentData] = useState([]);
-  const [loading, setLoading] = useState(true); // Add a loading state
+  const [filteredData, setFilteredData] = useState([]); // State for filtered student data
+  const [searchQuery, setSearchQuery] = useState(""); // Search query state
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
-        setLoading(true); // Start loading before fetching
+        setLoading(true);
         const response = await getApi("/api/student/get-all-student-details");
 
         setStudentData(response.data);
+        setFilteredData(response.data); // Initialize filteredData with the full student data
       } catch (error) {
         console.error("Error fetching student data:", error);
       } finally {
-        setLoading(false); // End loading after fetching is complete
+        setLoading(false);
       }
     };
 
     fetchStudentData();
   }, []);
+
+  useEffect(() => {
+    // Filter the student data based on the search query
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    const filtered = studentData.filter(
+      (student) =>
+        student.student_sap_no.toString().includes(lowerCaseQuery) ||
+        student.name_of_student.toLowerCase().includes(lowerCaseQuery) ||
+        student.student_email_id.toLowerCase().includes(lowerCaseQuery)
+    );
+    setFilteredData(filtered);
+  }, [searchQuery, studentData]); // Runs every time searchQuery or studentData changes
 
   const columns = [
     { id: "student_sap_no", label: "SAP ID", align: "left" },
@@ -51,7 +67,7 @@ const StudentDetails = () => {
           </Button>
           <Button
             variant="contained"
-            color="primary"
+            color="error"
             onClick={() => handleDelete(row)}
           >
             Delete
@@ -65,20 +81,50 @@ const StudentDetails = () => {
     navigate(`${ADMIN_PATH}/student-details/${student.student_sap_no}`);
   };
 
-  const handleDelete = (student) => {
-    try {
-      const response = deleteApi2(
-        student.student_sap_no,
-        "/api/student/delete-student"
-      );
+  const handleDelete = async (student) => {
+    const confirmationToastId = toast(
+      <div>
+        <p>Are you sure you want to delete this student record?</p>
+        <button
+          onClick={async () => {
+            toast.dismiss(confirmationToastId);
+            await proceedToDelete(student);
+          }}
+          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
+        >
+          Confirm
+        </button>
+        <button
+          onClick={() => toast.dismiss(confirmationToastId)}
+          className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 text-sm ml-2"
+        >
+          Cancel
+        </button>
+      </div>,
+      {
+        autoClose: false,
+        closeOnClick: false,
+        position: "top-center",
+      }
+    );
+  };
 
-      console.log(response);
+  const proceedToDelete = async (student) => {
+    try {
+      const response = await deleteApi(
+        `/api/student/delete-student/${student.student_sap_no}`
+      );
 
       if (response.statusCode === 200) {
         toast.success("Student Record Deleted Successfully");
+      } else {
+        toast.error("Failed to delete student record.");
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred while deleting the record."
+      );
     }
   };
 
@@ -86,20 +132,24 @@ const StudentDetails = () => {
     <>
       <Toast />
       <div>
-        <div className="flex justify-between items-center">
+        <div className="flex  flex-col lg:flex-row  justify-between   lg:items-center">
           <div>
             <h1 className="text-3xl font-bold mb-4">Student Details</h1>
           </div>
-          <div className="w-[400px]">
-            <SearchBar />
+          <div className=" lg:w-[400px]">
+            <SearchBar
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />{" "}
+            {/* Pass search state */}
           </div>
         </div>
-        <div className="lg:w-full w-[340px] ">
-          {loading ? ( // Conditionally render loader or table
+        <div className="lg:w-full w-[340px] mt-4 ">
+          {loading ? (
             <Loader message="Loading student data..." />
           ) : (
             <CustomPaginationActionsTable
-              data={studentData.map((student) => ({
+              data={filteredData.map((student) => ({
                 student_sap_no: student.student_sap_no,
                 name_of_student: student.name_of_student,
                 student_email_id: student.student_email_id,

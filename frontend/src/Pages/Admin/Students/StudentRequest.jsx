@@ -12,14 +12,14 @@ const StudentRequest = () => {
   const [studentData, setStudentData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const navigate= useNavigate();
-  
+  const navigate = useNavigate();
 
   // Fetch student data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getApi(`${SERVER_URL}/api/student-request`);
+
         setStudentData(response.data); // Assuming 'message' contains the list of students
         setLoading(false);
       } catch (error) {
@@ -137,9 +137,8 @@ const StudentRequest = () => {
   };
 
   const handleInfo = (row) => {
-    navigate(`${ADMIN_PATH}/student-request/${row.student_sap_no}`)
+    navigate(`${ADMIN_PATH}/student-request/${row.student_sap_no}`);
   };
-
 
   if (loading) {
     return <Loader />; // Display the loader while fetching data

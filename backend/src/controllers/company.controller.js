@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import Student from "../models/student.model.js";
 import { SendWhatsAppMessage } from "../utils/SendWhatsAppMessage.js";
-import { sendEmail } from "../utils/SendEmail.js";
+// import { sendEmail } from "../utils/SendEmail.js";
 // import { emailQueue } from "../utils/SendEmail.js";
 
 const createCompany = asyncHandler(async (req, res) => {

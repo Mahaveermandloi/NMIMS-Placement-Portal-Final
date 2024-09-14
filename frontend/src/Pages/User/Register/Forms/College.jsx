@@ -37,7 +37,7 @@ const College = () => {
               validation={{
                 required: "GPA First Semester First Year is required",
                 min: { value: 0, message: "Minimum value is 0" },
-                max: { value: 10, message: "Maximum value is 10" },
+                max: { value: 4, message: "Maximum value is 4" },
               }}
               errors={errors}
             />
@@ -50,7 +50,7 @@ const College = () => {
               validation={{
                 required: "CGPA First Semester First Year is required",
                 min: { value: 0, message: "Minimum value is 0" },
-                max: { value: 10, message: "Maximum value is 10" },
+                max: { value: 4, message: "Maximum value is 4" },
               }}
               errors={errors}
             />
@@ -78,7 +78,7 @@ const College = () => {
               validation={{
                 required: "GPA Second Semester First Year is required",
                 min: { value: 0, message: "Minimum value is 0" },
-                max: { value: 10, message: "Maximum value is 10" },
+                max: { value: 4, message: "Maximum value is 4" },
               }}
               errors={errors}
             />
@@ -91,7 +91,7 @@ const College = () => {
               validation={{
                 required: "CGPA Second Semester First Year is required",
                 min: { value: 0, message: "Minimum value is 0" },
-                max: { value: 10, message: "Maximum value is 10" },
+                max: { value: 4, message: "Maximum value is 4" },
               }}
               errors={errors}
             />
@@ -119,7 +119,7 @@ const College = () => {
               validation={{
                 required: "GPA Third Semester Second Year is required",
                 min: { value: 0, message: "Minimum value is 0" },
-                max: { value: 10, message: "Maximum value is 10" },
+                max: { value: 4, message: "Maximum value is 4" },
               }}
               errors={errors}
             />
@@ -132,7 +132,7 @@ const College = () => {
               validation={{
                 required: "CGPA Third Semester Second Year is required",
                 min: { value: 0, message: "Minimum value is 0" },
-                max: { value: 10, message: "Maximum value is 10" },
+                max: { value: 4, message: "Maximum value is 4" },
               }}
               errors={errors}
             />
@@ -160,7 +160,7 @@ const College = () => {
               validation={{
                 required: "GPA Fourth Semester Second Year is required",
                 min: { value: 0, message: "Minimum value is 0" },
-                max: { value: 10, message: "Maximum value is 10" },
+                max: { value: 4, message: "Maximum value is 4" },
               }}
               errors={errors}
             />
@@ -173,7 +173,7 @@ const College = () => {
               validation={{
                 required: "CGPA Fourth Semester Second Year is required",
                 min: { value: 0, message: "Minimum value is 0" },
-                max: { value: 10, message: "Maximum value is 10" },
+                max: { value: 4, message: "Maximum value is 4" },
               }}
               errors={errors}
             />
@@ -201,7 +201,7 @@ const College = () => {
               validation={{
                 required: "GPA Fifth Semester Third Year is required",
                 min: { value: 0, message: "Minimum value is 0" },
-                max: { value: 10, message: "Maximum value is 10" },
+                max: { value: 4, message: "Maximum value is 4" },
               }}
               errors={errors}
             />
@@ -214,7 +214,7 @@ const College = () => {
               validation={{
                 required: "CGPA Fifth Semester Third Year is required",
                 min: { value: 0, message: "Minimum value is 0" },
-                max: { value: 10, message: "Maximum value is 10" },
+                max: { value: 4, message: "Maximum value is 4" },
               }}
               errors={errors}
             />
@@ -242,7 +242,7 @@ const College = () => {
               validation={{
                 required: "GPA Sixth Semester Third Year is required",
                 min: { value: 0, message: "Minimum value is 0" },
-                max: { value: 10, message: "Maximum value is 10" },
+                max: { value: 4, message: "Maximum value is 4" },
               }}
               errors={errors}
             />
@@ -255,7 +255,7 @@ const College = () => {
               validation={{
                 required: "CGPA Sixth Semester Third Year is required",
                 min: { value: 0, message: "Minimum value is 0" },
-                max: { value: 10, message: "Maximum value is 10" },
+                max: { value: 4, message: "Maximum value is 4" },
               }}
               errors={errors}
             />
@@ -303,7 +303,7 @@ const College = () => {
             />
 
             <FormInput
-              id="last_received_marksheet "
+              id="last_received_marksheet"
               label="Last Received Student Marksheet(s)"
               type="date"
               placeholder="Last Received Student Marksheets"

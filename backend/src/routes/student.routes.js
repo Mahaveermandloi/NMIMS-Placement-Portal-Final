@@ -93,7 +93,7 @@ router.get("/get-profile", verifyJWT, verifyAPIKey, getProfile);
 
 router.get("/get-profile-image", verifyJWT, verifyAPIKey, getProfileImage);
 
-router.delete("/delete-student", verifyJWT, handleFormData, deleteStudent);
+router.delete("/delete-student/:student_sap_no", verifyJWT, handleFormData, deleteStudent);
 
 router.post(
   "/upload-student-file",

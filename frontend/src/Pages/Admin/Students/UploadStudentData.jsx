@@ -1,3 +1,4 @@
+ 
 import React, { useState, useEffect } from "react";
 import { postApi, getApi } from "../../../Utils/API";
 import Loader from "../../../Components/Loader";
@@ -12,14 +13,12 @@ const UploadStudentData = () => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
 
-  // Get today's date on component mount
   useEffect(() => {
-    const currentDate = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    const currentDate = new Date().toISOString().split("T")[0];
     setTodayDate(currentDate);
     fetchUploadedFiles();
   }, []);
 
-  // Fetch uploaded files from the server
   const fetchUploadedFiles = async () => {
     setLoadingFiles(true);
     try {
@@ -37,7 +36,6 @@ const UploadStudentData = () => {
     }
   };
 
-  // Handle file change
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (
@@ -53,7 +51,6 @@ const UploadStudentData = () => {
     }
   };
 
-  // Handle submit
   const handleSubmit = async () => {
     if (file && isFileSelected) {
       setLoading(true);
@@ -71,8 +68,22 @@ const UploadStudentData = () => {
           "/api/student/upload-student-file"
         );
 
+        console.log(response);
         if (response.statusCode === 200) {
           toast.success("Student data uploaded successfully!");
+
+          // Extract email details from response
+          const { emailArray, emailSubject, emailText } = response.data;
+
+          // Format the email
+          const mailtoLink = `mailto:${emailArray.join(
+            ","
+          )}?subject=${encodeURIComponent(
+            emailSubject
+          )}&body=${encodeURIComponent(emailText)}`;
+
+          // Open the default email client
+          window.open(mailtoLink, "_blank");
         } else {
           toast.error("Failed to upload student data.");
         }
@@ -86,11 +97,10 @@ const UploadStudentData = () => {
     }
   };
 
-  // Handle file download
   const handleDownload = (filePath) => {
     const link = document.createElement("a");
-    link.href = `${SERVER_URL}${filePath}`; // Assuming files are served from this path
-    link.download = filePath.split("/").pop(); // Extract the file name from the path
+    link.href = `${SERVER_URL}${filePath}`;
+    link.download = filePath.split("/").pop();
     link.click();
   };
 
@@ -99,10 +109,7 @@ const UploadStudentData = () => {
       <div className="">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-3xl font-bold">Upload Student Data</h1>
-          <a
-            href="../../../../public/TemplateFile.xlsx" // File located in public folder
-            download // This attribute triggers the download
-          >
+          <a href="../../../../public/TemplateFile.xlsx" download>
             <button className="bg-blue-500 text-white px-4 py-2 rounded">
               Download Excel Template
             </button>
@@ -143,7 +150,6 @@ const UploadStudentData = () => {
           {loading ? <Loader /> : "Submit"}
         </button>
 
-        {/* Display uploaded files */}
         <div className="mt-8">
           <h2 className="text-2xl font-bold mb-4">Uploaded Files</h2>
           {loadingFiles ? (
