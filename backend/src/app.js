@@ -59,6 +59,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
   "http://192.168.166.62:3000",
+  "https://nmims-placement-backend-v2.vercel.app"
   // Replace with your specific frontend URL
 ];
 
