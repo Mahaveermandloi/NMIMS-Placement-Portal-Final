@@ -72,14 +72,8 @@ const EditCompaniesDetails = () => {
       // Prepare the payload
       const payload = {
         company_name: data.company_name,
-        selection_rounds: data.selection_rounds,
-        eligible_branches_and_programs: data.eligible_branches_and_programs,
-        academic_criteria: data.academic_criteria,
-        designation: data.designation,
-        package: data.package,
         year: data.year,
         company_logo: logoPreview,
-        company_files: filePreview,
       };
 
       // Send the data to the API
@@ -133,6 +127,7 @@ const EditCompaniesDetails = () => {
           <h1 className="text-3xl font-bold">Edit Company Details</h1>
         </div>
       </div>
+
       <form
         onSubmit={handleSubmitCompany(onSubmitCompany)}
         className="space-y-4"
@@ -164,184 +159,26 @@ const EditCompaniesDetails = () => {
 
         <div>
           <label
-            htmlFor="selection_rounds"
+            htmlFor="year"
             className="block text-sm font-bold text-gray-700"
           >
-            Selection Rounds
+            Year
           </label>
-          <input
-            type="text"
-            id="selection_rounds"
-            placeholder="Enter Selection Rounds"
+          <select
+            id="year"
             className={`block w-full p-2 border rounded ${
-              errorsCompany.selection_rounds ? "border-red-500" : ""
+              errorsCompany.year ? "border-red-500" : ""
             }`}
-            {...registerCompany("selection_rounds", {
-              required: "Selection rounds are required",
-            })}
-          />
-          {errorsCompany.selection_rounds && (
-            <p className="text-red-500 text-sm">
-              {errorsCompany.selection_rounds.message}
-            </p>
+            {...registerCompany("year", { required: "Year is required" })}
+          >
+            <option value="">Select Year</option>
+            <option value={2022}>2022</option>
+            <option value={2023}>2023</option>
+            <option value={2024}>2024</option>
+          </select>
+          {errorsCompany.year && (
+            <p className="text-red-500 text-sm">{errorsCompany.year.message}</p>
           )}
-        </div>
-
-        <div className="flex flex-col lg:grid grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="eligible_branches_and_programs"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Eligible Programs and Branches
-            </label>
-            <textarea
-              id="eligible_branches_and_programs"
-              placeholder="Enter Eligible Programs and Branches"
-              className={`block w-full p-2 border rounded ${
-                errorsCompany.eligible_branches_and_programs
-                  ? "border-red-500"
-                  : ""
-              }`}
-              {...registerCompany("eligible_branches_and_programs", {
-                required: "Eligible programs and branches are required",
-              })}
-            />
-            {errorsCompany.eligible_branches_and_programs && (
-              <p className="text-red-500 text-sm">
-                {errorsCompany.eligible_branches_and_programs.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="academic_criteria"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Academic Criteria
-            </label>
-            <textarea
-              id="academic_criteria"
-              placeholder="Enter Academic Criteria"
-              className={`block w-full p-2 border rounded ${
-                errorsCompany.academic_criteria ? "border-red-500" : ""
-              }`}
-              {...registerCompany("academic_criteria", {
-                required: "Academic criteria is required",
-              })}
-            />
-            {errorsCompany.academic_criteria && (
-              <p className="text-red-500 text-sm">
-                {errorsCompany.academic_criteria.message}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="flex flex-col lg:grid grid-cols-2 gap-4">
-          <div className="">
-            <label
-              htmlFor="designation"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Designation
-            </label>
-            <input
-              type="text"
-              id="designation"
-              placeholder="Enter Designation"
-              className={`block w-full p-2 border rounded ${
-                errorsCompany.designation ? "border-red-500" : ""
-              }`}
-              {...registerCompany("designation", {
-                required: "Designation is required",
-              })}
-            />
-            {errorsCompany.designation && (
-              <p className="text-red-500 text-sm">
-                {errorsCompany.designation.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="package"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Details of CTC
-            </label>
-            <input
-              type="text"
-              id="package"
-              placeholder="Enter Package"
-              className={`block w-full p-2 border rounded ${
-                errorsCompany.package ? "border-red-500" : ""
-              }`}
-              {...registerCompany("package", {
-                required: "Package is required",
-              })}
-            />
-            {errorsCompany.package && (
-              <p className="text-red-500 text-sm">
-                {errorsCompany.package.message}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="flex flex-col lg:grid grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="package"
-              className="block text-sm font-bold text-gray-700"
-            >
-              CTC
-            </label>
-            <input
-              type="text"
-              id="package"
-              placeholder="Enter Package"
-              className={`block w-full p-2 border rounded ${
-                errorsCompany.package ? "border-red-500" : ""
-              }`}
-              {...registerCompany("package", {
-                required: "Package is required",
-              })}
-            />
-            {errorsCompany.package && (
-              <p className="text-red-500 text-sm">
-                {errorsCompany.package.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="year"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Year
-            </label>
-            <select
-              id="year"
-              className={`block w-full p-2 border rounded ${
-                errorsCompany.year ? "border-red-500" : ""
-              }`}
-              {...registerCompany("year", { required: "Year is required" })}
-            >
-              <option value="">Select Year</option>
-              <option value={2022}>2022</option>
-              <option value={2023}>2023</option>
-              <option value={2024}>2024</option>
-            </select>
-            {errorsCompany.year && (
-              <p className="text-red-500 text-sm">
-                {errorsCompany.year.message}
-              </p>
-            )}
-          </div>
         </div>
 
         <div className="flex flex-col lg:grid grid-cols-2 gap-4">
@@ -365,31 +202,6 @@ const EditCompaniesDetails = () => {
                 <img
                   src={`${SERVER_URL}${logoPreview}`}
                   alt="Logo Preview"
-                  className="w-32 h-32 object-cover rounded"
-                />
-              </div>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="company_files"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Company Files
-            </label>
-            <input
-              type="file"
-              id="company_files"
-              className="block w-full p-2 border rounded"
-              {...registerCompany("company_files")}
-              onChange={handleFileChange}
-            />
-            {filePreview && (
-              <div className="mt-5 bg-gray-100">
-                <img
-                  src={thumbnail}
-                  alt="File Preview"
                   className="w-32 h-32 object-cover rounded"
                 />
               </div>

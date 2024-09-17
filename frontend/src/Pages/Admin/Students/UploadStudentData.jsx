@@ -1,9 +1,9 @@
- 
 import React, { useState, useEffect } from "react";
 import { postApi, getApi } from "../../../Utils/API";
 import Loader from "../../../Components/Loader";
 import { toast } from "react-toastify";
 import { SERVER_URL } from "../../../Utils/URLPath";
+import { FaDownload } from "react-icons/fa";
 
 const UploadStudentData = () => {
   const [file, setFile] = useState(null);
@@ -107,17 +107,22 @@ const UploadStudentData = () => {
   return (
     <>
       <div className="">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold">Upload Student Data</h1>
+        <div className="flex justify-between items-center mb-4  ">
+          <h1 className="text-xl lg:text-3xl font-bold">Upload Student Data</h1>
+
           <a href="../../../../public/TemplateFile.xlsx" download>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded">
-              Download Excel Template
+         
+            <button className="bg-blue-500 text-white px-4 py-2 rounded flex items-center">
+              <FaDownload className="block lg:hidden" />
+
+            
+              <span className="hidden lg:block">Download Excel Template</span>
             </button>
           </a>
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block  text-sm font-medium text-gray-700">
             Upload File:
           </label>
           <input
@@ -136,7 +141,7 @@ const UploadStudentData = () => {
             type="date"
             value={todayDate}
             disabled
-            className="mt-1 block w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed"
+            className="mt-1 block  w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed"
           />
         </div>
 
@@ -151,11 +156,12 @@ const UploadStudentData = () => {
         </button>
 
         <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">Uploaded Files</h2>
+          <h2 className="text-xl lg:text-2xl font-bold mb-4">Uploaded Files</h2>
+         
           {loadingFiles ? (
             <Loader />
           ) : uploadedFiles.length > 0 ? (
-            <table className="min-w-full bg-white border">
+            <table className="lg:w-full bg-white border">
               <thead>
                 <tr>
                   <th className="py-2 px-4 border">Date</th>
@@ -175,7 +181,7 @@ const UploadStudentData = () => {
                     <td className="py-2 px-4 border">
                       <button
                         onClick={() => handleDownload(file.filePath)}
-                        className="bg-blue-500 text-white px-4 py-1 rounded"
+                        className="bg-blue-500 text-white lg:px-4 py-1 rounded"
                       >
                         Download
                       </button>
@@ -188,6 +194,8 @@ const UploadStudentData = () => {
             <p>No files uploaded yet.</p>
           )}
         </div>
+
+
       </div>
     </>
   );

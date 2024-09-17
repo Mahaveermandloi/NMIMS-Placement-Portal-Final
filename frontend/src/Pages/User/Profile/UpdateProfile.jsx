@@ -65,6 +65,7 @@ const UpdateProfile = () => {
 
         // Refresh profile data
         const updatedProfile = await getApi("/api/student/get-profile");
+        
         setProfile(updatedProfile.data);
 
         setTimeout(() => {

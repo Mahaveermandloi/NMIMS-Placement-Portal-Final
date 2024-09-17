@@ -12,6 +12,8 @@ import branchRoutes from "../src/routes/branch.routes.js";
 import placedstudentsRoutes from "../src/routes/placedstudents.routes.js";
 import shortlistedstudentsRoutes from "../src/routes/shortlistedstudents.routes.js";
 import studentrequest from "../src/routes/studentrequest.routes.js"
+import announcementRoutes from "../src/routes/announcement.routes.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -83,7 +85,11 @@ app.use("/api/student", userRoutes);
 
 app.use("/api/company", companyRoutes);
 
+
+
 app.use("/api", branchRoutes);
+
+app.use("/api", announcementRoutes);
 
 app.use("/api",  studentrequest);
 

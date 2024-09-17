@@ -35,8 +35,8 @@ const RequestedStudentInfo = () => {
   return (
     <>
       <Toast />
-      <div className="container mx-auto  text-sm  lg:text-md  ">
-        <h2 className="text-xl lg:text-2xl font-bold mb-4">
+      <div className="container  mx-auto  text-sm  lg:text-md  ">
+        <h2 className="text-xl lg:text-2xl  font-bold mb-4">
           Student Information
         </h2>
         <div className="overflow-x-auto">

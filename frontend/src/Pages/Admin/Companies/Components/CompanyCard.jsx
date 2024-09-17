@@ -90,22 +90,22 @@ const CompanyCard = ({ company }) => {
           </p>
 
           <div className="flex mt-3 space-x-2">
-            <button
+            {/* <button
               className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm"
               onClick={() =>
                 navigate(`${ADMIN_PATH}/company-detail/${company._id}`)
               }
             >
               Read More
-            </button>
-            <button
+            </button> */}
+            {/* <button
               className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
               onClick={() =>
                 navigate(`${ADMIN_PATH}/edit-company-details/${company._id}`)
               }
             >
               Edit
-            </button>
+            </button> */}
             <button
               className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
               onClick={() => handleDelete(company._id)}

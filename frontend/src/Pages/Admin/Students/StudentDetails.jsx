@@ -132,7 +132,7 @@ const StudentDetails = () => {
     <>
       <Toast />
       <div>
-        <div className="flex  flex-col lg:flex-row  justify-between   lg:items-center">
+        <div className="flex   flex-col lg:flex-row  justify-between   lg:items-center">
           <div>
             <h1 className="text-3xl font-bold mb-4">Student Details</h1>
           </div>

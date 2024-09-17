@@ -3,9 +3,11 @@ import Button from "@mui/material/Button";
 import CustomPaginationActionsTable from "../../../Components/TablePaginationActions.jsx";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_PATH, SERVER_URL } from "../../../Utils/URLPath.jsx";
-import { getApi } from "../../../Utils/API.js";
+import { getApi, deleteApi } from "../../../Utils/API.js";
 import { toast } from "react-toastify";
 import Loader from "../../../Components/Loader.jsx";
+import { IoAddCircleOutline } from "react-icons/io5";
+import { FaUpload } from "react-icons/fa";
 
 const ShortlistedStudents = () => {
   const [students, setStudents] = useState([]);
@@ -27,13 +29,16 @@ const ShortlistedStudents = () => {
       try {
         const response = await getApi(`${SERVER_URL}/api/shortlistedstudents`);
 
+        console.log(response);
+
         if (response.statusCode === 200) {
           const data = response.data.map((student) => ({
+            student_profile_image: student.student_profile_image,
             id: student._id, // Ensure the student ID is included
             student_sap_no: student.student_sap_no,
             name_of_student: student.name_of_student,
             company: student.company_name,
-            job_role: student.job_title,
+            student_sap_no: student.student_sap_no,
             branch: student.engineering_specialization || "Unknown", // Set branch field here
             year: student.year,
           }));
@@ -83,11 +88,52 @@ const ShortlistedStudents = () => {
     setFilteredData(data);
   }, [year, company, branch, students]);
 
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this student?")) {
+      try {
+        const response = await deleteApi(
+          `${SERVER_URL}/api/shortlistedstudents/${id}`
+        );
+        if (response.statusCode === 200) {
+          // Remove the deleted student from the state
+          setStudents((prevStudents) =>
+            prevStudents.filter((student) => student.id !== id)
+          );
+          setFilteredData((prevData) =>
+            prevData.filter((student) => student.id !== id)
+          );
+          toast.success("Shortlisted Student removed successfully");
+        } else {
+          toast.error(response.message || "Failed to delete student");
+        }
+      } catch (error) {
+        toast.error("Failed to delete student");
+      }
+    }
+  };
+
   const columns = [
+    {
+      id: "student_profile_image",
+      label: "Photo",
+      align: "left",
+      render: (row) => (
+        <img
+          src={`${SERVER_URL}${row.student_profile_image}`}
+          alt={row.name_of_student}
+          style={{
+            width: 50,
+            height: 50,
+            borderRadius: "50%", // This makes the image rounded
+            objectFit: "cover", // Ensures the image covers the area without distortion
+          }}
+        />
+      ),
+    },
     { id: "name_of_student", label: "Name", align: "left" },
     { id: "company", label: "Company", align: "left" },
-    { id: "job_role", label: "Job Role", align: "left" },
-    { id: "branch", label: "Branch", align: "left" }, // Ensure column ID is branch
+    { id: "branch", label: "Branch", align: "left" },
+    { id: "student_sap_no", label: "Student SAP ID", align: "left" },
     {
       id: "actions",
       label: "Actions",
@@ -96,13 +142,10 @@ const ShortlistedStudents = () => {
         <div style={{ display: "flex", justifyContent: "center", gap: "8px" }}>
           <Button
             variant="contained"
-            color="primary"
-            onClick={
-              () =>
-                navigate(`${ADMIN_PATH}/shortlisted-student-details/${row.id}`) // Use student ID for navigation
-            }
+            color="error"
+            onClick={() => handleDelete(row.id)}
           >
-            Info
+            Delete
           </Button>
         </div>
       ),
@@ -111,32 +154,34 @@ const ShortlistedStudents = () => {
 
   return (
     <>
-      {loading && <Loader />} {/* Show loader while loading */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold">Shortlisted Students</h1>
-
-        <div>
+      {loading && <Loader />}
+      <div className="flex justify-between  items-center mb-4">
+        <h1 className="text-2xl lg:text-3xl font-bold">Shortlisted Students</h1>
+        <div className="flex space-x-2">
           <button
             type="button"
             onClick={() => navigate(`${ADMIN_PATH}/add-shortlisted-student`)}
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 flex items-center"
           >
-            Add Student Shortlisted
+            <span className="hidden md:inline">Add Student Shortlisted</span>
+            <IoAddCircleOutline className="inline md:hidden" size={20} />
           </button>
+
           <button
             type="button"
             onClick={() =>
               navigate(`${ADMIN_PATH}/upload-shortlisted-students`)
             }
-            className="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 "
+            className="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 flex items-center"
           >
-            Upload Excel
+            <span className="hidden md:inline">Upload Excel</span>
+            <FaUpload className="inline md:hidden" size={20} />
           </button>
         </div>
       </div>
-      <div className="mb-4">
-        <div className="flex gap-4 mb-4">
-          <div className="flex-1">
+      <div className="mb-4 lg:w-full w-[340px] ">
+        <div className="flex  flex-col lg:flex-row     gap-4 mb-4">
+          <div className="">
             <label
               htmlFor="year"
               className="block text-sm font-medium text-gray-700"
@@ -147,7 +192,7 @@ const ShortlistedStudents = () => {
               id="year"
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              className="block w-full p-2 border rounded"
+              className="block w-full  p-2 border rounded"
             >
               <option value="">Select Year</option>
               {years.map((yr) => (
@@ -158,7 +203,7 @@ const ShortlistedStudents = () => {
             </select>
           </div>
 
-          <div className="flex-1">
+          <div className="">
             <label
               htmlFor="company"
               className="block text-sm font-medium text-gray-700"
@@ -180,7 +225,7 @@ const ShortlistedStudents = () => {
             </select>
           </div>
 
-          <div className="flex-1">
+          <div className="">
             <label
               htmlFor="branch"
               className="block text-sm font-medium text-gray-700"
@@ -203,14 +248,15 @@ const ShortlistedStudents = () => {
           </div>
         </div>
 
-        <div className="lg:w-full w-full">
+        <div className="">
           <CustomPaginationActionsTable
             data={filteredData.map((student) => ({
               id: student.id,
+              student_profile_image: student.student_profile_image,
               name_of_student: student.name_of_student,
               company: student.company,
-              job_role: student.job_role,
               branch: student.branch,
+              student_sap_no: student.student_sap_no,
               actions: columns
                 .find((col) => col.id === "actions")
                 .render(student),

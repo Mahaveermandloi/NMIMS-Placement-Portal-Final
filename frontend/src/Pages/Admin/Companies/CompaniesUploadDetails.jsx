@@ -62,22 +62,15 @@ const UploadCompaniesDetails = () => {
     <>
       <Toast />
       <div className="flex mb-4">
-        <button
-          className={`px-4 py-2 mr-2 rounded ${
-            tab === "uploadCompany" ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
-          onClick={() => setTab("uploadCompany")}
-        >
-          Upload a Company
-        </button>
-        <button
+        <h1 className="text-3xl font-bold">Add a Company</h1>
+        {/* <button
           className={`px-4 py-2 rounded ${
             tab === "uploadExcel" ? "bg-blue-500 text-white" : "bg-gray-200"
           }`}
           onClick={() => setTab("uploadExcel")}
         >
           Upload via Excel
-        </button>
+        </button> */}
       </div>
 
       {tab === "uploadCompany" ? (
@@ -112,155 +105,9 @@ const UploadCompaniesDetails = () => {
             </div>
             {/* Other fields */}
 
-            <div>
-              <label
-                htmlFor="selection_rounds"
-                className="block text-sm font-bold text-gray-700"
-              >
-                Selection Rounds
-              </label>
-              <input
-                type="text"
-                id="selection_rounds"
-                placeholder="Enter Selection Rounds"
-                className={`block w-full p-2 border rounded ${
-                  errorsCompany.selection_rounds ? "border-red-500" : ""
-                }`}
-                {...registerCompany("selection_rounds", {
-                  required: "Selection rounds are required",
-                })}
-              />
-              {errorsCompany.selection_rounds && (
-                <p className="text-red-500 text-sm">
-                  {errorsCompany.selection_rounds.message}
-                </p>
-              )}
-            </div>
+          
 
-            <div>
-              <label
-                htmlFor="eligible_branches_and_programs"
-                className="block text-sm font-bold text-gray-700"
-              >
-                Eligible Programs and Branches
-              </label>
-              <textarea
-                id="eligible_branches_and_programs"
-                placeholder="Enter Eligible Programs and Branches"
-                className={`block w-full p-2 border rounded ${
-                  errorsCompany.eligible_branches_and_programs
-                    ? "border-red-500"
-                    : ""
-                }`}
-                {...registerCompany("eligible_branches_and_programs", {
-                  required: "Eligible programs and branches are required",
-                })}
-              />
-              {errorsCompany.eligible_branches_and_programs && (
-                <p className="text-red-500 text-sm">
-                  {errorsCompany.eligible_branches_and_programs.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="academic_criteria"
-                className="block text-sm font-bold text-gray-700"
-              >
-                Academic Criteria
-              </label>
-              <textarea
-                id="academic_criteria"
-                placeholder="Enter Academic Criteria"
-                className={`block w-full p-2 border rounded ${
-                  errorsCompany.academic_criteria ? "border-red-500" : ""
-                }`}
-                {...registerCompany("academic_criteria", {
-                  required: "Academic criteria is required",
-                })}
-              />
-              {errorsCompany.academic_criteria && (
-                <p className="text-red-500 text-sm">
-                  {errorsCompany.academic_criteria.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="designation"
-                className="block text-sm font-bold text-gray-700"
-              >
-                Designation
-              </label>
-              <input
-                type="text"
-                id="designation"
-                placeholder="Enter Designation"
-                className={`block w-full p-2 border rounded ${
-                  errorsCompany.designation ? "border-red-500" : ""
-                }`}
-                {...registerCompany("designation", {
-                  required: "Designation is required",
-                })}
-              />
-              {errorsCompany.designation && (
-                <p className="text-red-500 text-sm">
-                  {errorsCompany.designation.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="details_of_ctc"
-                className="block text-sm font-bold text-gray-700"
-              >
-                Details of CTC
-              </label>
-              <input
-                type="text"
-                id="details_of_ctc"
-                placeholder="Enter Details of CTC"
-                className={`block w-full p-2 border rounded ${
-                  errorsCompany.details_of_ctc ? "border-red-500" : ""
-                }`}
-                {...registerCompany("details_of_ctc", {
-                  required: "Details of the CTC are required",
-                })}
-              />
-              {errorsCompany.details_of_ctc && (
-                <p className="text-red-500 text-sm">
-                  {errorsCompany.details_of_ctc.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="ctc"
-                className="block text-sm font-bold text-gray-700"
-              >
-                CTC
-              </label>
-              <input
-                type="text"
-                id="ctc"
-                placeholder="Enter CTC"
-                className={`block w-full p-2 border rounded ${
-                  errorsCompany.ctc ? "border-red-500" : ""
-                }`}
-                {...registerCompany("ctc", {
-                  required: "CTC is required",
-                })}
-              />
-              {errorsCompany.ctc && (
-                <p className="text-red-500 text-sm">
-                  {errorsCompany.ctc.message}
-                </p>
-              )}
-            </div>
+          
 
             <div>
               <label
@@ -311,22 +158,7 @@ const UploadCompaniesDetails = () => {
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="company_files"
-                className="block text-sm font-bold text-gray-700"
-              >
-                Additional Files
-              </label>
-              <input
-                type="file"
-                id="company_files"
-                className="block w-full p-2 border rounded"
-                multiple
-                accept=".pdf, .xlsx, .xls, .doc, .docx, .ppt, .pptx, .txt" // Allow specific file types
-                {...registerCompany("company_files")}
-              />
-            </div>
+          
           </div>
 
           <div className="relative">
@@ -347,43 +179,8 @@ const UploadCompaniesDetails = () => {
           </div>
         </form>
       ) : (
-        <form onSubmit={handleSubmitExcel(onSubmitExcel)} className="space-y-4">
-          <div>
-            <label
-              htmlFor="excel_file"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Upload Excel File
-            </label>
-            <input
-              type="file"
-              id="excel_file"
-              className="block w-full p-2 border rounded"
-              {...registerExcel("excel_file", {
-                required: "Excel file is required",
-              })}
-            />
-            {errorsExcel.excel_file && (
-              <p className="text-red-500 text-sm">
-                {errorsExcel.excel_file.message}
-              </p>
-            )}
-          </div>
-
-          <div className="relative">
-            <button
-              type="submit"
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-            >
-              Upload
-            </button>
-            {loadingExcel && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Loader message="Uploading..." />
-              </div>
-            )}
-          </div>
-        </form>
+        <>
+        </>
       )}
     </>
   );

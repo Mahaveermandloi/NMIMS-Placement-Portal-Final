@@ -37,15 +37,16 @@ import UploadExcel from "../Pages/Admin/Shortlisted Students/UploadExcel.jsx";
 import { removeTokensAndRedirectForAdminRoutes } from "../Components/AdminTokenManager.jsx";
 import { getApi } from "../Utils/API.js";
 import Announcements from "../Pages/Admin/Announcements/Announcements.jsx";
-import AddAnnouncements from "../Pages/Admin/Announcements/AddAnnouncements.jsx";
 import RequestedStudentInfo from "../Pages/Admin/Students/RequestedStudentInfo.jsx";
-const AdminRoutes = () => {
+import AddAnnouncement from "../Pages/Admin/Announcements/AddAnnouncements.jsx";
+import UpdateAnnouncement from "../Pages/Admin/Announcements/UpdateAnnouncements.jsx";
 
+const AdminRoutes = () => {
   const navigate = useNavigate();
 
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-  
- useEffect(() => {
+
+  useEffect(() => {
     const checkAuthentication = () => {
       const refreshToken = localStorage.getItem("refreshToken");
 
@@ -55,12 +56,10 @@ const AdminRoutes = () => {
         setIsAdminAuthenticated(false);
         navigate(`${ADMIN_PATH}/login`);
       }
-      
     };
 
     checkAuthentication();
   }, []);
-
 
   // const verifyRefreshToken = async () => {
   //   try {
@@ -71,7 +70,7 @@ const AdminRoutes = () => {
   //     if (response.statusCode === 200) {
   //       const data = response.data;
   //       localStorage.setItem("expiresIn", data.expiresIn);
-   
+
   //       setIsAdminAuthenticated(true);
   //     } else {
   //       throw new Error("Failed to verify refresh token");
@@ -82,8 +81,6 @@ const AdminRoutes = () => {
   //     removeTokensAndRedirectForAdminRoutes(navigate);
   //   }
   // };
-
-  
 
   return (
     <Routes>
@@ -105,15 +102,16 @@ const AdminRoutes = () => {
 
                   <Route path="student-request" element={<StudentRequest />} />
 
-                  <Route path="student-request/:student_sap_no" element={<RequestedStudentInfo />} />
-
+                  <Route
+                    path="student-request/:student_sap_no"
+                    element={<RequestedStudentInfo />}
+                  />
 
                   <Route path="student-details" element={<StudentDetails />} />
                   <Route
                     path="student-details/:student_sap_no"
                     element={<StudentCompleteDetails />}
                   />
-
 
                   <Route
                     path="upload-student-details"
@@ -126,13 +124,18 @@ const AdminRoutes = () => {
                   />
 
                   <Route path="companies" element={<Companies />} />
-              
+
                   <Route path="announcements" element={<Announcements />} />
 
-                  <Route path="add-announcement" element={<AddAnnouncements />} />
+                  <Route
+                    path="add-announcements"
+                    element={<AddAnnouncement />}
+                  />
 
-
-
+                  <Route
+                    path="update-announcement/:id"
+                    element={<UpdateAnnouncement />}
+                  />
 
                   <Route
                     path="company-detail/:id"
@@ -201,6 +204,7 @@ const AdminRoutes = () => {
                     element={<Navigate to="dashboard" replace />}
                   />
                 </Routes>
+                
               </Sidebar>
             }
           />

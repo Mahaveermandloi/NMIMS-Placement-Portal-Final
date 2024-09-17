@@ -244,12 +244,15 @@ const getApi2 = async (data, route) => {
 // PUT API
 const putApi = async (data, route) => {
   try {
-    const formData = toFormData(data);
+    console.log(data);
 
+    const formData = toFormData(data);
     console.log("FormData contents:");
     formData.forEach((value, key) => {
       console.log(`${key}:`, value);
     });
+
+    // const formData = toFormData(data);
 
     const response = await api.put(route, formData, {
       headers: {

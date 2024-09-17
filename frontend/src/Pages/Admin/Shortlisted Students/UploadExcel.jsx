@@ -13,6 +13,9 @@ const UploadExcel = () => {
   const [loading, setLoading] = useState(false); // State to control the loader
   const navigate = useNavigate();
 
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [loadingFiles, setLoadingFiles] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -23,11 +26,9 @@ const UploadExcel = () => {
   useEffect(() => {
     // Fetch companies
 
-   
     const fetchCompanies = async () => {
-
       setLoading(true);
-    
+
       try {
         const response = await getApi(
           `${SERVER_URL}/api/company/get-all-companies`
@@ -39,18 +40,36 @@ const UploadExcel = () => {
         }
       } catch (error) {
         toast.error("Error fetching companies");
-      }
-      finally{
+      } finally {
         setLoading(false);
-    
       }
     };
+
+    const fetchExcels = async () => {
+      setLoading(true);
+
+      try {
+        const response = await getApi(
+          `${SERVER_URL}/api/get-all-shortlisted-excels`
+        );
+        if (response.statusCode === 200) {
+          setUploadedFiles(response.data);
+        } else {
+          toast.error("Failed to fetch companies");
+        }
+      } catch (error) {
+        toast.error("Error fetching companies");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExcels();
 
     fetchCompanies();
   }, []);
 
   const onSubmit = async (data) => {
-     
     if (!data.company_name) {
       toast.error("Please select a company");
       return;
@@ -64,8 +83,6 @@ const UploadExcel = () => {
     }
 
     setLoading(true);
-
-    
 
     try {
       const response = await postApi(
@@ -92,8 +109,13 @@ const UploadExcel = () => {
     <>
       <Toast />
 
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Upload Excel File</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-3xl font-bold">Upload Student Data</h1>
+        <a href="../../../../public/ShortlistedStudents.xlsx" download>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded">
+            Download Excel Template
+          </button>
+        </a>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -182,6 +204,45 @@ const UploadExcel = () => {
           <Loader />
         )}
       </form>
+
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold mb-4">Uploaded Files</h2>
+        {loadingFiles ? (
+          <Loader />
+        ) : uploadedFiles.length > 0 ? (
+          <table className="min-w-full bg-white border">
+            <thead>
+              <tr>
+                <th className="py-2 px-4 border">Date</th>
+                <th className="py-2 px-4 border">File Name</th>
+                <th className="py-2 px-4 border">Download</th>
+              </tr>
+            </thead>
+            <tbody>
+              {uploadedFiles.map((file) => (
+                <tr key={file._id}>
+                  <td className="py-2 px-4 border">
+                    {new Date(file.date).toLocaleDateString()}
+                  </td>
+                  <td className="py-2 px-4 border">
+                    {file.filePath.split("/").pop()}
+                  </td>
+                  <td className="py-2 px-4 border">
+                    <button
+                      onClick={() => handleDownload(file.filePath)}
+                      className="bg-blue-500 text-white px-4 py-1 rounded"
+                    >
+                      Download
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No files uploaded yet.</p>
+        )}
+      </div>
     </>
   );
 };

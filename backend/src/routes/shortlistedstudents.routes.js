@@ -4,6 +4,7 @@ import handleFormData from "../middleware/handleFormData.js";
 import {
   createShortlistedStudent,
   deleteShortlistedStudent,
+  getAllExcels,
   getAllShortlistedStudents,
   getShortlistedStudentById,
   updateShortlistedStudent,
@@ -45,5 +46,12 @@ router.post(
   uploadShortlistedStudent,
   uploadExcelShortlistedStudent
 );
+
+
+router.get("/get-all-shortlisted-excels" , verifyJWT , getAllExcels);
+
+
+
+
 
 export default router;

@@ -7,42 +7,43 @@ import Student from "../models/student.model.js";
 import Joblisting from "../models/joblisting.model.js";
 import JobListing from "../models/joblisting.model.js";
 import { SendWhatsAppMessage } from "../utils/SendWhatsAppMessage.js";
-// import { sendEmail } from "../utils/SendEmail.js";
+import { sendEmail } from "../utils/SendEmail.js";
 import Document from "../models/shortlistedstudentfiles.model.js";
 
 import XLSX from "xlsx";
 
 const createShortlistedStudent = asyncHandler(async (req, res) => {
   const {
+    branch,
     company_name,
-    job_title,
-    student_sap_no,
+    job_role,
     name_of_student,
-
+    student_email_id,
+    student_sap_no,
     year,
   } = req.body;
 
+  console.log(
+    branch,
+    company_name,
+    job_role,
+    name_of_student,
+    student_email_id,
+    student_sap_no,
+    year
+  );
+
   // Validate input fields
   if (
+    !branch ||
     !company_name ||
-    !job_title ||
-    !student_sap_no ||
+    !job_role ||
     !name_of_student ||
+    !student_email_id ||
+    !student_sap_no ||
     !year
   ) {
     throw new ApiError(400, "All fields are required");
-  }
-
-  // Check if the student is already shortlisted
-  const existingShortlistedStudent = await ShortlistedStudent.findOne({
-    student_sap_no,
-  });
-
-  if (existingShortlistedStudent) {
-    throw new ApiError(
-      409,
-      "Student with this SAP number is already shortlisted"
-    );
   }
 
   // Fetch the company and job IDs using their names
@@ -51,33 +52,58 @@ const createShortlistedStudent = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Company not found");
   }
 
-  const job = await Joblisting.findOne({ job_title });
+  const job = await Joblisting.findOne({ job_title: job_role });
   if (!job) {
     throw new ApiError(404, "Job not found");
   }
 
-  // Fetch engineering specialization from Student model
+  // Fetch engineering specialization and profile image from Student model
   const student = await Student.findOne({ student_sap_no });
   if (!student) {
     throw new ApiError(404, "Student not found");
   }
 
-  const engineering_specialization = student.engineering_specialization;
+  const { engineering_specialization, student_profile_image } = student;
 
+  // Create and save the ShortlistedStudent document
   const shortlistedStudent = new ShortlistedStudent({
     company_id: company._id,
     job_id: job._id,
     student_sap_no,
     company_name,
     name_of_student,
-    job_title,
+    job_title: job_role,
     student_email_id,
     engineering_specialization,
     year,
+    student_profile_image, // Save the student's profile image URL
   });
 
   await shortlistedStudent.save();
 
+  if (student) {
+    
+    const emailBody = `
+      Dear ${name_of_student},
+
+      Congratulations! You have been shortlisted for a job opportunity with ${company_name}. 
+
+      Your SAP number is: ${student_sap_no}.
+
+      Best regards,
+      Placement Team
+    `;
+
+    await sendEmail(
+      student_email_id,
+      "Shortlisted for Job Opportunity",
+      emailBody
+    );
+
+  
+  }
+
+  
   res
     .status(201)
     .json(
@@ -154,28 +180,12 @@ const updateShortlistedStudent = asyncHandler(async (req, res) => {
 const getAllShortlistedStudents = asyncHandler(async (req, res) => {
   const shortlistedStudents = await ShortlistedStudent.find();
 
-  const companies = await Company.find().select("company_name");
-  const jobs = await JobListing.find().select("job_title");
-
-  const companyMap = new Map(
-    companies.map((company) => [company._id.toString(), company.company_name])
-  );
-  const jobMap = new Map(
-    jobs.map((job) => [job._id.toString(), job.job_title])
-  );
-
-  const detailedShortlistedStudents = shortlistedStudents.map((student) => ({
-    ...student.toObject(),
-    company_name: companyMap.get(student.company_id.toString()) || "Unknown",
-    job_title: jobMap.get(student.job_id.toString()) || "Unknown",
-  }));
-
   res
     .status(200)
     .json(
       new ApiResponse(
         200,
-        detailedShortlistedStudents,
+        shortlistedStudents,
         "Shortlisted students fetched successfully"
       )
     );
@@ -243,14 +253,11 @@ const deleteShortlistedStudent = asyncHandler(async (req, res) => {
 const uploadExcelShortlistedStudent = asyncHandler(async (req, res) => {
   const { company_name, date } = req.body;
 
-  console.log(company_name, date);
-
   if (!company_name || !date) {
     throw new ApiError(400, "Company name and date are required");
   }
 
   const file = req.file;
-
   if (!file) {
     throw new ApiError(400, "File is required");
   }
@@ -263,6 +270,7 @@ const uploadExcelShortlistedStudent = asyncHandler(async (req, res) => {
     filePath,
   });
 
+  // Read Excel file and extract data
   const workbook = XLSX.readFile(file.path);
   const sheetNames = workbook.SheetNames;
   const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetNames[0]]);
@@ -273,34 +281,41 @@ const uploadExcelShortlistedStudent = asyncHandler(async (req, res) => {
   }
 
   for (const row of data) {
-    const { name_of_student, campus } = row;
+    const { student_sap_no, name_of_student, campus, student_email_id } = row;
 
-    if (campus && campus.toLowerCase() === "shirpur") {
-      // Find the student by name
-      const student = await Student.findOne({ name: name_of_student });
-      console.log(student);
+    console.log(student_sap_no, name_of_student, campus, student_email_id);
+
+    if (campus === "shirpur" || campus === "Shirpur") {
+      const student = await Student.findOne({ name_of_student });
+
+     
       if (student) {
-        // Send email to student
-        const emailBody = `Dear ${name_of_student},\n\nCongratulations! You have been shortlisted for a job opportunity with ${company_name}.\n\nBest regards,\nYour Company`;
+        const emailBody = `
+          Dear ${name_of_student},
+
+          Congratulations! You have been shortlisted for a job opportunity with ${company_name}. 
+
+          Your SAP number is: ${student_sap_no}.
+
+          Best regards,
+          Placement Team
+        `;
+
         await sendEmail(
-          student.student_email_id,
+          student_email_id,
           "Shortlisted for Job Opportunity",
           emailBody
         );
 
-        // Send WhatsApp message
-        const messageBody = `Congratulations ${name_of_student}! You have been shortlisted for a job opportunity with ${company_name}.`;
-        await SendWhatsAppMessage(student.student_mobile_no, messageBody);
 
-        // Create a ShortlistedStudent record
         await ShortlistedStudent.create({
           company_id: company._id,
-          job_id: null, // or set appropriate job ID if available
-          student_sap_no: student.student_sap_no,
+          job_id: null, // Set this to the appropriate job ID if available
+          student_sap_no: student_sap_no,
           company_name,
           name_of_student,
-          job_title: null, // or set appropriate job title if available
-          student_email_id: student.student_email_id,
+          job_title: null, // Set this to the appropriate job title if available
+          student_email_id,
           engineering_specialization: student.engineering_specialization,
           year: new Date(date).getFullYear(), // Convert date to year
         });
@@ -308,11 +323,29 @@ const uploadExcelShortlistedStudent = asyncHandler(async (req, res) => {
     }
   }
 
+  // Respond with success
   res
     .status(200)
     .json(
       new ApiResponse(200, null, "Shortlisted students processed successfully")
     );
+});
+
+const getAllExcels = asyncHandler(async (req, res) => {
+  try {
+    const document = await Document.find();
+
+    console.log(document);
+    res
+      .status(200)
+      .json(new ApiResponse(200, document, "Fetched data successfully!!"));
+  } catch (error) {
+    res
+      .status(500)
+      .json(
+        new ApiResponse(500, error.message, "Error retrieving Excel files")
+      );
+  }
 });
 
 // Exporting all CRUD controller functions for ShortlistedStudent
@@ -323,4 +356,5 @@ export {
   updateShortlistedStudent,
   deleteShortlistedStudent,
   uploadExcelShortlistedStudent,
+  getAllExcels,
 };

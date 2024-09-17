@@ -112,11 +112,11 @@ const Sidebar = (props) => {
               },
             ],
           },
-          // {
-          //   icon: <PiFactory size={25} />,
-          //   text: "Companies",
-          //   path: `${ADMIN_PATH}/companies`,
-          // },
+          {
+            icon: <PiFactory size={25} />,
+            text: "Companies",
+            path: `${ADMIN_PATH}/companies`,
+          },
           {
             icon: <GrAnnounce size={25} />,
             text: "Announcements",
