@@ -19,6 +19,13 @@ const storage = multer.diskStorage({
         file.mimetype === "application/vnd.ms-excel")
     ) {
       cb(null, path.join(__dirname, "..", "uploads", "ShortlistedStudent"));
+    } else if (
+      file.fieldname === "student_excel_file" &&
+      (file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+        file.mimetype === "application/vnd.ms-excel")
+    ) {
+      cb(null, path.join(__dirname, "..", "uploads", "Student", "Excel"));
     } else {
       cb(new Error("Unsupported file type"), null);
     }
@@ -31,6 +38,8 @@ const upload = multer({ storage });
 const uploadAdminProfileImage = upload.single("profile_image");
 
 const uploadShortlistedStudent = upload.single("excel_file");
+
+const uploadStudentFile = upload.single("student_excel_file");
 
 // Middleware to remove the old profile image
 const removeOldProfileImage = async (req, res, next) => {
@@ -57,4 +66,5 @@ export {
   uploadAdminProfileImage,
   removeOldProfileImage,
   uploadShortlistedStudent,
+  uploadStudentFile,
 };

@@ -114,15 +114,35 @@ const studentSchema = new Schema(
       type: String,
       default: "",
     },
-    student_marksheet: {
+
+    student_marksheet_sem_1: {
+      type: String,
+      default: "",
+    },
+    student_marksheet_sem_2: {
+      type: String,
+      default: "",
+    },
+    student_marksheet_sem_3: {
+      type: String,
+      default: "",
+    },
+    student_marksheet_sem_4: {
+      type: String,
+      default: "",
+    },
+    student_marksheet_sem_5: {
+      type: String,
+      default: "",
+    },
+    student_marksheet_sem_6: {
       type: String,
       default: "",
     },
     status: {
       type: String,
-      default: "pending",
+      default: "",
     },
-
   },
   { timestamps: true }
 );

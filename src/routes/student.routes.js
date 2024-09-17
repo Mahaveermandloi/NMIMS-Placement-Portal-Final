@@ -13,9 +13,13 @@ import {
   getStudentDetailsByBranch,
   getProfileImage,
   verifyRefreshToken,
+  uploadStudentDataViaExcel,
+  deleteStudent,
+  getAllExcels,
 } from "../controllers/student.controller.js";
 import { verifyAPIKey, verifyJWT } from "../middleware/auth.middleware.js";
 import handleFormData from "../middleware/handleFormData.js";
+import { uploadStudentFile } from "../middleware/multer.middleware.js";
 
 const router = Router();
 
@@ -69,7 +73,6 @@ router.get("/refresh-token", reGenerateAccessToken);
 
 router.get("/verify-refresh-token", verifyRefreshToken);
 
-
 router.put(
   "/update-profile",
   verifyJWT,
@@ -89,5 +92,18 @@ router.get("/get-student-by-branch", verifyJWT, getStudentDetailsByBranch);
 router.get("/get-profile", verifyJWT, verifyAPIKey, getProfile);
 
 router.get("/get-profile-image", verifyJWT, verifyAPIKey, getProfileImage);
+
+router.delete("/delete-student/:student_sap_no", verifyJWT, handleFormData, deleteStudent);
+
+router.post(
+  "/upload-student-file",
+  verifyJWT,
+  uploadStudentFile,
+  uploadStudentDataViaExcel
+);
+
+router.get("/get-all-excel" , verifyJWT , getAllExcels);
+
+
 
 export default router;

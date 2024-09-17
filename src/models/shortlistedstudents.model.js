@@ -11,12 +11,12 @@ const ShortlistedStudentSchema = new Schema({
   job_id: {
     type: Schema.Types.ObjectId,
     ref: "Job", // Reference to the Job model
-    required: true,
+    // required: true,
   },
   student_sap_no: {
     type: String,
     required: true,
-    unique: true,
+    unique: false,
   },
   company_name: {
     type: String,
@@ -28,7 +28,7 @@ const ShortlistedStudentSchema = new Schema({
   },
   job_title: {
     type: String,
-    required: true,
+    // required: true,
   },
   student_email_id: {
     type: String,
@@ -41,6 +41,10 @@ const ShortlistedStudentSchema = new Schema({
   year: {
     type: Number,
     required: true,
+  },
+  student_profile_image: {
+    type: String,
+    default: "",
   },
 });
 

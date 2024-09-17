@@ -2,265 +2,32 @@ import Company from "../models/company.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import Student from "../models/student.model.js";
-import { SendWhatsAppMessage } from "../utils/SendWhatsAppMessage.js";
-import { sendEmail } from "../utils/SendEmail.js";
-// import { emailQueue } from "../utils/SendEmail.js";
-
+ 
 const createCompany = asyncHandler(async (req, res) => {
-  const {
-    company_name,
-    selection_rounds,
-    eligible_branches_and_programs,
-    academic_criteria,
-    designation,
-    details_of_ctc,
-    ctc,
-    year,
-  } = req.body;
+  const { company_name, year } = req.body;
 
-  // Validate required fields
-  if (
-    [
-      company_name,
-      selection_rounds,
-      eligible_branches_and_programs,
-      academic_criteria,
-      designation,
-      details_of_ctc,
-      ctc,
-      year,
-    ].some((field) => field?.trim() === "")
-  ) {
+  if ([company_name, year].some((field) => !field || field?.trim() === "")) {
     throw new ApiError(400, "All fields are required");
   }
 
-  // Handle file uploads
-  const logoFile = req.files["company_logo"]
-    ? `/uploads/Company/Logo/${req.files["company_logo"][0].filename}`
+  const logoFile = req.files?.company_logo?.[0]
+    ? `/uploads/Company/Logo/${req.files.company_logo[0].filename}`
     : "";
-  const companyFiles = req.files["company_files"]
-    ? req.files["company_files"].map(
-        (file) => `/uploads/Company/Files/${file.filename}`
-      )
-    : [];
 
-  // Create and save company record
   const company = new Company({
-    company_name,
-    selection_rounds,
-    eligible_branches_and_programs,
-    academic_criteria,
-    designation,
-    details_of_ctc,
-    ctc,
+    company_name: company_name.trim(),
     year,
     company_logo: logoFile,
-    company_files: companyFiles,
   });
 
   await company.save();
 
-  // Prepare notification message for WhatsApp
-  // const message = `A new company, *${company_name}*, has been added to the placement portal. Check out the details and apply if you're eligible.`;
-
-  // Send WhatsApp notifications to all students
-
-  // const students = await Student.find();
-  // for (const student of students) {
-  //   try {
-  //     const response = await SendWhatsAppMessage(
-  //       student.student_mobile_no,
-  //       message
-  //     );
-  //     console.log(`Message sent to ${student.student_mobile_no}:`, response);
-  //   } catch (error) {
-  //     console.error(
-  //       `Failed to send message to ${student.student_mobile_no}:`,
-  //       error
-  //     );
-  //   }
-  // }
-
-  // Fetch email addresses from the Student collection
-
-  const studentsWithEmail = await Student.find({
-    student_email_id: { $ne: null },
-  }); // Fetch students with non-null email addresses
-  const emailAddresses = studentsWithEmail.map(
-    (student) => student.student_email_id
+  res.status(201).json(
+    new ApiResponse(201, {
+      company,
+    })
   );
-
-  // Prepare email content
-  const emailSubject = `New Company Added: ${company_name}`;
-  const emailText = `Dear Student,
-
-  // A new company, *${company_name}*, has been added to the placement portal.
-
-  // Details:
-  // - Selection Rounds: ${selection_rounds}
-  // - Eligible Branches and Programs: ${eligible_branches_and_programs}
-  // - Academic Criteria: ${academic_criteria}
-  // - Designation: ${designation}
-  // - Details of CTC: ${details_of_ctc}
-  // - CTC: ${ctc}
-  // - Year: ${year}
-
-  // Please review the company details and take any necessary actions.
-
-  // Best Regards,
-  // Placement Team`;
-
-  // Send email notifications to all students
-  for (const email of emailAddresses) {
-    try {
-      const info = await sendEmail(email, emailSubject, emailText);
-      console.log(`Email sent to ${email}:`, info.response);
-    } catch (error) {
-      console.error(`Failed to send email to ${email}:`, error);
-    }
-  }
-
-  res
-    .status(201)
-    .json(new ApiResponse(201, company, "Company created successfully"));
-  // });
-
-  // const studentsWithEmail = await Student.find({
-  //   student_email_id: { $ne: null },
-  // });
-  // const emailAddresses = studentsWithEmail.map(
-  //   (student) => student.student_email_id
-  // );
-
-  // // Prepare email content
-  // const emailSubject = `New Company Added: ${company_name}`;
-  // const emailText = `Dear Student,\n\nA new company, *${company_name}*, has been added to the placement portal.\n\nDetails:\n- Selection Rounds: ${selection_rounds}\n- Eligible Branches and Programs: ${eligible_branches_and_programs}\n- Academic Criteria: ${academic_criteria}\n- Designation: ${designation}\n- Details of CTC: ${details_of_ctc}\n- CTC: ${ctc}\n- Year: ${year}\n\nPlease review the company details and take any necessary actions.\n\nBest Regards,\nPlacement Team`;
-
-  // // Add email jobs to the queue
-  // for (const email of emailAddresses) {
-  //   emailQueue.add({ email, subject: emailSubject, text: emailText });
-  // }
-
-  // Respond to the client with success immediately
-  // res
-  //   .status(201)
-  //   .json(
-  //     new ApiResponse(
-  //       201,
-  //       company,
-  //       "Company created and email notifications queued successfully"
-  //     )
-  //   );
 });
-
-// Get all companies
-
-// const createCompany = asyncHandler(async (req, res) => {
-//   const {
-//     company_name,
-//     selection_rounds,
-//     eligible_branches_and_programs,
-//     academic_criteria,
-//     designation,
-//     details_of_ctc,
-//     ctc,
-//     year,
-//   } = req.body;
-
-//   // Validate required fields
-//   if (
-//     [
-//       company_name,
-//       selection_rounds,
-//       eligible_branches_and_programs,
-//       academic_criteria,
-//       designation,
-//       details_of_ctc,
-//       ctc,
-//       year,
-//     ].some((field) => field?.trim() === "")
-//   ) {
-//     throw new ApiError(400, "All fields are required");
-//   }
-
-//   // Handle file uploads
-//   const logoFile = req.files["company_logo"]
-//     ? `/uploads/Company/Logo/${req.files["company_logo"][0].filename}`
-//     : "";
-//   const companyFiles = req.files["company_files"]
-//     ? req.files["company_files"].map(
-//         (file) => `/uploads/Company/Files/${file.filename}`
-//       )
-//     : [];
-
-//   // Create and save company record
-//   const company = new Company({
-//     company_name,
-//     selection_rounds,
-//     eligible_branches_and_programs,
-//     academic_criteria,
-//     designation,
-//     details_of_ctc,
-//     ctc,
-//     year,
-//     company_logo: logoFile,
-//     company_files: companyFiles,
-//   });
-
-//   await company.save();
-
-//   // Prepare notification message for WhatsApp
-//   // const message = `A new company, *${company_name}*, has been added to the placement portal. Check out the details and apply if you're eligible.`;
-
-//   // Commented out WhatsApp notifications
-//   // const students = await Student.find();
-//   // for (const student of students) {
-//   //   try {
-//   //     const response = await SendWhatsAppMessage(
-//   //       student.student_mobile_no,
-//   //       message
-//   //     );
-//   //     console.log(`Message sent to ${student.student_mobile_no}:`, response);
-//   //   } catch (error) {
-//   //     console.error(
-//   //       `Failed to send message to ${student.student_mobile_no}:`,
-//   //       error
-//   //     );
-//   //   }
-//   // }
-
-//   // Fetch email addresses from the Student collection
-//   const studentsWithEmail = await Student.find({
-//     student_email_id: { $ne: null },
-//   });
-//   const emailAddresses = studentsWithEmail.map(
-//     (student) => student.student_email_id
-//   );
-
-//   console.log(emailAddresses)
-
-//   // Prepare email content
-//   const emailSubject = `New Company Added: ${company_name}`;
-//   const emailText = `Dear Student,\n\nA new company, *${company_name}*, has been added to the placement portal.\n\nDetails:\n- Selection Rounds: ${selection_rounds}\n- Eligible Branches and Programs: ${eligible_branches_and_programs}\n- Academic Criteria: ${academic_criteria}\n- Designation: ${designation}\n- Details of CTC: ${details_of_ctc}\n- CTC: ${ctc}\n- Year: ${year}\n\nPlease review the company details and take any necessary actions.\n\nBest Regards,\nPlacement Team`;
-
-//   // Add email jobs to the queue
-//   for (const email of emailAddresses) {
-
-//     emailQueue.add({ email, subject: emailSubject, text: emailText });
-//   }
-
-//   // Respond to the client with success
-//   res
-//     .status(201)
-//     .json(
-//       new ApiResponse(
-//         201,
-//         company,
-//         "Company created and email notifications queued successfully"
-//       )
-//     );
-// });
 
 const getAllCompanies = asyncHandler(async (req, res) => {
   const companies = await Company.find();
@@ -288,16 +55,7 @@ const getCompanyById = asyncHandler(async (req, res) => {
 // Update a company
 const updateCompany = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const {
-    company_name,
-    selection_rounds,
-    eligible_branches_and_programs,
-    academic_criteria,
-    designation,
-    details_of_ctc,
-    ctc,
-    year,
-  } = req.body;
+  const { company_name, year } = req.body;
 
   // Find the company by ID
   const company = await Company.findById(id);
@@ -307,27 +65,14 @@ const updateCompany = asyncHandler(async (req, res) => {
   }
 
   // Process uploaded files
-  const logoFile = req.files["company_logo"]
-    ? `/uploads/Company/Logo/${req.files["company_logo"][0].filename}`
+  const logoFile = req.files?.company_logo?.[0]
+    ? `/uploads/Company/Logo/${req.files.company_logo[0].filename}`
     : company.company_logo;
-  const companyFiles = req.files["company_files"]
-    ? req.files["company_files"].map(
-        (file) => `/uploads/Company/Files/${file.filename}`
-      )
-    : company.company_files;
 
   // Update company fields
-  company.company_name = company_name || company.company_name;
-  company.selection_rounds = selection_rounds || company.selection_rounds;
-  company.eligible_branches_and_programs =
-    eligible_branches_and_programs || company.eligible_branches_and_programs;
-  company.academic_criteria = academic_criteria || company.academic_criteria;
-  company.designation = designation || company.designation;
-  company.details_of_ctc = details_of_ctc || company.details_of_ctc;
-  company.ctc = ctc || company.ctc;
+  company.company_name = company_name?.trim() || company.company_name;
   company.year = year || company.year;
   company.company_logo = logoFile || company.company_logo;
-  company.company_files = companyFiles || company.company_files;
 
   await company.save();
 
