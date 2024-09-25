@@ -16,7 +16,9 @@ const RequestedStudentInfo = () => {
       try {
         setLoading(true); // Start loading before fetching
         const response = await getApi(`/api/student-request/${student_sap_no}`);
+       
         console.log(response.data);
+        
         setStudentData(response.data);
       } catch (error) {
         console.error("Error fetching student data:", error);
@@ -60,6 +62,7 @@ const RequestedStudentInfo = () => {
                     alt="Student Profile"
                     className="w-32 h-32 object-cover"
                   />
+
                 </td>
               </tr>
               <tr className="bg-gray-100">

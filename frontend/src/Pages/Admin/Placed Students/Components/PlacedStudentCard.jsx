@@ -69,7 +69,9 @@ const PlacedStudentCard = ({ student }) => {
       <div className="absolute top-2 right-2 flex gap-2">
         <FiEdit
           style={{ cursor: "pointer", fontSize: "24px", color: "#3f51b5" }}
-          onClick={() => navigate(`/admin/edit-placed-student/${student._id}`)}
+          onClick={() =>
+            navigate(`/nmims/admin/edit-placed-student/${student._id}`)
+          }
         />
         <AiOutlineDelete
           style={{ cursor: "pointer", fontSize: "26px", color: "#f44336" }}
@@ -94,7 +96,7 @@ const PlacedStudentCard = ({ student }) => {
           </span>
           <br />
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            {student.ctc} <span>|</span>{" "}
+            {student.ctc} LPA <span>|</span>{" "}
             <span className="text-gray-600">{student.year}</span>
           </span>
           <br />

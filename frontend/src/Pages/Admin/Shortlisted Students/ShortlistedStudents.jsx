@@ -158,6 +158,7 @@ const ShortlistedStudents = () => {
       <div className="flex justify-between  items-center mb-4">
         <h1 className="text-2xl lg:text-3xl font-bold">Shortlisted Students</h1>
         <div className="flex space-x-2">
+         
           <button
             type="button"
             onClick={() => navigate(`${ADMIN_PATH}/add-shortlisted-student`)}

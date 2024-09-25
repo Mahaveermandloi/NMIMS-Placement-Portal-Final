@@ -1,128 +1,72 @@
-const FormField = ({
-  label,
-  id,
-  type = "text",
-  options = [],
-  register,
-  errors,
-  disabled = false,
-  onChange,
-  defaultValue,
-}) => {
-  return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-bold text-gray-700">
-        {label}
-      </label>
-      {type === "select" ? (
-        <select
-          id={id}
-          className={`block w-full p-2 border rounded ${
-            errors ? "border-red-500" : ""
-          }`}
-          {...register}
-          onChange={onChange}
-          disabled={disabled}
-          defaultValue={defaultValue}
-        >
-          <option value="">Select {label}</option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <input
-          type={type}
-          id={id}
-          placeholder={`Enter ${label}`}
-          className={`block w-full p-2 border rounded ${
-            errors ? "border-red-500" : ""
-          }`}
-          {...register}
-          disabled={disabled}
-          defaultValue={defaultValue}
-        />
-      )}
-      {errors && <p className="text-red-500 text-sm">{errors.message}</p>}
-    </div>
-  );
-};
-
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getApi, putApi } from "../../../Utils/API.js";
-import { useNavigate, useParams } from "react-router-dom";
-import Loader from "../../../Components/Loader.jsx";
 import { Toast } from "../../../Components/Toast.jsx";
-import { ADMIN_PATH } from "../../../Utils/URLPath.jsx";
-// import FormField from "../../../Components/FormField.jsx";
+import Loader from "../../../Components/Loader.jsx";
+import { getApi, postApi, putApi } from "../../../Utils/API.js";
+import { ADMIN_PATH, SERVER_URL } from "../../../Utils/URLPath.jsx";
+import { useNavigate, useParams } from "react-router-dom";
 
 const EditPlacedStudent = () => {
-  const [years, setYears] = useState([]);
-  const [companies, setCompanies] = useState([]);
-  const [branches, setBranches] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState("");
-  const [initialData, setInitialData] = useState(null);
-  const [studentSapNo, setStudentSapNo] = useState(""); // New state for student_sap_no
-
-  const { id } = useParams(); // Assume the student ID is passed as a URL parameter
-
+  const { id } = useParams(); // Get the student ID from the URL
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors },
   } = useForm();
-
   const navigate = useNavigate();
+
+  const [companies, setCompanies] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState("");
+  const [student_sap_no, setStudentSapNo] = useState("");
+  const [student_email_id, setStudentEmailId] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // Calculate current year and previous four years
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 4 }, (_, i) => currentYear - i);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Generate years dropdown options
-        const currentYear = new Date().getFullYear();
-        setYears([
-          currentYear - 0,
-          currentYear - 1,
-          currentYear - 2,
-          currentYear - 3,
-        ]);
+        // Fetch companies
+        const companyResponse = await getApi(`${SERVER_URL}/api/joblisting`);
+        setCompanies(companyResponse.data);
 
-        const companyResponse = await getApi("/api/company/get-all-companies");
-        if (companyResponse.statusCode === 200) {
-          setCompanies(companyResponse.data);
-        }
-
-        const branchResponse = await getApi("/api/branch");
-        if (branchResponse.statusCode === 200) {
-          setBranches(branchResponse.data);
-        }
-
-        // Fetch the student details
-        const studentResponse = await getApi(`/api/placedstudents/${id}`);
-
+        // Fetch the student details using the ID
+        const studentResponse = await getApi(
+          `${SERVER_URL}/api/placedstudents/${id}`
+        );
         if (studentResponse.statusCode === 200) {
           const data = studentResponse.data;
-          setInitialData(data);
-          setStudentSapNo(data.student_sap_no);
           setValue("year", data.year);
           setValue("company_name", data.company_name);
-          setValue("branch_name", data.engineering_specialization);
-          setValue("student_name", data.name_of_student);
-          setValue("ctc", data.ctc);
           setValue("job_title", data.job_title);
-          setValue("email", data.student_email_id);
+          setValue("ctc", data.ctc);
+          setValue("branch", data.engineering_specialization);
+          setValue("name_of_student", data.name_of_student);
+          setValue("student_sap_no", data.student_sap_no);
+          setValue("student_email_id", data.student_email_id);
+          setStudentSapNo(data.student_sap_no);
+          setStudentEmailId(data.student_email_id);
           setSelectedBranch(data.engineering_specialization);
         }
+
+        // Fetch all students
+        const allStudentsResponse = await getApi(
+          `${SERVER_URL}/api/student/get-all-student-details`
+        );
+        setStudents(allStudentsResponse.data);
+        setFilteredStudents(allStudentsResponse.data);
+
+        setLoading(false);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        toast.error("Failed to fetch data");
+        setLoading(false);
       }
     };
 
@@ -130,167 +74,330 @@ const EditPlacedStudent = () => {
   }, [id, setValue]);
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      if (selectedBranch) {
-        setLoading(true);
-        try {
-          const studentResponse = await getApi(
-            `/api/student/get-student-by-branch?engineering_specialization=${selectedBranch}`
-          );
-          if (studentResponse.statusCode === 200) {
-            setStudents(studentResponse.data);
-          }
-        } catch (error) {
-          console.error("Error fetching students:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchStudents();
-  }, [selectedBranch]);
-
-  const onSubmit = async (data) => {
-    const requestData = {
-      student_sap_no: studentSapNo, // Use stored student_sap_no
-      name_of_student: data.student_name,
-      student_email_id: data.email,
-      company_name: data.company_name,
-      job_title: data.job_title,
-      ctc: data.ctc,
-      year: data.year,
-      engineering_specialization: data.branch_name,
-    };
-
-    try {
-      const response = await putApi(
-        requestData,
-        `/api/placedstudents/${id}` // Update the correct endpoint with student ID
+    if (selectedBranch) {
+      setFilteredStudents(
+        students.filter(
+          (student) => student.engineering_specialization === selectedBranch
+        )
       );
-      if (response.statusCode === 200) {
-        toast.success("Student details updated successfully");
-        setTimeout(() => {
-          navigate(`${ADMIN_PATH}/placed-students`);
-        }, 1500);
-      } else {
-        toast.error("Failed to update student details");
-      }
-    } catch (error) {
-      console.error("Error updating student details:", error);
-      toast.error("An error occurred while updating student details");
+    } else {
+      setFilteredStudents(students);
+    }
+  }, [selectedBranch, students]);
+
+  const handleBranchChange = (event) => {
+    const branch = event.target.value;
+    setSelectedBranch(branch);
+    setValue("branch", branch);
+  };
+
+  const handleStudentChange = (event) => {
+    const name_of_student = event.target.value;
+    const selectedStudentData = students.find(
+      (student) => student.name_of_student === name_of_student
+    );
+
+    if (selectedStudentData) {
+      setStudentSapNo(selectedStudentData.student_sap_no);
+      setValue("student_sap_no", selectedStudentData.student_sap_no);
+      setValue("student_email_id", selectedStudentData.student_email_id);
+      setStudentEmailId(selectedStudentData.student_email_id);
+    } else {
+      setStudentSapNo("");
+      setStudentEmailId("");
     }
   };
 
-  if (!initialData) {
-    return <Loader />;
-  }
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      const response = await putApi(
+        data,
+        `${SERVER_URL}/api/placedstudents/${id}`
+      ); // Update endpoint
+
+      if (response.statusCode === 200) {
+        setLoading(false);
+        toast.success("Student Updated Successfully");
+        setTimeout(() => {
+          navigate(`${ADMIN_PATH}/placed-students`);
+        }, 2000);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+      setLoading(false);
+    }
+  };
 
   return (
     <>
-      <Toast />
-      <div className="flex mb-6">
-        <h1 className="text-3xl font-bold">Edit Placed Student</h1>
-      </div>
+      {loading ? (
+        <>
+          <Toast />
+          <Loader />
+        </>
+      ) : (
+        <>
+          <Toast />
+          <div>
+            <h1 className="text-3xl font-bold text-gray-700 mb-6">
+              Edit Placed Student
+            </h1>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {/* Year */}
+                <div>
+                  <label
+                    htmlFor="year"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Year
+                  </label>
+                  <select
+                    id="year"
+                    {...register("year", { required: "Year is required" })}
+                    className={`w-full p-2 border rounded ${
+                      errors.year ? "border-red-500" : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Select Year</option>
+                    {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.year && (
+                    <p className="text-red-500 text-sm">
+                      {errors.year.message}
+                    </p>
+                  )}
+                </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid lg:grid-cols-2 lg:gap-6 gap-4">
-          <FormField
-            label="Year"
-            id="year"
-            type="select"
-            options={years.map((year) => ({ value: year, label: year }))}
-            register={register("year", { required: "Year is required" })}
-            errors={errors.year}
-          />
+                {/* Company Name */}
+                <div>
+                  <label
+                    htmlFor="company_name"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Company Name
+                  </label>
+                  <select
+                    id="company_name"
+                    {...register("company_name", {
+                      required: "Company name is required",
+                    })}
+                    className={`w-full p-2 border rounded ${
+                      errors.company_name ? "border-red-500" : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Select Company</option>
+                    {companies.map((company) => (
+                      <option key={company._id} value={company.company_name}>
+                        {company.company_name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.company_name && (
+                    <p className="text-red-500 text-sm">
+                      {errors.company_name.message}
+                    </p>
+                  )}
+                </div>
 
-          <FormField
-            label="Company Name"
-            id="company_name"
-            type="select"
-            options={companies.map((company) => ({
-              value: company.company_name,
-              label: company.company_name,
-            }))}
-            register={register("company_name", {
-              required: "Company name is required",
-            })}
-            errors={errors.company_name}
-          />
+                {/* Job Role */}
+                <div>
+                  <label
+                    htmlFor="job_title"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Job Title
+                  </label>
+                  <select
+                    id="job_title"
+                    {...register("job_title", {
+                      required: "Job title is required",
+                    })}
+                    className={`w-full p-2 border rounded ${
+                      errors.job_title ? "border-red-500" : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Select Job Title</option>
+                    {companies.map((company) => (
+                      <option key={company._id} value={company.job_title}>
+                        {company.job_title}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.job_title && (
+                    <p className="text-red-500 text-sm">
+                      {errors.job_title.message}
+                    </p>
+                  )}
+                </div>
 
-          <FormField
-            label="Branch Name"
-            id="branch_name"
-            type="select"
-            options={branches.map((branch) => ({
-              value: branch.branch_name,
-              label: branch.branch_name,
-            }))}
-            register={register("branch_name", {
-              required: "Branch name is required",
-            })}
-            errors={errors.branch_name}
-            onChange={(e) => {
-              setSelectedBranch(e.target.value);
-              setValue("branch_name", e.target.value); // update react-hook-form value
-            }}
-          />
+                {/* CTC */}
+                <div>
+                  <label
+                    htmlFor="ctc"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    CTC (Cost to Company)
+                  </label>
+                  <input
+                    type="text"
+                    id="ctc"
+                    {...register("ctc", { required: "CTC is required" })}
+                    className={`w-full p-2 border rounded ${
+                      errors.ctc ? "border-red-500" : "border-gray-300"
+                    }`}
+                  />
+                  <p className="text-gray-400 text-sm">Example 6.4 LPA</p>
+                  {errors.ctc && (
+                    <p className="text-red-500 text-sm">{errors.ctc.message}</p>
+                  )}
+                </div>
 
-          <FormField
-            label="Student SAP ID"
-            id="student_sap_no"
-            type="text"
-            disabled={true}
-            defaultValue={studentSapNo} // Set initial value
-          />
+                {/* Branch */}
+                <div>
+                  <label
+                    htmlFor="branch"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Branch
+                  </label>
+                  <select
+                    id="branch"
+                    value={selectedBranch}
+                    onChange={handleBranchChange}
+                    className={`w-full p-2 border rounded ${
+                      errors.branch ? "border-red-500" : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Select Branch</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Computer Engineering">
+                      Computer Engineering
+                    </option>
+                    <option value="Information Technology">
+                      Information Technology
+                    </option>
+                    <option value="Artificial Intelligence and Machine Learning">
+                      Artificial Intelligence and Machine Learning
+                    </option>
+                  </select>
+                  {errors.branch && (
+                    <p className="text-red-500 text-sm">
+                      {errors.branch.message}
+                    </p>
+                  )}
+                </div>
 
-          <FormField
-            label="Student Name"
-            id="student_name"
-            type="text" // Change type to "text" for disabled state
-            disabled={true}
-            defaultValue={initialData.name_of_student} // Set initial value
-          />
+                {/* Student Name */}
+                <div>
+                  <label
+                    htmlFor="name_of_student"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Student Name
+                  </label>
+                  <select
+                    id="name_of_student"
+                    {...register("name_of_student", {
+                      required: "Student name is required",
+                    })}
+                    onChange={handleStudentChange}
+                    className={`w-full p-2 border rounded ${
+                      errors.name_of_student
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Select Student</option>
+                    {filteredStudents.map((student) => (
+                      <option key={student._id} value={student.name_of_student}>
+                        {student.name_of_student}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.name_of_student && (
+                    <p className="text-red-500 text-sm">
+                      {errors.name_of_student.message}
+                    </p>
+                  )}
+                </div>
 
-          <FormField
-            label="CTC"
-            id="ctc"
-            type="text"
-            register={register("ctc", { required: "CTC is required" })}
-            errors={errors.ctc}
-          />
+                {/* Student SAP Number */}
+                <div>
+                  <label
+                    htmlFor="student_sap_no"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Student SAP Number
+                  </label>
+                  <input
+                    type="text"
+                    id="student_sap_no"
+                    {...register("student_sap_no", {
+                      required: "Student SAP number is required",
+                    })}
+                    value={student_sap_no}
+                    readOnly
+                    className={`w-full p-2 border rounded ${
+                      errors.student_sap_no
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                  />
+                  {errors.student_sap_no && (
+                    <p className="text-red-500 text-sm">
+                      {errors.student_sap_no.message}
+                    </p>
+                  )}
+                </div>
 
-          <FormField
-            label="Job Title"
-            id="job_title"
-            type="text"
-            register={register("job_title", {
-              required: "Job title is required",
-            })}
-            errors={errors.job_title}
-          />
+                {/* Student Email */}
+                <div>
+                  <label
+                    htmlFor="student_email_id"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Student Email
+                  </label>
+                  <input
+                    type="email"
+                    id="student_email_id"
+                    {...register("student_email_id", {
+                      required: "Student email is required",
+                    })}
+                    value={student_email_id}
+                    readOnly
+                    className={`w-full p-2 border rounded ${
+                      errors.student_email_id
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                  />
+                  {errors.student_email_id && (
+                    <p className="text-red-500 text-sm">
+                      {errors.student_email_id.message}
+                    </p>
+                  )}
+                </div>
+              </div>
 
-          <FormField
-            label="Email"
-            id="email"
-            type="email"
-            register={register("email", {
-              required: "Email is required",
-              pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: "Invalid email address",
-              },
-            })}
-            errors={errors.email}
-          />
-        </div>
-        <button
-          type="submit"
-          className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
-        >
-          Update
-        </button>
-      </form>
+              <div>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Update Student
+                </button>
+              </div>
+            </form>
+          </div>
+        </>
+      )}
     </>
   );
 };

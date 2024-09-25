@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import nodata from "../../../../public/images/no-data.png";
 import { ADMIN_PATH } from "../../../Utils/URLPath";
 
+import { IoAddCircleOutline } from "react-icons/io5";
+
 const PlacedStudents = () => {
   const [students, setStudents] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -28,8 +30,8 @@ const PlacedStudents = () => {
     const fetchStudents = async () => {
       try {
         const response = await getApi(`/api/placedstudents`);
-        
 
+        console.log(response);
         if (response.statusCode === 200) {
           setStudents(response.data);
           setFilteredData(response.data);
@@ -48,7 +50,6 @@ const PlacedStudents = () => {
     const fetchBranches = async () => {
       try {
         const response = await getApi(`/api/branch`);
-        
 
         if (response.statusCode === 200) {
           setBranches(response.data);
@@ -65,7 +66,7 @@ const PlacedStudents = () => {
     const fetchCompanies = async () => {
       try {
         const response = await getApi(`/api/company/get-all-companies`);
-       
+
         if (response.statusCode === 200) {
           setCompanies(response.data);
         } else {
@@ -123,12 +124,23 @@ const PlacedStudents = () => {
       <Toast />
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Placed Students</h1>
+
+        {/* Button for larger screens */}
         <button
           type="button"
           onClick={() => navigate(`${ADMIN_PATH}/add-placed-student`)}
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+          className="hidden md:flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         >
-          Add Student Placement
+          Add Placed Student
+        </button>
+
+        {/* Icon for mobile view */}
+        <button
+          type="button"
+          onClick={() => navigate(`${ADMIN_PATH}/add-placed-student`)}
+          className="flex items-center md:hidden text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+        >
+          <IoAddCircleOutline size={20} />
         </button>
       </div>
 

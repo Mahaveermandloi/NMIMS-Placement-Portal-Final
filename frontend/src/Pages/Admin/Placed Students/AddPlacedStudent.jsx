@@ -1,54 +1,455 @@
+// import React, { useEffect, useState } from "react";
+// import { useForm } from "react-hook-form";
+// import { toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+// import { Toast } from "../../../Components/Toast.jsx";
+// import Loader from "../../../Components/Loader.jsx";
+// import { getApi, postApi } from "../../../Utils/API.js";
+// import { ADMIN_PATH, SERVER_URL } from "../../../Utils/URLPath.jsx";
+// import { useNavigate } from "react-router-dom";
+
+// const AddPlacedStudent = () => {
+//   const {
+//     register,
+//     handleSubmit,
+//     setValue,
+//     formState: { errors },
+//   } = useForm();
+
+//   const navigate = useNavigate();
+
+//   const [companies, setCompanies] = useState([]);
+//   const [students, setStudents] = useState([]);
+//   const [filteredStudents, setFilteredStudents] = useState([]);
+//   const [selectedBranch, setSelectedBranch] = useState("");
+//   const [selectedStudent, setSelectedStudent] = useState("");
+//   const [student_sap_no, setStudentSapNo] = useState("");
+//   const [student_email_id, setStudentEmailId] = useState("");
+//   const [loading, setLoading] = useState(true);
+
+//   // Calculate current year and previous four years
+//   const currentYear = new Date().getFullYear();
+//   const years = Array.from({ length: 4 }, (_, i) => currentYear - i);
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const companyResponse = await getApi(`${SERVER_URL}/api/joblisting`);
+
+//         console.log(companyResponse)
+
+//         setCompanies(companyResponse.data);
+
+//         const studentResponse = await getApi(
+//           `${SERVER_URL}/api/student/get-all-student-details`
+//         );
+
+//         setStudents(studentResponse.data);
+//         setFilteredStudents(studentResponse.data);
+
+//         setLoading(false);
+//       } catch (error) {
+//         toast.error("Failed to fetch data");
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchData();
+//   }, []);
+
+//   useEffect(() => {
+//     if (selectedBranch) {
+//       setFilteredStudents(
+//         students.filter(
+//           (student) => student.engineering_specialization === selectedBranch
+//         )
+//       );
+//     } else {
+//       setFilteredStudents(students);
+//     }
+//   }, [selectedBranch, students]);
+
+//   const handleBranchChange = (event) => {
+//     const branch = event.target.value;
+//     setSelectedBranch(branch);
+//     setValue("branch", branch);
+//   };
+
+//   const handleStudentChange = (event) => {
+//     const name_of_student = event.target.value;
+//     setSelectedStudent(name_of_student);
+//     setValue("name_of_student", name_of_student);
+
+//     const selectedStudentData = students.find(
+//       (student) => student.name_of_student === name_of_student
+//     );
+
+//     if (selectedStudentData) {
+//       setStudentSapNo(selectedStudentData.student_sap_no);
+//       setValue("student_sap_no", selectedStudentData.student_sap_no);
+//       setValue("student_email_id", selectedStudentData.student_email_id);
+//       setStudentEmailId(selectedStudentData.student_email_id);
+//     } else {
+//       setStudentSapNo("");
+//       setStudentEmailId("");
+//     }
+//   };
+
+//   const onSubmit = async (data) => {
+//     setLoading(true);
+//     console.log(data);
+//     try {
+//       const response = await postApi(data, `${SERVER_URL}/api/placedstudents`);
+
+//       console.log(response);
+
+//       if (response.statusCode === 201) {
+//         setLoading(false);
+//         toast.success("Student Added Successfully");
+//         setTimeout(() => {
+//           navigate(`${ADMIN_PATH}/placed-students`);
+//         }, 2000);
+//       }
+//     } catch (error) {
+//       console.log(error);
+//       toast.error(error.response.data.message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <>
+//       {loading ? (
+//         <>
+//           <Toast />
+//           <Loader />
+//         </>
+//       ) : (
+//         <>
+//           <Toast />
+//           <div>
+//             <h1 className="text-3xl font-bold text-gray-700 mb-6">
+//               Add Placed Student
+//             </h1>
+//             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+//               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+//                 {/* Year */}
+//                 <div>
+//                   <label
+//                     htmlFor="year"
+//                     className="block text-md font-bold text-gray-700 mb-1"
+//                   >
+//                     Year
+//                   </label>
+//                   <select
+//                     id="year"
+//                     {...register("year", { required: "Year is required" })}
+//                     className={`w-full p-2 border rounded ${
+//                       errors.year ? "border-red-500" : "border-gray-300"
+//                     }`}
+//                   >
+//                     <option value="">Select Year</option>
+//                     {years.map((year) => (
+//                       <option key={year} value={year}>
+//                         {year}
+//                       </option>
+//                     ))}
+//                   </select>
+//                   {errors.year && (
+//                     <p className="text-red-500 text-sm">
+//                       {errors.year.message}
+//                     </p>
+//                   )}
+//                 </div>
+
+//                 {/* Company Name */}
+//                 <div>
+//                   <label
+//                     htmlFor="company_name"
+//                     className="block text-md font-bold text-gray-700 mb-1"
+//                   >
+//                     Company Name
+//                   </label>
+//                   <select
+//                     id="company_name"
+//                     {...register("company_name", {
+//                       required: "Company name is required",
+//                     })}
+//                     className={`w-full p-2 border rounded ${
+//                       errors.company_name ? "border-red-500" : "border-gray-300"
+//                     }`}
+//                   >
+//                     <option value="">Select Company</option>
+//                     {companies.map((company) => (
+//                       <option key={company._id} value={company.company_name}>
+//                         {company.company_name}
+//                       </option>
+//                     ))}
+//                   </select>
+//                   {errors.company_name && (
+//                     <p className="text-red-500 text-sm">
+//                       {errors.company_name.message}
+//                     </p>
+//                   )}
+//                 </div>
+
+//                 {/* Job Role */}
+//                 <div>
+//                   <label
+//                     htmlFor="job_title"
+//                     className="block text-md font-bold text-gray-700 mb-1"
+//                   >
+//                     Job Title
+//                   </label>
+//                   <select
+//                     id="job_title"
+//                     {...register("job_title", {
+//                       required: "Job title is required",
+//                     })}
+//                     className={`w-full p-2 border rounded ${
+//                       errors.job_title ? "border-red-500" : "border-gray-300"
+//                     }`}
+//                   >
+//                     <option value="">Select Job Title</option>
+//                     {companies.map((company) => (
+//                       <option key={company._id} value={company.job_title}>
+//                         {company.job_title}
+//                       </option>
+//                     ))}
+//                   </select>
+//                   {errors.job_title && (
+//                     <p className="text-red-500 text-sm">
+//                       {errors.job_title.message}
+//                     </p>
+//                   )}
+//                 </div>
+
+//                 {/* CTC */}
+//                 {/* CTC */}
+//                 <div>
+//                   <label
+//                     htmlFor="ctc"
+//                     className="block text-md font-bold text-gray-700 mb-1"
+//                   >
+//                     CTC (Cost to Company)
+//                   </label>
+//                   <input
+//                     type="number"
+//                     id="ctc"
+//                     {...register("ctc", {
+//                       required: "CTC is required",
+//                       valueAsNumber: true, // Convert the value to a number
+//                     })}
+//                     className={`w-full p-2 border rounded ${
+//                       errors.ctc ? "border-red-500" : "border-gray-300"
+//                     }`}
+//                     step="0.01" // Allows decimal input
+//                     placeholder="Enter CTC in LPA" // Optional: placeholder for better UX
+//                   />
+//                   <p className="text-gray-400 text-sm">Example: 6.4 LPA</p>
+//                   {errors.ctc && (
+//                     <p className="text-red-500 text-sm">{errors.ctc.message}</p>
+//                   )}
+//                 </div>
+
+//                 {/* Branch */}
+//                 <div>
+//                   <label
+//                     htmlFor="branch"
+//                     className="block text-md font-bold text-gray-700 mb-1"
+//                   >
+//                     Branch
+//                   </label>
+//                   <select
+//                     id="branch"
+//                     value={selectedBranch}
+//                     onChange={handleBranchChange}
+//                     className={`w-full p-2 border rounded ${
+//                       errors.branch ? "border-red-500" : "border-gray-300"
+//                     }`}
+//                   >
+//                     <option value="">Select Branch</option>
+//                     <option value="Computer Science">Computer Science</option>
+//                     <option value="Computer Engineering">
+//                       Computer Engineering
+//                     </option>
+//                     <option value="Information Technology">
+//                       Information Technology
+//                     </option>
+//                     <option value="Artificial Intelligence and Machine Learning">
+//                       Artificial Intelligence and Machine Learning
+//                     </option>
+//                   </select>
+//                   {errors.branch && (
+//                     <p className="text-red-500 text-sm">
+//                       {errors.branch.message}
+//                     </p>
+//                   )}
+//                 </div>
+
+//                 {/* Student Name */}
+//                 <div>
+//                   <label
+//                     htmlFor="name_of_student"
+//                     className="block text-md font-bold text-gray-700 mb-1"
+//                   >
+//                     Student Name
+//                   </label>
+//                   <select
+//                     id="name_of_student"
+//                     {...register("name_of_student", {
+//                       required: "Student name is required",
+//                     })}
+//                     onChange={handleStudentChange}
+//                     className={`w-full p-2 border rounded ${
+//                       errors.name_of_student
+//                         ? "border-red-500"
+//                         : "border-gray-300"
+//                     }`}
+//                   >
+//                     <option value="">Select Student</option>
+//                     {filteredStudents.map((student) => (
+//                       <option key={student._id} value={student.name_of_student}>
+//                         {student.name_of_student}
+//                       </option>
+//                     ))}
+//                   </select>
+//                   {errors.name_of_student && (
+//                     <p className="text-red-500 text-sm">
+//                       {errors.name_of_student.message}
+//                     </p>
+//                   )}
+//                 </div>
+
+//                 {/* Student SAP Number */}
+//                 <div>
+//                   <label
+//                     htmlFor="student_sap_no"
+//                     className="block text-md font-bold text-gray-700 mb-1"
+//                   >
+//                     Student SAP Number
+//                   </label>
+//                   <input
+//                     type="text"
+//                     id="student_sap_no"
+//                     {...register("student_sap_no", {
+//                       required: "Student SAP number is required",
+//                     })}
+//                     value={student_sap_no}
+//                     readOnly
+//                     className={`w-full p-2 border rounded ${
+//                       errors.student_sap_no
+//                         ? "border-red-500"
+//                         : "border-gray-300"
+//                     }`}
+//                   />
+//                   {errors.student_sap_no && (
+//                     <p className="text-red-500 text-sm">
+//                       {errors.student_sap_no.message}
+//                     </p>
+//                   )}
+//                 </div>
+
+//                 {/* Student Email */}
+//                 <div>
+//                   <label
+//                     htmlFor="student_email_id"
+//                     className="block text-md font-bold text-gray-700 mb-1"
+//                   >
+//                     Student Email
+//                   </label>
+//                   <input
+//                     type="email"
+//                     id="student_email_id"
+//                     {...register("student_email_id", {
+//                       required: "Student email is required",
+//                     })}
+//                     value={student_email_id}
+//                     readOnly
+//                     className={`w-full p-2 border rounded ${
+//                       errors.student_email_id
+//                         ? "border-red-500"
+//                         : "border-gray-300"
+//                     }`}
+//                   />
+//                   {errors.student_email_id && (
+//                     <p className="text-red-500 text-sm">
+//                       {errors.student_email_id.message}
+//                     </p>
+//                   )}
+//                 </div>
+//               </div>
+
+//               <div>
+//                 <button
+//                   type="submit"
+//                   className="bg-blue-500 text-white px-4 py-2 rounded"
+//                 >
+//                   Add Student
+//                 </button>
+//               </div>
+//             </form>
+//           </div>
+//         </>
+//       )}
+//     </>
+//   );
+// };
+
+// export default AddPlacedStudent;
+
+
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getApi, postApi } from "../../../Utils/API.js";
-import { useNavigate } from "react-router-dom";
-import Loader from "../../../Components/Loader.jsx";
 import { Toast } from "../../../Components/Toast.jsx";
-import { ADMIN_PATH } from "../../../Utils/URLPath.jsx";
+import Loader from "../../../Components/Loader.jsx";
+import { getApi, postApi } from "../../../Utils/API.js";
+import { ADMIN_PATH, SERVER_URL } from "../../../Utils/URLPath.jsx";
+import { useNavigate } from "react-router-dom";
 
 const AddPlacedStudent = () => {
-  const [years, setYears] = useState([]);
-  const [companies, setCompanies] = useState([]);
-  const [branches, setBranches] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState("");
-
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors },
   } = useForm();
 
   const navigate = useNavigate();
 
+  const [companies, setCompanies] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [student_sap_no, setStudentSapNo] = useState("");
+  const [student_email_id, setStudentEmailId] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 4 }, (_, i) => currentYear - i);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Generate years dropdown options
-        const currentYear = new Date().getFullYear();
-        setYears([
-          currentYear - 0,
-          currentYear - 1,
-          currentYear - 2,
-          currentYear - 3,
-        ]);
+        const companyResponse = await getApi(`${SERVER_URL}/api/joblisting`);
+        setCompanies(companyResponse.data);
 
-        const companyResponse = await getApi("/api/company/get-all-companies");
-        if (companyResponse.statusCode === 200) {
-          setCompanies(companyResponse.data);
-        }
+        const studentResponse = await getApi(
+          `${SERVER_URL}/api/student/get-all-student-details`
+        );
 
-        const branchResponse = await getApi("/api/branch");
-        if (branchResponse.statusCode === 200) {
-          setBranches(branchResponse.data);
-        }
+        setStudents(studentResponse.data);
+        setFilteredStudents(studentResponse.data);
+
+        setLoading(false);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        toast.error("Failed to fetch data");
+        setLoading(false);
       }
     };
 
@@ -56,264 +457,342 @@ const AddPlacedStudent = () => {
   }, []);
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      if (selectedBranch) {
-        setLoading(true);
-        try {
-          const studentResponse = await getApi(
-            `/api/student/get-student-by-branch?engineering_specialization=${selectedBranch}`
-          );
+    if (selectedBranch) {
+      setFilteredStudents(
+        students.filter(
+          (student) => student.engineering_specialization === selectedBranch
+        )
+      );
+    } else {
+      setFilteredStudents(students);
+    }
+  }, [selectedBranch, students]);
 
-          if (studentResponse.statusCode === 200) {
-            setStudents(studentResponse.data);
-          }
-        } catch (error) {
-          console.error("Error fetching students:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
+  const handleBranchChange = (event) => {
+    const branch = event.target.value;
+    setSelectedBranch(branch);
+    setValue("branch", branch);
+  };
 
-    fetchStudents();
-  }, [selectedBranch]);
+  const handleCompanyChange = (event) => {
+    const companyName = event.target.value;
+    setSelectedCompany(companyName);
+    setValue("company_name", companyName);
+
+    const selectedCompanyData = companies.find(
+      (company) => company.company_name === companyName
+    );
+
+    if (selectedCompanyData) {
+      setJobTitle(selectedCompanyData.job_title);
+      setValue("job_title", selectedCompanyData.job_title);
+    } else {
+      setJobTitle("");
+    }
+  };
+
+  const handleStudentChange = (event) => {
+    const name_of_student = event.target.value;
+    setValue("name_of_student", name_of_student);
+
+    const selectedStudentData = students.find(
+      (student) => student.name_of_student === name_of_student
+    );
+
+    if (selectedStudentData) {
+      setStudentSapNo(selectedStudentData.student_sap_no);
+      setValue("student_sap_no", selectedStudentData.student_sap_no);
+      setValue("student_email_id", selectedStudentData.student_email_id);
+      setStudentEmailId(selectedStudentData.student_email_id);
+    } else {
+      setStudentSapNo("");
+      setStudentEmailId("");
+    }
+  };
 
   const onSubmit = async (data) => {
-    const requestData = {
-      student_sap_no: data.student_sap_no, // Assuming the SAP number is sent as student_name
-      name_of_student: data.student_name,
-      student_email_id: data.email,
-      company_name: data.company_name,
-      job_title: data.job_title,
-      ctc: data.ctc,
-      year: data.year,
-      engineering_specialization: data.branch_name,
-    };
-
+    setLoading(true);
     try {
-      const response = await postApi(requestData, "/api/placedstudents");
+      const response = await postApi(data, `${SERVER_URL}/api/placedstudents`);
 
       if (response.statusCode === 201) {
-        toast.success("Student placed successfully");
+        setLoading(false);
+        toast.success("Student Added Successfully");
         setTimeout(() => {
           navigate(`${ADMIN_PATH}/placed-students`);
-        }, 1500);
-      } else {
-        toast.error("Failed to place student");
+        }, 2000);
       }
     } catch (error) {
       toast.error(error.response.data.message);
-      // toast.error("An error occurred while placing student");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
-      <Toast />
-      <div className="flex mb-6">
-        <h1 className="text-3xl font-bold">Add Placed Students</h1>
-      </div>
-
-      {loading && <Loader />}
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid  lg:grid-cols-2 lg:gap-6 gap-4 ">
+      {loading ? (
+        <>
+          <Toast />
+          <Loader />
+        </>
+      ) : (
+        <>
+          <Toast />
           <div>
-            <label
-              htmlFor="year"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Year
-            </label>
-            <select
-              id="year"
-              className={`block w-full p-2 border rounded ${
-                errors.year ? "border-red-500" : ""
-              }`}
-              {...register("year", { required: "Year is required" })}
-            >
-              <option value="">Select Year</option>
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-            {errors.year && (
-              <p className="text-red-500 text-sm">{errors.year.message}</p>
-            )}
-          </div>
+            <h1 className="text-3xl font-bold text-gray-700 mb-6">
+              Add Placed Student
+            </h1>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="year"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Year
+                  </label>
+                  <select
+                    id="year"
+                    {...register("year", { required: "Year is required" })}
+                    className={`w-full p-2 border rounded ${
+                      errors.year ? "border-red-500" : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Select Year</option>
+                    {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.year && (
+                    <p className="text-red-500 text-sm">
+                      {errors.year.message}
+                    </p>
+                  )}
+                </div>
 
-          <div>
-            <label
-              htmlFor="company_name"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Company Name
-            </label>
-            <select
-              id="company_name"
-              className={`block w-full p-2 border rounded ${
-                errors.company_name ? "border-red-500" : ""
-              }`}
-              {...register("company_name", {
-                required: "Company name is required",
-              })}
-            >
-              <option value="">Select Company</option>
-              {companies.map((company) => (
-                <option key={company.id} value={company.company_name}>
-                  {company.company_name}
-                </option>
-              ))}
-            </select>
-            {errors.company_name && (
-              <p className="text-red-500 text-sm">
-                {errors.company_name.message}
-              </p>
-            )}
-          </div>
+                <div>
+                  <label
+                    htmlFor="company_name"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Company Name
+                  </label>
+                  <select
+                    id="company_name"
+                    {...register("company_name", {
+                      required: "Company name is required",
+                    })}
+                    onChange={handleCompanyChange}
+                    className={`w-full p-2 border rounded ${
+                      errors.company_name ? "border-red-500" : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Select Company</option>
+                    {companies.map((company) => (
+                      <option key={company._id} value={company.company_name}>
+                        {company.company_name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.company_name && (
+                    <p className="text-red-500 text-sm">
+                      {errors.company_name.message}
+                    </p>
+                  )}
+                </div>
 
-          <div>
-            <label
-              htmlFor="branch_name"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Branch Name
-            </label>
-            <select
-              id="branch_name"
-              className={`block w-full p-2 border rounded ${
-                errors.branch_name ? "border-red-500" : ""
-              }`}
-              {...register("branch_name", {
-                required: "Branch name is required",
-              })}
-              onChange={(e) => {
-                setSelectedBranch(e.target.value);
-                setValue("branch_name", e.target.value); // update react-hook-form value
-              }}
-            >
-              <option value="">Select Branch</option>
-              {branches.map((branch) => (
-                <option key={branch.id} value={branch.branch_name}>
-                  {branch.branch_name}
-                </option>
-              ))}
-            </select>
-            {errors.branch_name && (
-              <p className="text-red-500 text-sm">
-                {errors.branch_name.message}
-              </p>
-            )}
-          </div>
+                <div>
+                  <label
+                    htmlFor="job_title"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Job Title
+                  </label>
+                  <input
+                    id="job_title"
+                    type="text"
+                    {...register("job_title", {
+                      required: "Job title is required",
+                    })}
+                    value={jobTitle}
+                    readOnly
+                    className={`w-full p-2 border rounded ${
+                      errors.job_title ? "border-red-500" : "border-gray-300"
+                    }`}
+                  />
+                  {errors.job_title && (
+                    <p className="text-red-500 text-sm">
+                      {errors.job_title.message}
+                    </p>
+                  )}
+                </div>
 
-          <div>
-            <label
-              htmlFor="student_name"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Student Name
-            </label>
-            <select
-              id="student_name"
-              className={`block w-full p-2 border rounded ${
-                errors.student_name ? "border-red-500" : ""
-              }`}
-              {...register("student_name", {
-                required: "Student name is required",
-              })}
-            >
-              <option value="">Select Student</option>
-              {students.map((student) => (
-                <option key={student.sap_no} value={student.name_of_student}>
-                  {student.name_of_student} {student.student_sap_no}
-                </option>
-              ))}
-            </select>
-            {errors.student_name && (
-              <p className="text-red-500 text-sm">
-                {errors.student_name.message}
-              </p>
-            )}
-          </div>
+                <div>
+                  <label
+                    htmlFor="ctc"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    CTC (Cost to Company)
+                  </label>
+                  <input
+                    type="number"
+                    id="ctc"
+                    {...register("ctc", {
+                      required: "CTC is required",
+                      valueAsNumber: true,
+                    })}
+                    className={`w-full p-2 border rounded ${
+                      errors.ctc ? "border-red-500" : "border-gray-300"
+                    }`}
+                    step="0.01"
+                    placeholder="Enter CTC in LPA"
+                  />
+                  <p className="text-gray-400 text-sm">Example: 6.4 LPA</p>
+                  {errors.ctc && (
+                    <p className="text-red-500 text-sm">{errors.ctc.message}</p>
+                  )}
+                </div>
 
-          <div>
-            <label
-              htmlFor="ctc"
-              className="block text-sm font-bold text-gray-700"
-            >
-              CTC
-            </label>
-            <input
-              type="text"
-              id="ctc"
-              placeholder="Enter CTC"
-              className={`block w-full p-2 border rounded ${
-                errors.ctc ? "border-red-500" : ""
-              }`}
-              {...register("ctc", { required: "CTC is required" })}
-            />
-            {errors.ctc && (
-              <p className="text-red-500 text-sm">{errors.ctc.message}</p>
-            )}
-          </div>
+                <div>
+                  <label
+                    htmlFor="branch"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Branch
+                  </label>
+                  <select
+                    id="branch"
+                    value={selectedBranch}
+                    onChange={handleBranchChange}
+                    className={`w-full p-2 border rounded ${
+                      errors.branch ? "border-red-500" : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Select Branch</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Computer Engineering">
+                      Computer Engineering
+                    </option>
+                    <option value="Information Technology">
+                      Information Technology
+                    </option>
+                    <option value="Artificial Intelligence and Machine Learning">
+                      Artificial Intelligence and Machine Learning
+                    </option>
+                  </select>
+                  {errors.branch && (
+                    <p className="text-red-500 text-sm">
+                      {errors.branch.message}
+                    </p>
+                  )}
+                </div>
 
-          <div>
-            <label
-              htmlFor="job_title"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Job Title
-            </label>
-            <input
-              type="text"
-              id="job_title"
-              placeholder="Enter Job Title"
-              className={`block w-full p-2 border rounded ${
-                errors.job_title ? "border-red-500" : ""
-              }`}
-              {...register("job_title", { required: "Job title is required" })}
-            />
-            {errors.job_title && (
-              <p className="text-red-500 text-sm">{errors.job_title.message}</p>
-            )}
-          </div>
+                <div>
+                  <label
+                    htmlFor="name_of_student"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Name of Student
+                  </label>
+                  <select
+                    id="name_of_student"
+                    {...register("name_of_student", {
+                      required: "Name of student is required",
+                    })}
+                    onChange={handleStudentChange}
+                    className={`w-full p-2 border rounded ${
+                      errors.name_of_student
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Select Student</option>
+                    {filteredStudents.map((student) => (
+                      <option
+                        key={student.student_sap_no}
+                        value={student.name_of_student}
+                      >
+                        {student.name_of_student}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.name_of_student && (
+                    <p className="text-red-500 text-sm">
+                      {errors.name_of_student.message}
+                    </p>
+                  )}
+                </div>
 
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-bold text-gray-700"
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter Email"
-              className={`block w-full p-2 border rounded ${
-                errors.email ? "border-red-500" : ""
-              }`}
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                  message: "Invalid email address",
-                },
-              })}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
-            )}
+                <div>
+                  <label
+                    htmlFor="student_sap_no"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Student SAP No.
+                  </label>
+                  <input
+                    id="student_sap_no"
+                    type="text"
+                    {...register("student_sap_no", {
+                      required: "Student SAP No. is required",
+                    })}
+                    value={student_sap_no}
+                    readOnly
+                    className={`w-full p-2 border rounded ${
+                      errors.student_sap_no ? "border-red-500" : "border-gray-300"
+                    }`}
+                  />
+                  {errors.student_sap_no && (
+                    <p className="text-red-500 text-sm">
+                      {errors.student_sap_no.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="student_email_id"
+                    className="block text-md font-bold text-gray-700 mb-1"
+                  >
+                    Student Email ID
+                  </label>
+                  <input
+                    id="student_email_id"
+                    type="email"
+                    {...register("student_email_id", {
+                      required: "Student Email ID is required",
+                    })}
+                    value={student_email_id}
+                    readOnly
+                    className={`w-full p-2 border rounded ${
+                      errors.student_email_id
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                  />
+                  {errors.student_email_id && (
+                    <p className="text-red-500 text-sm">
+                      {errors.student_email_id.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  className="mt-4 w-full p-2 bg-blue-500 text-white font-bold rounded hover:bg-blue-600"
+                >
+                  Add Placed Student
+                </button>
+              </div>
+            </form>
           </div>
-        </div>
-        <button
-          type="submit"
-          className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
-        >
-          Submit
-        </button>
-      </form>
+        </>
+      )}
     </>
   );
 };

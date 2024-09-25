@@ -67,7 +67,7 @@ const FormPage = () => {
         toast.success("Request Sent Successfully");
 
         setTimeout(() => {
-          navigate(`${STUDENT_PATH}/login`);
+          // navigate(`${STUDENT_PATH}/login`);
         }, 1000);
       }
     } catch (error) {
@@ -136,6 +136,8 @@ const FormPage = () => {
                   <img src={logo} className="h-20" alt="NMIMS Logo" />
                   {renderPage()}
 
+             
+             
                   <div className="flex justify-between w-full mt-6">
                     <button
                       onClick={handlePrevious}
@@ -156,6 +158,9 @@ const FormPage = () => {
                       {currentPage === 5 ? "Submit" : "Next"}
                     </button>
                   </div>
+
+
+
                 </div>
               </div>
             </>

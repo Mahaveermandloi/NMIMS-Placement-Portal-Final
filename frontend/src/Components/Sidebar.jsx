@@ -125,7 +125,7 @@ const Sidebar = (props) => {
 
           {
             icon: <CiViewList size={25} />,
-            text: "Job Listings",
+            text: "Job Profiles",
             path: `${ADMIN_PATH}/job-listings`,
           },
           {

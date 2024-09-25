@@ -14,7 +14,6 @@ const createPlacedStudent = asyncHandler(async (req, res) => {
     job_title,
     ctc,
     year,
-    engineering_specialization, // Added field
   } = req.body;
 
   console.log(
@@ -24,8 +23,7 @@ const createPlacedStudent = asyncHandler(async (req, res) => {
     company_name,
     job_title,
     ctc,
-    year,
-    engineering_specialization
+    year
   );
 
   if (
@@ -35,8 +33,7 @@ const createPlacedStudent = asyncHandler(async (req, res) => {
     !company_name ||
     !job_title ||
     ctc === undefined ||
-    !year ||
-    !engineering_specialization // Ensure specialization is provided
+    !year
   ) {
     throw new ApiError(400, "All fields are required");
   }
@@ -73,7 +70,7 @@ const createPlacedStudent = asyncHandler(async (req, res) => {
     job_title,
     ctc,
     year,
-    engineering_specialization, // Use the specialization from the request body
+    engineering_specialization: student.engineering_specialization, // Use the specialization from the request body
   });
 
   // Save the PlacedStudent document
@@ -132,7 +129,10 @@ const updatePlacedStudent = asyncHandler(async (req, res) => {
   }
 
   // Check if the student SAP number has changed
-  if (student_sap_no && student_sap_no !== currentPlacedStudent.student_sap_no) {
+  if (
+    student_sap_no &&
+    student_sap_no !== currentPlacedStudent.student_sap_no
+  ) {
     const student = await Student.findOne({ student_sap_no });
 
     if (!student) {
@@ -160,7 +160,6 @@ const updatePlacedStudent = asyncHandler(async (req, res) => {
       new ApiResponse(200, placedStudent, "Placed student updated successfully")
     );
 });
-
 
 // Get all Placed Students
 const getAllPlacedStudents = asyncHandler(async (req, res) => {
