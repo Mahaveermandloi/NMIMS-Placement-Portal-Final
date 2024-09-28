@@ -2,20 +2,26 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import PlacedStudent from "../models/placedstudents.model.js";
-
+import Student from "../models/student.model.js";
 
 const placementStats = asyncHandler(async (req, res) => {
   try {
-    const students = await PlacedStudent.find();
+    const placedStudents = await PlacedStudent.find();
+    const allStudents = await Student.find(); // Fetch all students
 
-    if (!students.length) {
+    if (!placedStudents.length) {
       throw new ApiError(404, "No placement data found");
     }
 
+    const totalStudents = allStudents.length;
+    const totalPlaced = placedStudents.length;
+    const totalUnplaced = totalStudents - totalPlaced; // Calculate unplaced students
+
     const ctcByYear = {};
     const ctcBySpecialization = {};
+    const studentCountBySpecialization = {}; // Object to count students by specialization
 
-    students.forEach((student) => {
+    placedStudents.forEach((student) => {
       const year = student.year;
       const ctc = student.ctc; // CTC is already a number
       const specialization = student.engineering_specialization;
@@ -29,8 +35,10 @@ const placementStats = asyncHandler(async (req, res) => {
       // Organize CTC data by engineering specialization
       if (!ctcBySpecialization[specialization]) {
         ctcBySpecialization[specialization] = [];
+        studentCountBySpecialization[specialization] = 0; // Initialize count for new specialization
       }
       ctcBySpecialization[specialization].push(ctc);
+      studentCountBySpecialization[specialization]++; // Increment the count
     });
 
     // Function to calculate statistics
@@ -60,9 +68,10 @@ const placementStats = asyncHandler(async (req, res) => {
     // Calculate stats for each engineering specialization
     const statsBySpecialization = {};
     for (const specialization in ctcBySpecialization) {
-      statsBySpecialization[specialization] = calculateStats(
-        ctcBySpecialization[specialization]
-      );
+      statsBySpecialization[specialization] = {
+        stats: calculateStats(ctcBySpecialization[specialization]),
+        numberOfStudents: studentCountBySpecialization[specialization], // Include the count of students
+      };
     }
 
     // Respond with the calculated statistics
@@ -70,6 +79,9 @@ const placementStats = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         {
+          totalPlaced,
+          totalUnplaced,
+          totalStudents,
           statsByYear,
           statsBySpecialization,
         },

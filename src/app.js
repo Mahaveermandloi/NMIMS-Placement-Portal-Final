@@ -14,6 +14,9 @@ import shortlistedstudentsRoutes from "../src/routes/shortlistedstudents.routes.
 import studentrequest from "../src/routes/studentrequest.routes.js"
 import announcementRoutes from "../src/routes/announcement.routes.js";
 
+import dashboardRoutes from "../src/routes/dashboard.routes.js";
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -92,6 +95,9 @@ app.use("/api", branchRoutes);
 app.use("/api", announcementRoutes);
 
 app.use("/api",  studentrequest);
+
+app.use("/api" , dashboardRoutes);
+
 
 
 app.use("/api", joblistingRoutes);
