@@ -66,7 +66,7 @@ const Companies = () => {
       <Toast />
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h1 className="text-3xl font-bold">Job Listings</h1>
+          <h1 className="text-3xl font-bold">Job Profiles</h1>
         </div>
 
         <div>

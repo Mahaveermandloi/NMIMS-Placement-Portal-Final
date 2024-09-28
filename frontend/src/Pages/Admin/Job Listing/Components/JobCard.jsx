@@ -50,9 +50,10 @@ const JobCard = ({ job }) => {
   return (
     <div className="flex flex-row items-center border hover:border-gray-100 rounded-lg shadow-xl md:flex-row md:max-w-md">
       <img
-        className="object-cover lg:w-20 lg:h-20 ml-4 h-20 w-20"
+        className=" lg:w-24 lg:h-20 ml-4 h-20 w-20"
         src={`${SERVER_URL}${job.company_logo}`}
         alt={`${job.company_name} Logo`}
+
       />
 
       <div className="flex flex-col justify-between p-4 leading-normal">

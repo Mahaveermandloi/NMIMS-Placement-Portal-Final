@@ -20,6 +20,8 @@ import FormPage from "../Pages/User/Register/FormPage.jsx";
 // import OtherDetails from "../Pages/User/Register/OtherDetails.jsx";
 import { removeTokensAndRedirectForUserRoutes } from "../Components/AdminTokenManager.jsx";
 import { STUDENT_PATH } from "../Utils/URLPath.jsx";
+import Notifications from "../Pages/User/Notifications/Notifications.jsx";
+
 
 const UserRoutes = () => {
   const navigate = useNavigate();
@@ -70,10 +72,19 @@ const UserRoutes = () => {
               path="/student/*"
               element={
                 <Sidebar userRole="student">
+
+
                   <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
 
+
                     <Route path="companies" element={<Companies />} />
+                    
+                    
+                    <Route path="notifications" element={<Notifications />} />
+                  
+                  
+
                     <Route
                       path="company-detail/:id"
                       element={<CompanyDetail />}

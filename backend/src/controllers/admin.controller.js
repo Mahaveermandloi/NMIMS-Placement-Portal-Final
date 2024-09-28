@@ -230,7 +230,7 @@ const reGenerateAccessToken = asyncHandler(async (req, res) => {
   }
 
   try {
-    // Verify refresh token (this will check the expiration as well)
+ 
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
     const admin = await Admin.findOne({ _id: decoded._id, refreshToken });

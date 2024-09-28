@@ -6,7 +6,6 @@ import Password from "../models/password.model.js";
 
 export const verifyJWT = async (req, res, next) => {
   try {
-    
     const token = req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
@@ -23,6 +22,8 @@ export const verifyJWT = async (req, res, next) => {
 
     // Find user based on token
     let user;
+
+    
 
     if (decodedToken._id) {
       user = await Admin.findById(decodedToken._id).select(

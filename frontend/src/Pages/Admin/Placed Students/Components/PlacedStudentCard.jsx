@@ -104,7 +104,7 @@ const PlacedStudentCard = ({ student }) => {
             <img
               src={`${SERVER_URL}${student.company_logo}`}
               alt="Company Logo"
-              className="w-20 h-10 object-cover"
+              className="w-20 h-10 "
             />
           </div>
         </div>

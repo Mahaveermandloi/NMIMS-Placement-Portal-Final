@@ -15,12 +15,12 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 
 import logo from "../../public/images/nmimslogo.png";
-import user from "../../public/images/user.png";
+import userImage from "../../public/images/user.png";
 import { PiFactory } from "react-icons/pi";
 import { CiViewList } from "react-icons/ci";
 import { PiStudent } from "react-icons/pi";
@@ -34,6 +34,8 @@ import { StudentTokenManager } from "./StudentTokenManager.jsx";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { getApi } from "../Utils/API.js";
 import { GrAnnounce } from "react-icons/gr";
+import { VscBellDot } from "react-icons/vsc";
+import BellIcon from "./BellIcon.jsx";
 
 const drawerWidth = 240;
 
@@ -44,23 +46,77 @@ const Sidebar = (props) => {
   const [studentOpen, setStudentOpen] = useState(false); // State for controlling the student dropdown
   const [profileImage, setProfileImage] = useState("");
 
+  const [announcements, setAnnouncements] = useState(false);
+  const [announcementCount, setAnnouncementsCount] = useState(0);
+
+  const navigate = useNavigate();
+
   useEffect(() => {
-    if (userRole === "student") {
-      const getProfile = async () => {
+    const getProfile = async () => {
+      if (userRole === "student") {
         try {
           const response = await getApi("/api/student/get-profile-image");
-
-          setProfileImage(response.data.student_profile_image);
+          setProfileImage(response.data.student_profile_image); // Use default if no image
+          localStorage.setItem("SAPID", response.data.student_sap_no);
         } catch (error) {
           console.log(error);
+          setProfileImage(userImage); // Set default on error
         }
-      };
+      } else {
+        setProfileImage(userImage);
+      }
+    };
 
-      getProfile();
-    } else {
-      // Use a static image for non-student roles
-      setProfileImage("/images/static-profile.png");
-    }
+    // const getAnnouncements = async () => {
+    //   if (userRole === "student") {
+    //     const SAPID = localStorage.getItem("SAPID");
+    //     try {
+    //       const response = await getApi("/api/announcement");
+    //       console.log(response);
+    //       if (response.statusCode === 200) {
+    //         if (response.data.length > 0) {
+    //           setAnnouncements(true);
+    //           setAnnouncementsCount(response.data.length);
+    //         } else {
+    //           setAnnouncements(false);
+    //         }
+    //       }
+    //     } catch (error) {
+    //       console.error("Error fetching announcements:", error);
+    //     }
+    //   }
+    // };
+
+    const getAnnouncements = async () => {
+      if (userRole === "student") {
+        const SAPID = localStorage.getItem("SAPID");
+        try {
+          const response = await getApi("/api/announcement");
+          console.log(response);
+
+          if (response.statusCode === 200) {
+            const filteredAnnouncements = response.data.filter(
+              (announcement) => {
+                return !announcement.status.includes(SAPID);
+              }
+            );
+
+            if (filteredAnnouncements.length > 0) {
+              setAnnouncements(true);
+              setAnnouncementsCount(filteredAnnouncements.length);
+            } else {
+              setAnnouncements(false);
+              setAnnouncementsCount(0); // Reset count if no announcements
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching announcements:", error);
+        }
+      }
+    };
+
+    getProfile();
+    getAnnouncements();
   }, [userRole]);
 
   const handleDrawerClose = () => {
@@ -304,13 +360,37 @@ const Sidebar = (props) => {
                 marginLeft: "auto",
                 display: "flex",
                 alignItems: "center",
+                gap: 3,
               }}
             >
-              <img
-                src={`${SERVER_URL}${profileImage}`}
-                className="h-10 w-10 rounded-full"
-                alt=""
-              />
+              {userRole === "student" ? (
+                <>
+                  <BellIcon announcementCount={announcementCount} />
+                </>
+              ) : (
+                <></>
+              )}
+
+              <div>
+                {userRole === "student" ? (
+                  <>
+                    <img
+                      src={`${SERVER_URL}${profileImage}`}
+                      className="h-10 w-10 rounded-full"
+                      alt=""
+                    />
+                  </>
+                ) : (
+                  <>
+                    <img
+                      src={userImage}
+                      className="h-10 w-10 rounded-full"
+                      alt=""
+                    />
+                  </>
+                )}
+              </div>
+
               <Dropdown profileImage={profileImage} userRole={userRole} />
             </Box>
           </Typography>

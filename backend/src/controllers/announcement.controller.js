@@ -138,7 +138,6 @@ const updateAnnouncement = asyncHandler(async (req, res) => {
     Best regards,
     Placement Team
   `;
-  
 
   res.status(200).json(
     new ApiResponse(
@@ -169,10 +168,61 @@ const deleteAnnouncement = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Announcement deleted successfully"));
 });
 
+const readAnnouncement = asyncHandler(async (req, res) => {
+  try {
+
+    const { announcementIds, student_sap_no } = req.body;
+
+    console.log(announcementIds, student_sap_no);
+    
+
+    // Check if both announcementIds and student_sap_no are provided
+    // if (!announcementIds || !student_sap_no) {
+    //   throw new ApiError(
+    //     400,
+    //     "Announcement IDs and student SAP number are required."
+    //   );
+    // }
+
+    // Loop through each announcement ID and update the status
+    for (let announcementId of announcementIds) {
+      const announcement = await Announcement.findById(announcementId);
+
+      if (!announcement) {
+        continue; // Skip if the announcement is not found
+      }
+
+      // Check if the SAP number already exists in the status array
+      if (!announcement.status.includes(student_sap_no)) {
+        // Add the student's SAP number to the status array
+        announcement.status.push(student_sap_no);
+        // Save the updated announcement
+        await announcement.save();
+      }
+    }
+
+    // Send a success response after processing all announcements
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          null,
+          "Student SAP number added successfully to the announcements."
+        )
+      );
+  } catch (error) {
+    // Handle and log the error
+    console.log(error);
+    throw new ApiError(500, "An error occurred while updating announcements.");
+  }
+});
+
 export {
   createAnnouncement,
   getAllAnnouncements,
   getAnnouncementById,
   updateAnnouncement,
   deleteAnnouncement,
+  readAnnouncement,
 };
