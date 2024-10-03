@@ -1,8 +1,6 @@
-
 import multer from "multer";
 
 const upload = multer();
-
 
 const handleFormData = (req, res, next) => {
   upload.none()(req, res, (err) => {

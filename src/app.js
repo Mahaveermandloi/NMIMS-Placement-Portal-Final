@@ -11,11 +11,12 @@ import joblistingRoutes from "../src/routes/joblisting.routes.js";
 import branchRoutes from "../src/routes/branch.routes.js";
 import placedstudentsRoutes from "../src/routes/placedstudents.routes.js";
 import shortlistedstudentsRoutes from "../src/routes/shortlistedstudents.routes.js";
-import studentrequest from "../src/routes/studentrequest.routes.js"
+import studentrequest from "../src/routes/studentrequest.routes.js";
 import announcementRoutes from "../src/routes/announcement.routes.js";
 
 import dashboardRoutes from "../src/routes/dashboard.routes.js";
 
+import updateStudentDetailsRoutes from "../src/routes/updatestudentdetails.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,7 +65,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
   "http://192.168.166.62:3000",
-  "https://nmims-placement-backend-v2.vercel.app"
+  "https://nmims-placement-backend-v2.vercel.app",
   // Replace with your specific frontend URL
 ];
 
@@ -88,25 +89,19 @@ app.use("/api/student", userRoutes);
 
 app.use("/api/company", companyRoutes);
 
-
-
 app.use("/api", branchRoutes);
 
 app.use("/api", announcementRoutes);
 
-app.use("/api",  studentrequest);
+app.use("/api", studentrequest);
 
-app.use("/api" , dashboardRoutes);
-
-
+app.use("/api", dashboardRoutes);
 
 app.use("/api", joblistingRoutes);
 app.use("/api", placedstudentsRoutes);
 app.use("/api", shortlistedstudentsRoutes);
 
-
-
-
+app.use("/api", updateStudentDetailsRoutes);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the backend server!");

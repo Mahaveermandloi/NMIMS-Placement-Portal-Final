@@ -822,6 +822,8 @@ const updateStudentProfile = asyncHandler(async (req, res) => {
   const profileImagePath = studentProfileImage
     ? `/uploads/Student/ProfileImage/${studentProfileImage.filename}`
     : null;
+
+    
   const cvPath = studentCV
     ? `/uploads/Student/Resume/${studentCV.filename}`
     : null;
