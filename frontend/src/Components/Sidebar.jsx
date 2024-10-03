@@ -103,6 +103,7 @@ const Sidebar = (props) => {
 
             if (filteredAnnouncements.length > 0) {
               setAnnouncements(true);
+              alert(filteredAnnouncements.length);
               setAnnouncementsCount(filteredAnnouncements.length);
             } else {
               setAnnouncements(false);

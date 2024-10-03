@@ -176,7 +176,7 @@ const Dashboard = () => {
             </p>
           </div>
 
-          <img src={median} alt=""   className="h-14 w-14" />
+          <img src={median} alt="" className="h-14 w-14" />
         </div>
 
         <div className="bg-white  flex justify-between items-center rounded-lg shadow-lg p-4">
@@ -186,7 +186,7 @@ const Dashboard = () => {
               {packageStats.lowest} LPA
             </p>
           </div>
-          <img src={lowest} alt=""  className="h-14 w-14"  />
+          <img src={lowest} alt="" className="h-14 w-14" />
         </div>
       </div>
 
@@ -211,7 +211,9 @@ const Dashboard = () => {
           <div className="w-full h-80">
             {/* Render Pie chart for placed/unplaced */}
             {placedUnplacedData ? (
-              <Pie data={placedUnplacedData} options={pieOptions} />
+              <>
+                <Pie data={placedUnplacedData} options={pieOptions} />
+              </>
             ) : (
               <p>No data available</p>
             )}

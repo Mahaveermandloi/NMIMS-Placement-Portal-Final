@@ -33,13 +33,80 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
 });
 
+// const marksheetStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     if (file.fieldname === "tenth_marksheet" && file.mimetype.includes("pdf")) {
+//       cb(null, path.join(__dirname, "..", "uploads", "Student", "Marksheets"));
+//     }
+//     if (
+//       file.fieldname === "tenth_marksheet" &&
+//       file.mimetype === "application/pdf"
+//     ) {
+//       cb(null, path.join(__dirname, "..", "uploads", "Student", "Marksheets"));
+//     }
+//     if (
+//       file.fieldname === "twelfth_marksheet" &&
+//       file.mimetype.includes("pdf")
+//     ) {
+//       cb(null, path.join(__dirname, "..", "uploads", "Student", "Marksheets"));
+//     }
+//     if (
+//       file.fieldname === "diploma_marksheet" &&
+//       file.mimetype.includes("pdf")
+//     ) {
+//       cb(null, path.join(__dirname, "..", "uploads", "Student", "Marksheets"));
+//     } else {
+//       cb(new Error("Unsupported file type"), null);
+//     }
+//   },
+//   filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
+// });
+
+
+
+const marksheetStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    if (file.fieldname === "tenth_marksheet" && file.mimetype.includes("pdf")) {
+      cb(null, path.join(__dirname, "..", "uploads", "Student", "Marksheets"));
+    } else if (
+      file.fieldname === "twelfth_marksheet" &&
+      file.mimetype.includes("pdf")
+    ) {
+      cb(null, path.join(__dirname, "..", "uploads", "Student", "Marksheets"));
+    } else if (
+      file.fieldname === "diploma_marksheet" &&
+      file.mimetype.includes("pdf")
+    ) {
+      cb(null, path.join(__dirname, "..", "uploads", "Student", "Marksheets"));
+    } else {
+      cb(new Error("Unsupported file type"), null);
+    }
+  },
+  filename: (req, file, cb) => {
+    // Create a unique filename using Date.now() and original filename
+    const uniqueFilename = `${Date.now()}-${Math.floor(Math.random() * 10000)}-${file.originalname}`;
+    
+    // Return the unique filename
+    cb(null, uniqueFilename);
+  },
+});
+
+
+
 const upload = multer({ storage });
+const uploadmarksheet = multer({ marksheetStorage });
 
 const uploadAdminProfileImage = upload.single("profile_image");
 
 const uploadShortlistedStudent = upload.single("excel_file");
 
 const uploadStudentFile = upload.single("student_excel_file");
+
+const tenthMarksheets = uploadmarksheet.single("tenth_marksheet");
+
+const twelfthMarksheets = uploadmarksheet.single("twelfth_marksheet");
+
+const diplomaMarksheets = uploadmarksheet.single("diploma_marksheet");
 
 // Middleware to remove the old profile image
 const removeOldProfileImage = async (req, res, next) => {
@@ -67,4 +134,7 @@ export {
   removeOldProfileImage,
   uploadShortlistedStudent,
   uploadStudentFile,
+  tenthMarksheets,
+  twelfthMarksheets,
+  diplomaMarksheets,
 };

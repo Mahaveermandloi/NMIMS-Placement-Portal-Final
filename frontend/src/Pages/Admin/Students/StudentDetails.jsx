@@ -4,7 +4,7 @@ import CustomPaginationActionsTable from "../../../Components/TablePaginationAct
 import SearchBar from "./Components/SearchBar.jsx";
 import { deleteApi, deleteApi2, getApi } from "../../../Utils/API.js";
 import { useNavigate } from "react-router-dom";
-import { ADMIN_PATH } from "../../../Utils/URLPath.jsx";
+import { ADMIN_PATH, SERVER_URL } from "../../../Utils/URLPath.jsx";
 import Loader from "../../../Components/Loader.jsx";
 import { Toast } from "../../../Components/Toast.jsx";
 import { toast } from "react-toastify";
@@ -41,12 +41,29 @@ const StudentDetails = () => {
       (student) =>
         student.student_sap_no.toString().includes(lowerCaseQuery) ||
         student.name_of_student.toLowerCase().includes(lowerCaseQuery) ||
-        student.student_email_id.toLowerCase().includes(lowerCaseQuery)
+        student.student_email_id.toLowerCase().includes(lowerCaseQuery) ||
+        (student.skills &&
+          student.skills.some((skill) =>
+            skill.toLowerCase().includes(lowerCaseQuery)
+          ))
     );
+
     setFilteredData(filtered);
   }, [searchQuery, studentData]); // Runs every time searchQuery or studentData changes
 
   const columns = [
+    {
+      id: "student_profile_image",
+      label: "Student Profile",
+      align: "left",
+      render: (row) => (
+        <img
+          src={`${SERVER_URL}${row.student_profile_image}`}
+          alt={`${row.name_of_student}'s profile`}
+          className="rounded-full h-16 w-16 "
+        />
+      ),
+    },
     { id: "student_sap_no", label: "SAP ID", align: "left" },
     { id: "name_of_student", label: "Name", align: "left" },
     { id: "student_email_id", label: "Email", align: "left" },
@@ -150,6 +167,7 @@ const StudentDetails = () => {
           ) : (
             <CustomPaginationActionsTable
               data={filteredData.map((student) => ({
+                student_profile_image: student.student_profile_image,
                 student_sap_no: student.student_sap_no,
                 name_of_student: student.name_of_student,
                 student_email_id: student.student_email_id,

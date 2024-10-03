@@ -15,18 +15,14 @@ import ChangePassword from "../Pages/User/Profile/ChangePassword.jsx";
 import UpdateProfile from "../Pages/User/Profile/UpdateProfile.jsx";
 import CompanyDetail from "../Pages/Admin/Companies/CompanyDetail.jsx";
 import JobDetailsPage from "../Pages/User/Job Listing/Components/JobDetailsPage.jsx";
-// import Register from "../Pages/User/Register/Register.jsx";
 import FormPage from "../Pages/User/Register/FormPage.jsx";
-// import OtherDetails from "../Pages/User/Register/OtherDetails.jsx";
-import { removeTokensAndRedirectForUserRoutes } from "../Components/AdminTokenManager.jsx";
 import { STUDENT_PATH } from "../Utils/URLPath.jsx";
 import Notifications from "../Pages/User/Notifications/Notifications.jsx";
 
-
 const UserRoutes = () => {
   const navigate = useNavigate();
-
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true); // Add a loading state
 
   useEffect(() => {
     const checkAuthentication = () => {
@@ -36,12 +32,18 @@ const UserRoutes = () => {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
-        navigate(`${STUDENT_PATH}/login`);
       }
+
+      setLoading(false); // Finish loading after checking authentication
     };
 
     checkAuthentication();
   }, []);
+
+  // Show a loading spinner or similar while loading
+  if (loading) {
+    return <div>Loading...</div>; // You can replace this with a spinner or placeholder
+  }
 
   return (
     <>
@@ -50,17 +52,12 @@ const UserRoutes = () => {
           <>
             <Route path="/student/login" element={<UserLogin />} />
             <Route path="/forget-password" element={<ForgetPassword />} />
-
             <Route path="/register" element={<FormPage />} />
-
-            {/* <Route path="/register/files" element={<OtherDetails />} /> */}
-
             <Route path="/otp-page/:email" element={<OTPPage />} />
             <Route
               path="/update-password/:email"
               element={<UpdatePassword />}
             />
-
             <Route
               path="*"
               element={<Navigate to="/student/login" replace />}
@@ -72,31 +69,19 @@ const UserRoutes = () => {
               path="/student/*"
               element={
                 <Sidebar userRole="student">
-
-
                   <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
-
-
                     <Route path="companies" element={<Companies />} />
-                    
-                    
                     <Route path="notifications" element={<Notifications />} />
-                  
-                  
-
                     <Route
                       path="company-detail/:id"
                       element={<CompanyDetail />}
                     />
-
                     <Route path="job-listings" element={<JobListings />} />
-
                     <Route
                       path="job-listings/:id"
                       element={<JobDetailsPage />}
                     />
-
                     <Route
                       path="shortlisted-students"
                       element={<ShortlistedStudents />}

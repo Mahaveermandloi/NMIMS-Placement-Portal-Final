@@ -42,12 +42,21 @@ const studentSchema = new Schema(
     has_passport: String,
     passport_no: String,
     passport_expiry_date: Date,
+
+    //
     tenth_standard_percentage: Number,
     year_of_passing_tenth: Number,
     board_of_passing_tenth: String,
     tenth_school: String,
+
     tenth_passing_state: String,
     tenth_passing_country: String,
+    tenth_marksheet: {
+      type: String,
+      default: "",
+    },
+
+    //
     twelfth_standard_percentage: Number,
     year_of_passing_twelfth: Number,
     board_of_passing_twelfth: String,
@@ -55,12 +64,24 @@ const studentSchema = new Schema(
     twelfth_school_city: String,
     twelfth_passing_state: String,
     twelfth_passing_country: String,
+    twelfth_marksheet: {
+      type: String,
+      default: "",
+    },
+
+    //
     diploma_stream: String,
     diploma_passing_state: String,
     diploma_passing_country: String,
     diploma_college: String,
     diploma_board_of_passing: String,
     diploma_year_of_passing: Number,
+    diploma_marksheet: {
+      type: String,
+      default: "",
+    },
+
+    //
     first_year_first_semester_percentage_diploma: Number,
     first_year_second_semester_percentage_diploma: Number,
     first_year_percentage_diploma: Number,
@@ -76,6 +97,8 @@ const studentSchema = new Schema(
     final_percentage_diploma: Number,
     aggregate_percentage_diploma: Number,
     year_of_passing_diploma: Number,
+
+    //
     gpa_first_semester_first_year: Number,
     cgpa_first_semester_first_year: Number,
     academic_year_clearing_sem1: Number,
@@ -94,6 +117,8 @@ const studentSchema = new Schema(
     gpa_sixth_semester_third_year: Number,
     cgpa_sixth_semester_third_year: Number,
     academic_year_clearing_sem6: Number,
+
+    //
     total_dead_kts: Number,
     total_live_kts: Number,
     last_received_marksheet: String,
@@ -104,8 +129,17 @@ const studentSchema = new Schema(
     year_drop_between_engineering: String,
     years_of_gap_during_engineering: Number,
     reason_for_gap_or_drop_during_engineering: String,
+
+    //
     cv_uploaded_in_nmims_format: String,
     documents_uploaded: String,
+
+    // skills
+    skills: {
+      type: [String],
+      default: [],
+    },
+    //
     student_cv: {
       type: String,
       default: "",
