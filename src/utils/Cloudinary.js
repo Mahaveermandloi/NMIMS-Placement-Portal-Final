@@ -18,8 +18,7 @@ const uploadOnCloudinary = async (localfilePath) => {
       resource_type: "auto",
     });
 
-    //   file has been successfully uploaded
-    // console.log("file is uploaded successfully ");
+
 
     fs.unlinkSync(localfilePath);
 
@@ -34,7 +33,7 @@ cloudinary.uploader.upload(
   "https://upload.wikimedia.org/wikipedia/commons/a/ae/Olympic_flag.jpg",
   { public_id: "olympic_flag" },
   function (error, result) {
-  //  console.log(result);
+
   }
 );
 

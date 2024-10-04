@@ -506,16 +506,52 @@ const updateCollegeDetails = asyncHandler(async (req, res) => {
     );
 });
 
+// const updateProfileImage = asyncHandler(async (req, res) => {
+//   const { student_sap_no } = req.body;
+
+//   const studentProfileImage = req.files["student_profile_image"]
+//     ? req.files["student_profile_image"][0]
+//     : null;
+
+//   const profileImagePath = studentProfileImage
+//     ? `/uploads/Student/ProfileImage/${studentProfileImage.filename}`
+//     : null;
+
+//   if (!student_sap_no) {
+//     throw new ApiError(400, "Student SAP number is required");
+//   }
+
+//   const student = await Student.findOne({ student_sap_no });
+
+//   if (!student) {
+//     throw new ApiError(404, "Student not found");
+//   }
+
+//   // Update the profile image if a new one is uploaded
+//   if (profileImagePath) {
+//     student.student_profile_image = profileImagePath;
+//   }
+
+//   // Save the student profile with the updated image
+//   await student.save();
+
+//   console.log(student);
+
+//   // Return success response
+//   return res
+//     .status(200)
+//     .json(
+//       new ApiResponse(
+//         200,
+//         { profileImagePath: student.student_profile_image },
+//         "Profile image updated successfully"
+//       )
+//     );
+// });
+
+
 const updateProfileImage = asyncHandler(async (req, res) => {
   const { student_sap_no } = req.body;
-
-  const studentProfileImage = req.files["student_profile_image"]
-    ? req.files["student_profile_image"][0]
-    : null;
-
-  const profileImagePath = studentProfileImage
-    ? `/uploads/Student/ProfileImage/${studentProfileImage.filename}`
-    : null;
 
   if (!student_sap_no) {
     throw new ApiError(400, "Student SAP number is required");
@@ -527,13 +563,16 @@ const updateProfileImage = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Student not found");
   }
 
-  // Update the profile image if a new one is uploaded
-  if (profileImagePath) {
-    student.student_profile_image = profileImagePath;
+  // Check if a new profile image is uploaded
+  if (req.file) {
+    // Cloudinary returns the URL directly
+    student.student_profile_image = req.file.path; // Get the Cloudinary URL
   }
 
   // Save the student profile with the updated image
   await student.save();
+
+  console.log(student);
 
   // Return success response
   return res
