@@ -6,7 +6,7 @@ import Company from "../models/company.model.js";
 import Student from "../models/student.model.js";
 import Joblisting from "../models/joblisting.model.js";
 import JobListing from "../models/joblisting.model.js";
-import { SendWhatsAppMessage } from "../utils/SendWhatsAppMessage.js";
+
 import { sendEmail } from "../utils/SendEmail.js";
 import Document from "../models/shortlistedstudentfiles.model.js";
 import XLSX from "xlsx";
