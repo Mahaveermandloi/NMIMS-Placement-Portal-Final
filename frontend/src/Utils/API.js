@@ -64,6 +64,8 @@ const getHeaders = () => {
 const postApi = async (data, route) => {
   try {
     const formData = toFormData(data);
+
+    console.log(formData);
     const response = await api.post(route, formData, {
       headers: {
         "Content-Type": "multipart/form-data",

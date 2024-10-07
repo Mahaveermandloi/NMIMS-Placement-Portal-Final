@@ -44,10 +44,14 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+
+
 // Initialize multer with the storage configuration and file filter
 const uploadCompanyFiles = multer({ storage, fileFilter }).fields([
   { name: "company_logo", maxCount: 1 }, // Only allow one company logo
   { name: "company_files", maxCount: 10 }, // Allow up to 10 company files
 ]);
+
+
 
 export { uploadCompanyFiles };

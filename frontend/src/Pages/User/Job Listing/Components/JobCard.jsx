@@ -60,7 +60,7 @@ const JobCard = ({ job }) => {
 
       <img
         className="lg:w-20 ml-4 w-20"
-        src={`${SERVER_URL}${job.company_logo}`}
+        src={`${job.company_logo}`}
         alt={`${job.company_name} Logo`}
       />
 

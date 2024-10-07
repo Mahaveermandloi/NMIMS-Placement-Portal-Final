@@ -55,7 +55,7 @@ const FormPage = () => {
   const onSubmit = async (data) => {
     setLoading(true);
 
-    console.log(data);
+
 
     try {
       const response = await postApi(
@@ -71,7 +71,7 @@ const FormPage = () => {
         }, 1000);
       }
     } catch (error) {
-      console.log(error);
+    
       toast.error(error.response.data.message);
       // toast.error("An error occurred during registration. Please try again.");
     } finally {

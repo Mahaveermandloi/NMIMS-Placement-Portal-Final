@@ -8,6 +8,8 @@ import { postApi } from "../../../Utils/API.js";
 import { ADMIN_PATH, SERVER_URL } from "../../../Utils/URLPath.jsx";
 import Loader from "../../../Components/Loader.jsx";
 
+import { IoArrowBack } from "react-icons/io5";
+
 const UploadCompaniesDetails = () => {
   const navigate = useNavigate();
   const [tab, setTab] = useState("uploadCompany");
@@ -41,8 +43,6 @@ const UploadCompaniesDetails = () => {
           navigate(`${ADMIN_PATH}/companies`);
         }, 1000);
       }
-
-      // console.log("Server Response:", response);
     } catch (error) {
       toast.error("Failed to upload company data");
       console.error("Error uploading company data:", error);
@@ -52,8 +52,8 @@ const UploadCompaniesDetails = () => {
   };
 
   const onSubmitExcel = (data) => {
-    setLoadingExcel(true); // Show loader
-    // console.log("Upload Excel Data:", data);
+    setLoadingExcel(true);
+
     toast.success("Excel data uploaded successfully");
     setLoadingExcel(false); // Hide loader
   };
@@ -61,16 +61,16 @@ const UploadCompaniesDetails = () => {
   return (
     <>
       <Toast />
-      <div className="flex mb-4">
+      <div className="flex mb-4 flex-col gap-4">
+        <IoArrowBack
+          size={30}
+          onClick={() => {
+            navigate(`${ADMIN_PATH}/companies`);
+          }}
+          className="cursor-pointer"
+        />
+
         <h1 className="text-3xl font-bold">Add a Company</h1>
-        {/* <button
-          className={`px-4 py-2 rounded ${
-            tab === "uploadExcel" ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
-          onClick={() => setTab("uploadExcel")}
-        >
-          Upload via Excel
-        </button> */}
       </div>
 
       {tab === "uploadCompany" ? (
@@ -104,10 +104,6 @@ const UploadCompaniesDetails = () => {
               )}
             </div>
             {/* Other fields */}
-
-          
-
-          
 
             <div>
               <label
@@ -157,8 +153,6 @@ const UploadCompaniesDetails = () => {
                 {...registerCompany("company_logo")}
               />
             </div>
-
-          
           </div>
 
           <div className="relative">
@@ -179,8 +173,7 @@ const UploadCompaniesDetails = () => {
           </div>
         </form>
       ) : (
-        <>
-        </>
+        <></>
       )}
     </>
   );

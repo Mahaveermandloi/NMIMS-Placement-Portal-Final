@@ -8,7 +8,7 @@ const PlacedStudentCard = ({ student }) => {
         <div class="flex flex-col items-center pb-5">
           <img
             class="w-32 h-32 mb-3 rounded-full shadow-lg mt-2"
-            src={`${SERVER_URL}${student.student_profile_image}`}
+            src={`${student.student_profile_image}`}
             alt="Bonnie image"
           />
 
@@ -23,7 +23,7 @@ const PlacedStudentCard = ({ student }) => {
           </span>
           <span class="text-sm text-gray-500 dark:text-gray-400">
             <img
-              src={`${SERVER_URL}${student.company_logo}`}
+              src={`${student.company_logo}`}
               className="mt-2 w-20"
             />
           </span>

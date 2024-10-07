@@ -16,16 +16,7 @@ const createPlacedStudent = asyncHandler(async (req, res) => {
     year,
   } = req.body;
 
-  console.log(
-    student_sap_no,
-    name_of_student,
-    student_email_id,
-    company_name,
-    job_title,
-    ctc,
-    year
-  );
-
+  
   if (
     !student_sap_no ||
     !name_of_student ||

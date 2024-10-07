@@ -82,10 +82,11 @@ const PlacedStudentCard = ({ student }) => {
       <div className="flex items-center p-4">
         <div className="w-24 h-24 flex-shrink-0 mr-4">
           <img
-            className="w-full h-full object-cover rounded-full shadow-lg"
-            src={`${SERVER_URL}${student.student_profile_image}`}
+            className="w-full h-full   rounded-full shadow-lg"
+            src={`${student.student_profile_image}`}
             alt="Profile"
           />
+        
         </div>
         <div className="flex-1">
           <h5 className="text-lg font-medium text-gray-900">
@@ -102,7 +103,7 @@ const PlacedStudentCard = ({ student }) => {
           <br />
           <div className="mt-2">
             <img
-              src={`${SERVER_URL}${student.company_logo}`}
+              src={`${student.company_logo}`}
               alt="Company Logo"
               className="w-20 h-10 "
             />

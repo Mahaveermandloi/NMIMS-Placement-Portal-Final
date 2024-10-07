@@ -24,8 +24,8 @@ const PlacedStudents = () => {
     try {
       const response = await getApi(`${SERVER_URL}/api/placedstudents`);
 
-  
-
+   
+      
       if (response.statusCode === 200) {
         setPlacedStudents(response.data);
       } else {
@@ -128,7 +128,6 @@ const PlacedStudents = () => {
           {filteredStudents.map((student) => (
             <>
               <PlacedStudentCard key={student._id} student={student} />
-      
             </>
           ))}
         </div>

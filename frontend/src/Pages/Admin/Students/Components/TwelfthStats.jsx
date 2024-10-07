@@ -14,7 +14,7 @@ export const TwelfthStats = ({ studentData }) => {
           </h3>
         </div>
         <div className="flex-grow border-t border-gray-300 mb-4"></div>{" "}
-        <div className="flex flex-col font-serif text-[16px] gap-2 lg:w-1/2">
+        <div className="flex flex-col font-serif text-[16px] gap-2 ">
           <div className="flex justify-between">
             <p className="text-gray-400">Percentage:</p>
             <p>{studentData.twelfth_standard_percentage}</p>
@@ -54,7 +54,7 @@ export const TwelfthStats = ({ studentData }) => {
             <p className="text-gray-400">Marksheet:</p>
             <p>
               <a
-                href={`${SERVER_URL}${studentData.twelfth_marksheet}`}
+                href={`${studentData.twelfth_marksheet}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 underline"

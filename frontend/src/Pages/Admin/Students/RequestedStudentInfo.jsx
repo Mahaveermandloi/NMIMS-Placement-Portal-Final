@@ -17,8 +17,7 @@ const RequestedStudentInfo = () => {
         setLoading(true); // Start loading before fetching
         const response = await getApi(`/api/student-request/${student_sap_no}`);
        
-        console.log(response.data);
-        
+     
         setStudentData(response.data);
       } catch (error) {
         console.error("Error fetching student data:", error);

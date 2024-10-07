@@ -47,7 +47,7 @@ const Login = () => {
       if (error.response) {
         const { message } = error.response.data;
 
-        console.log(error.response.data);
+     
 
         toast.error(message || "An error occurred. Please try again.");
       } else {

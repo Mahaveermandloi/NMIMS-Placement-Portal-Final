@@ -4,7 +4,7 @@ import { GiDiploma } from "react-icons/gi";
 export const DiplomaStats = ({ studentData }) => {
   return (
     <>
-      {studentData.diploma_stream === "" ? (
+      {!studentData.diploma_stream  ? (
         <>
           <div className="flex font-serif items-center my-4">
             <h3 className="font-serif font-bold text-lg text-gray-800 flex-shrink-0 pr-4">
@@ -15,6 +15,10 @@ export const DiplomaStats = ({ studentData }) => {
             </h3>
           </div>
           <div className="flex-grow border-t border-gray-300 mb-4 "></div>
+          <div className="font-serif text-lg ">
+            No Data for Diploma
+
+          </div>
         </>
       ) : (
         <>
@@ -29,7 +33,7 @@ export const DiplomaStats = ({ studentData }) => {
           <div className="flex-grow border-t border-gray-300 mb-4 "></div>
 
           <div className="mb-16">
-            <div className="flex flex-col font-serif text-[16px] gap-2 lg:w-1/2">
+            <div className="flex flex-col font-serif text-[16px] gap-2">
               <div className="flex justify-between">
                 <p className="text-gray-400">Stream:</p>
                 <p>{studentData.diploma_stream}</p>
@@ -162,7 +166,7 @@ export const DiplomaStats = ({ studentData }) => {
                 <p className="text-gray-400">Marksheet:</p>
                 <p>
                   <a
-                    href={`${SERVER_URL}${studentData.diploma_marksheet}`}
+                    href={`${studentData.diploma_marksheet}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 underline"

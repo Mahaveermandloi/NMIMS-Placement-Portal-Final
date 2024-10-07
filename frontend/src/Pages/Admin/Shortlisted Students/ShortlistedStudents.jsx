@@ -29,7 +29,7 @@ const ShortlistedStudents = () => {
       try {
         const response = await getApi(`${SERVER_URL}/api/shortlistedstudents`);
 
-        console.log(response);
+      
 
         if (response.statusCode === 200) {
           const data = response.data.map((student) => ({
@@ -119,13 +119,13 @@ const ShortlistedStudents = () => {
       align: "left",
       render: (row) => (
         <img
-          src={`${SERVER_URL}${row.student_profile_image}`}
+          src={`${row.student_profile_image}`}
           alt={row.name_of_student}
           style={{
             width: 50,
             height: 50,
             borderRadius: "50%", // This makes the image rounded
-            objectFit: "cover", // Ensures the image covers the area without distortion
+            objectFit: "", // Ensures the image covers the area without distortion
           }}
         />
       ),

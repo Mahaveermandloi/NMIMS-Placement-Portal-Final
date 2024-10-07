@@ -23,7 +23,7 @@ const UploadStudentData = () => {
     setLoadingFiles(true);
     try {
       const response = await getApi("/api/student/get-all-excel");
-      console.log(response);
+
       if (response.statusCode === 200) {
         setUploadedFiles(response.data);
       } else {
@@ -60,7 +60,7 @@ const UploadStudentData = () => {
         date: todayDate,
       };
 
-      console.log(payload);
+   
 
       try {
         const response = await postApi(
@@ -68,7 +68,7 @@ const UploadStudentData = () => {
           "/api/student/upload-student-file"
         );
 
-        console.log(response);
+        
         if (response.statusCode === 200) {
           toast.success("Student data uploaded successfully!");
 

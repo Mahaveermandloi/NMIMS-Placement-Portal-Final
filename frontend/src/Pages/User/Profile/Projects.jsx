@@ -44,7 +44,7 @@ export const Projects = ({ studentData }) => {
 
   // Handle form submission
   const onSubmit = (data) => {
-    console.log("Form submitted:", data);
+  
     // Here you would typically send the updated data to the server
     closeModal();
   };

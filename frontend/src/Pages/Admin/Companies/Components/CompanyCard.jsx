@@ -76,7 +76,7 @@ const CompanyCard = ({ company }) => {
         <div className="w-32 h-32 flex items-center  overflow-hidden">
           <img
             className="object-cover w-96 rounded-xl"
-            src={`${SERVER_URL}${company.company_logo}`}
+            src={`${company.company_logo}`}
             alt="Company Logo"
           />
         </div>
@@ -98,6 +98,7 @@ const CompanyCard = ({ company }) => {
             >
               Read More
             </button> */}
+           
             {/* <button
               className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
               onClick={() =>

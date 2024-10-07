@@ -59,7 +59,6 @@ const Sidebar = (props) => {
           setProfileImage(response.data.student_profile_image); // Use default if no image
           localStorage.setItem("SAPID", response.data.student_sap_no);
         } catch (error) {
-          console.log(error);
           setProfileImage(userImage); // Set default on error
         }
       } else {
@@ -67,32 +66,11 @@ const Sidebar = (props) => {
       }
     };
 
-    // const getAnnouncements = async () => {
-    //   if (userRole === "student") {
-    //     const SAPID = localStorage.getItem("SAPID");
-    //     try {
-    //       const response = await getApi("/api/announcement");
-    //       console.log(response);
-    //       if (response.statusCode === 200) {
-    //         if (response.data.length > 0) {
-    //           setAnnouncements(true);
-    //           setAnnouncementsCount(response.data.length);
-    //         } else {
-    //           setAnnouncements(false);
-    //         }
-    //       }
-    //     } catch (error) {
-    //       console.error("Error fetching announcements:", error);
-    //     }
-    //   }
-    // };
-
     const getAnnouncements = async () => {
       if (userRole === "student") {
         const SAPID = localStorage.getItem("SAPID");
         try {
           const response = await getApi("/api/announcement");
-          console.log(response);
 
           if (response.statusCode === 200) {
             const filteredAnnouncements = response.data.filter(
@@ -103,7 +81,7 @@ const Sidebar = (props) => {
 
             if (filteredAnnouncements.length > 0) {
               setAnnouncements(true);
-              alert(filteredAnnouncements.length);
+
               setAnnouncementsCount(filteredAnnouncements.length);
             } else {
               setAnnouncements(false);
@@ -376,7 +354,7 @@ const Sidebar = (props) => {
                 {userRole === "student" ? (
                   <>
                     <img
-                      src={`${SERVER_URL}${profileImage}`}
+                      src={`${profileImage}`}
                       className="h-10 w-10 rounded-full"
                       alt=""
                     />

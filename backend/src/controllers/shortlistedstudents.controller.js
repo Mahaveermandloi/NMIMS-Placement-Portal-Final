@@ -9,8 +9,9 @@ import JobListing from "../models/joblisting.model.js";
 import { SendWhatsAppMessage } from "../utils/SendWhatsAppMessage.js";
 import { sendEmail } from "../utils/SendEmail.js";
 import Document from "../models/shortlistedstudentfiles.model.js";
-
 import XLSX from "xlsx";
+import { uploadOnCloudinary } from "../utils/Cloudinary.js";
+// import cloudinary from "cloudinary";
 
 const createShortlistedStudent = asyncHandler(async (req, res) => {
   const {
@@ -23,15 +24,7 @@ const createShortlistedStudent = asyncHandler(async (req, res) => {
     year,
   } = req.body;
 
-  console.log(
-    branch,
-    company_name,
-    job_role,
-    name_of_student,
-    student_email_id,
-    student_sap_no,
-    year
-  );
+ 
 
   // Validate input fields
   if (
@@ -82,7 +75,6 @@ const createShortlistedStudent = asyncHandler(async (req, res) => {
   await shortlistedStudent.save();
 
   if (student) {
-    
     const emailBody = `
       Dear ${name_of_student},
 
@@ -99,11 +91,8 @@ const createShortlistedStudent = asyncHandler(async (req, res) => {
       "Shortlisted for Job Opportunity",
       emailBody
     );
-
-  
   }
 
-  
   res
     .status(201)
     .json(
@@ -237,6 +226,7 @@ const getShortlistedStudentById = asyncHandler(async (req, res) => {
 const deleteShortlistedStudent = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
+ 
   const shortlistedStudent = await ShortlistedStudent.findByIdAndDelete(id);
 
   if (!shortlistedStudent) {
@@ -258,22 +248,26 @@ const uploadExcelShortlistedStudent = asyncHandler(async (req, res) => {
   }
 
   const file = req.file;
+
   if (!file) {
     throw new ApiError(400, "File is required");
   }
 
-  const filePath = `/uploads/ShortlistedStudent/${file.filename}`;
-
-  await Document.create({
-    company_name,
-    date: new Date(date),
-    filePath,
-  });
-
-  // Read Excel file and extract data
+  const fileName = req.file.originalname;
   const workbook = XLSX.readFile(file.path);
   const sheetNames = workbook.SheetNames;
   const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetNames[0]]);
+
+  const cloudinaryResult = await uploadOnCloudinary(file.path);
+
+  const filePath = cloudinaryResult.secure_url;
+
+  const documentResponse = await Document.create({
+    company_name,
+    date: new Date(date),
+    filePath,
+    fileName,
+  });
 
   const company = await Company.findOne({ company_name });
   if (!company) {
@@ -283,17 +277,16 @@ const uploadExcelShortlistedStudent = asyncHandler(async (req, res) => {
   for (const row of data) {
     const { student_sap_no, name_of_student, campus, student_email_id } = row;
 
-    console.log(student_sap_no, name_of_student, campus, student_email_id);
-
+  
     if (campus === "shirpur" || campus === "Shirpur") {
       const student = await Student.findOne({ name_of_student });
 
-     
+      
       if (student) {
         const emailBody = `
           Dear ${name_of_student},
 
-          Congratulations! You have been shortlisted for a job opportunity with ${company_name}. 
+          Congratulations! You have been shortlisted for a job opportunity with ${company_name}.
 
           Your SAP number is: ${student_sap_no}.
 
@@ -307,23 +300,21 @@ const uploadExcelShortlistedStudent = asyncHandler(async (req, res) => {
           emailBody
         );
 
-
         await ShortlistedStudent.create({
           company_id: company._id,
-          job_id: null, // Set this to the appropriate job ID if available
+          job_id: null,
           student_sap_no: student_sap_no,
           company_name,
           name_of_student,
-          job_title: null, // Set this to the appropriate job title if available
+          job_title: null,
           student_email_id,
           engineering_specialization: student.engineering_specialization,
-          year: new Date(date).getFullYear(), // Convert date to year
+          year: new Date(date).getFullYear(),
         });
       }
     }
   }
 
-  // Respond with success
   res
     .status(200)
     .json(
@@ -335,7 +326,6 @@ const getAllExcels = asyncHandler(async (req, res) => {
   try {
     const document = await Document.find();
 
-    console.log(document);
     res
       .status(200)
       .json(new ApiResponse(200, document, "Fetched data successfully!!"));
@@ -348,6 +338,25 @@ const getAllExcels = asyncHandler(async (req, res) => {
   }
 });
 
+const deleteExcel = asyncHandler(async (req, res) => {
+  const { id } = req.params; // Extract the ID from request parameters
+
+ 
+
+  // Find the document by ID and delete it
+  const document = await Document.findByIdAndDelete(id);
+
+  // Check if document was found and deleted
+  if (!document) {
+    throw new ApiError(404, "Document not found");
+  }
+
+  // Send a success response
+  res
+    .status(200)
+    .json(new ApiResponse(200, null, "Document deleted successfully"));
+});
+
 // Exporting all CRUD controller functions for ShortlistedStudent
 export {
   createShortlistedStudent,
@@ -357,4 +366,5 @@ export {
   deleteShortlistedStudent,
   uploadExcelShortlistedStudent,
   getAllExcels,
+  deleteExcel,
 };

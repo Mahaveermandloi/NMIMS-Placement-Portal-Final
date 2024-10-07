@@ -14,9 +14,8 @@ const createAnnouncement = asyncHandler(async (req, res) => {
   }
 
   // Handle company logo upload
-  const logoFile = req.files["company_logo"]
-    ? `/uploads/Company/Logo/${req.files["company_logo"][0].filename}`
-    : "";
+
+  const logoFile = req.file ? req.file.path : ""; // Cloudinary uploads give `req.file.path` for the URL
 
   // Create a new announcement
   const announcement = new Announcement({
@@ -98,8 +97,7 @@ const updateAnnouncement = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { company_name, date, roles_offered } = req.body;
 
-  console.log(id, company_name, date, roles_offered);
-
+ 
   const announcement = await Announcement.findById(id);
 
   if (!announcement) {
@@ -107,10 +105,8 @@ const updateAnnouncement = asyncHandler(async (req, res) => {
   }
 
   // Check if a new logo file is uploaded
-  let logoFile = announcement.company_logo; // Retain the existing logo if no new one is provided
-  if (req.files && req.files["company_logo"]) {
-    logoFile = `/uploads/Company/Logo/${req.files["company_logo"][0].filename}`;
-  }
+  const logoFile = req.file ? req.file.path : ""; // Cloudinary uploads give `req.file.path` for the URL
+ 
 
   // Update fields if provided in the request body
   if (company_name) announcement.company_name = company_name;
@@ -170,11 +166,8 @@ const deleteAnnouncement = asyncHandler(async (req, res) => {
 
 const readAnnouncement = asyncHandler(async (req, res) => {
   try {
-
     const { announcementIds, student_sap_no } = req.body;
 
-    console.log(announcementIds, student_sap_no);
-    
 
     // Check if both announcementIds and student_sap_no are provided
     // if (!announcementIds || !student_sap_no) {

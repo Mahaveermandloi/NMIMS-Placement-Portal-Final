@@ -15,7 +15,7 @@ export const TenthStats = ({ studentData }) => {
         </div>
         <div className="flex-grow border-t border-gray-300 mb-4"></div>{" "}
         {/* Adjusted for spacing */}
-        <div className="flex flex-col font-serif text-[16px] gap-2 lg:w-1/2">
+        <div className="flex flex-col font-serif text-[16px] gap-2 ">
           <div className="flex justify-between">
             <p className="text-gray-400">School:</p>
             <p>{studentData.tenth_school}</p>
@@ -55,7 +55,7 @@ export const TenthStats = ({ studentData }) => {
             <p className="text-gray-400">Marksheet:</p>
             <p>
               <a
-                href={`${SERVER_URL}${studentData.tenth_marksheet}`}
+                href={`${studentData.tenth_marksheet}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 underline"

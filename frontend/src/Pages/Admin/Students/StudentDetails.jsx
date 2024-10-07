@@ -58,7 +58,7 @@ const StudentDetails = () => {
       align: "left",
       render: (row) => (
         <img
-          src={`${SERVER_URL}${row.student_profile_image}`}
+          src={`${row.student_profile_image}`}
           alt={`${row.name_of_student}'s profile`}
           className="rounded-full h-16 w-16 "
         />

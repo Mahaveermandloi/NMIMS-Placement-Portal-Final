@@ -7,7 +7,7 @@ export const BasicDetails = ({ studentData }) => {
         <div className="  lg:flex flex-col items-center  space-x-8 mb-4">
           <div className="">
             <img
-              src={`${SERVER_URL}${studentData.student_profile_image}`}
+              src={`${studentData.student_profile_image}`}
               alt="Student Profile"
               className="w-60 h-60  rounded-full"
             />

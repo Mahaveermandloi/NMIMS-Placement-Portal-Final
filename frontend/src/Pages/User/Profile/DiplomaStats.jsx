@@ -73,7 +73,7 @@ export const DiplomaStats = ({ studentData }) => {
   };
   return (
     <>
-      {studentData.diploma_stream === "" ? (
+      {!studentData.diploma_stream ? (
         <>
           <div className="flex font-serif items-center my-4">
             <h3 className="font-serif font-bold text-lg text-gray-800 flex-shrink-0 pr-4">
@@ -84,6 +84,7 @@ export const DiplomaStats = ({ studentData }) => {
             </h3>
           </div>
           <div className="flex-grow border-t border-gray-300 mb-4 "></div>
+          <div className="font-serif mb-3">No Diploma Details</div>
         </>
       ) : (
         <>
@@ -235,7 +236,8 @@ export const DiplomaStats = ({ studentData }) => {
                 <p className="text-gray-400">Marksheet:</p>
                 <p>
                   <a
-                    href={`${SERVER_URL}${studentData.diploma_marksheet}`}
+                    href={`${studentData.diploma_marksheet}`}
+                    download={`${studentData.diploma_marksheet}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 underline"

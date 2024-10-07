@@ -36,7 +36,7 @@ const AddShortlistedStudent = () => {
       try {
         const companyResponse = await getApi(`${SERVER_URL}/api/joblisting`);
 
-        console.log(companyResponse.data);
+  
 
         setCompanies(companyResponse.data);
 

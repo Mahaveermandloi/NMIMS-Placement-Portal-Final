@@ -1,9 +1,5 @@
 import { Router } from "express";
-
-import { uploadStudentFiles } from "../middleware/studentmulter.middleware.js";
-
 import { verifyAPIKey, verifyJWT } from "../middleware/auth.middleware.js";
-import handleFormData from "../middleware/handleFormData.js";
 
 import {
   updateBasicDetails,
@@ -16,73 +12,63 @@ import {
 } from "../controllers/updatestudentdetails.controller.js";
 
 import {
-  uploadSingleMarksheet,
-  uploadSingleProfile,
-} from "../middleware/updateStudentMarksheet.middleware.js";
+  fileupload,
+  uploadMultipleFiles,
+} from "../middleware/multer2.middleware.js";
 
 const router = Router();
-
-router.put(
-  "/updatebasicdetails",
-  verifyAPIKey,
-  verifyJWT,
-  handleFormData,
-  updateBasicDetails
-);
-
-router.put(
-  "/updatetenthdetails",
-  verifyAPIKey,
-  verifyJWT,
-  uploadSingleMarksheet.single("tenth_marksheet"),
-  updateClassTenthDetails
-);
-
-router.put(
-  "/updatetwelfthdetails",
-  verifyAPIKey,
-  verifyJWT,
-  uploadSingleMarksheet.single("twelfth_marksheet"),
-  updateClassTweflthDetails
-);
-
-router.put(
-  "/updatediplomadetails",
-  verifyAPIKey,
-  verifyJWT,
-  uploadSingleMarksheet.single("diploma_marksheet"),
-  updateDiplomaDetails
-);
-
-router.put(
-  "/updatecollegedetails",
-  verifyAPIKey,
-  verifyJWT,
-  uploadStudentFiles.fields([
-    // { name: "student_profile_image", maxCount: 1 },
-    { name: "student_cv", maxCount: 1 },
-    { name: "student_marksheet", maxCount: 6 },
-  ]),
-
-  updateCollegeDetails
-);
 
 router.put(
   "/updateprofileimage",
   verifyAPIKey,
   verifyJWT,
-  uploadStudentFiles.fields([{ name: "student_profile_image", maxCount: 1 }]),
-
+  fileupload.single("student_profile_image"),
   updateProfileImage
 );
 
-router.put(
-  "/updateskills",
+// Update College Details with multiple file upload (images, PDF, Excel)
+// router.put(
+//   "/updatecollegedetails",
+//   verifyAPIKey,
+//   verifyJWT,
+//   uploadMultipleFiles, // Middleware for handling multiple files (e.g., CV, marksheets)
+//   updateCollegeDetails // Controller to handle logic
+// );
 
+router.put(
+  "/updatecollegedetails",
   verifyAPIKey,
   verifyJWT,
-  handleFormData,
-  updateSkills
+  uploadMultipleFiles, // Middleware for handling multiple files (e.g., CV, marksheets)
+  updateCollegeDetails // Controller to handle logic
 );
+
+
+// Other routes remain unchanged
+router.put("/updatebasicdetails", verifyAPIKey, verifyJWT, updateBasicDetails);
+
+router.put(
+  "/updatetenthdetails",
+  verifyAPIKey,
+  verifyJWT,
+  fileupload.single("tenth_marksheet"),
+  updateClassTenthDetails
+);
+router.put(
+  "/updatetwelfthdetails",
+  verifyAPIKey,
+  verifyJWT,
+  fileupload.single("twelfth_marksheet"),
+  updateClassTweflthDetails
+);
+router.put(
+  "/updatediplomadetails",
+  verifyAPIKey,
+  verifyJWT,
+  fileupload.single("diploma_marksheet"),
+  updateDiplomaDetails
+);
+
+router.put("/updateskills", verifyAPIKey, verifyJWT, updateSkills);
 
 export default router;

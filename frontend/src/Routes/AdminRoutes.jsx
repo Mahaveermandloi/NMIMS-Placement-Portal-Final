@@ -61,26 +61,7 @@ const AdminRoutes = () => {
     checkAuthentication();
   }, []);
 
-  // const verifyRefreshToken = async () => {
-  //   try {
-  //     const response = await getApi(
-  //       `${SERVER_URL}/api/admin/verify-refresh-token`
-  //     );
-
-  //     if (response.statusCode === 200) {
-  //       const data = response.data;
-  //       localStorage.setItem("expiresIn", data.expiresIn);
-
-  //       setIsAdminAuthenticated(true);
-  //     } else {
-  //       throw new Error("Failed to verify refresh token");
-  //     }
-  //   } catch (error) {
-  //     console.log("Error verifying refresh token:", error.message);
-  //     setIsAdminAuthenticated(false);
-  //     removeTokensAndRedirectForAdminRoutes(navigate);
-  //   }
-  // };
+ 
 
   return (
     <Routes>

@@ -30,7 +30,7 @@ const StudentCompleteDetails = () => {
           `/api/student/get-student-details-by-id/${student_sap_no}`
         );
 
-        console.log(response.data);
+    
         setStudentData(response.data);
       } catch (error) {
         console.error("Error fetching student data:", error);
@@ -55,7 +55,9 @@ const StudentCompleteDetails = () => {
             size={30}
             onClick={() => {
               navigate(`${ADMIN_PATH}/student-details`);
+              
             }}
+            className="mb-5"
           />
           Student Information
         </h2>
@@ -87,7 +89,7 @@ const EducationDetails = ({ studentData }) => {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
 
-        <div className="px-5 ">
+        <div className=" ">
           <TenthStats studentData={studentData} />
           <TwelfthStats studentData={studentData} />
           <DiplomaStats studentData={studentData} />

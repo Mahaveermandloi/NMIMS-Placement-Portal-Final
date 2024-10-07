@@ -75,7 +75,7 @@ const JobUploadDetails = () => {
     <>
       <Toast />
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Upload Job Details</h1>
+        <h1 className="text-3xl font-bold">Add Job Profile</h1>
       </div>
 
       <form onSubmit={handleSubmitJob(onSubmitJob)} className="space-y-6">

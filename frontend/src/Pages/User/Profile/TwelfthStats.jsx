@@ -49,7 +49,7 @@ export const TwelfthStats = ({ studentData }) => {
   const onSubmit = async (data) => {
     const payload = { ...data, student_sap_no: studentData.student_sap_no };
 
-    // setLoading(true);
+    setLoading(true);
 
     try {
       const response = await putApi(
@@ -60,6 +60,7 @@ export const TwelfthStats = ({ studentData }) => {
         setLoading(false);
         toast.success("Student Data Updated Successfully");
         closeModal();
+        window.location.reload();
       } else {
         alert("Failed to update student data. Please try again.");
       }
@@ -139,7 +140,8 @@ export const TwelfthStats = ({ studentData }) => {
                 <p className="text-gray-400">Marksheet:</p>
                 <p>
                   <a
-                    href={`${SERVER_URL}${studentData.twelfth_marksheet}`}
+                    href={`${studentData.twelfth_marksheet}`}
+                    download={`${studentData.twelfth_marksheet}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 underline"
@@ -150,182 +152,6 @@ export const TwelfthStats = ({ studentData }) => {
               </div>
             </div>
           </div>
-
-          {/* <Modal
-            isOpen={modalIsOpen}
-            onRequestClose={closeModal}
-            style={customStyles}
-            contentLabel="Edit Class X Details Modal"
-            ariaHideApp={false}
-          >
-            <div className="flex justify-between">
-              <h2 className="flex font-serif font-bold text-xl mb-10">
-                Class XII Details
-              </h2>
-              <RxCross1 size={30} onClick={closeModal} />
-            </div>
-
-            <form onSubmit={handleSubmit(onSubmit)} className="font-serif">
-              <div className="grid lg:grid-cols-2 gap-4 h-96 overflow-y-scroll">
-                <label>
-                  School:
-                  <input
-                    type="text"
-                    {...register("tenth_school", {
-                      required: "School name is required",
-                    })}
-                    className="border rounded p-2 w-full"
-                  />
-                  {errors.tenth_school && (
-                    <p className="text-red-500">
-                      {errors.tenth_school.message}
-                    </p>
-                  )}
-                </label>
-
-                <label>
-                  Board:
-                  <select
-                    {...register("board_of_passing_tenth", {
-                      required: "Board is required",
-                    })}
-                    className="border rounded p-2 w-full"
-                  >
-                    <option value="">Select a board</option>
-                    <option value="CBSE">CBSE</option>
-                    <option value="ICSE">ICSE</option>
-                    <option value="State Board">State Board</option>
-                  </select>
-                  {errors.board_of_passing_tenth && (
-                    <p className="text-red-500">
-                      {errors.board_of_passing_tenth.message}
-                    </p>
-                  )}
-                </label>
-
-                <label>
-                  Programme/Degree:
-                  <input
-                    type="text"
-                    value="12th"
-                    readOnly
-                    className="border rounded p-2 w-full bg-gray-100"
-                  />
-                </label>
-
-                <label>
-                  Percentage:
-                  <input
-                    type="number"
-                    {...register("tenth_standard_percentage", {
-                      required: "Percentage is required",
-                      min: { value: 0, message: "Minimum value is 0" },
-                      max: { value: 100, message: "Maximum value is 100" },
-                    })}
-                    className="border rounded p-2 w-full"
-                  />
-                  {errors.tenth_standard_percentage && (
-                    <p className="text-red-500">
-                      {errors.tenth_standard_percentage.message}
-                    </p>
-                  )}
-                </label>
-
-                <label>
-                  Year of Passing:
-                  <input
-                    type="number"
-                    {...register("year_of_passing_tenth", {
-                      required: "Year of Passing is required",
-                      min: {
-                        value: 1900,
-                        message: "Year must be at least 1900",
-                      },
-                      max: {
-                        value: new Date().getFullYear(),
-                        message: `Year must be no more than ${
-                          new Date().getFullYear() - 5
-                        } `,
-                      },
-                    })}
-                    className="border rounded p-2 w-full"
-                  />
-                  {errors.year_of_passing_tenth && (
-                    <p className="text-red-500">
-                      {errors.year_of_passing_tenth.message}
-                    </p>
-                  )}
-                </label>
-
-                <label>
-                  State:
-                  <select
-                    {...register("tenth_passing_state", {
-                      required: "State is required",
-                    })}
-                    className="border rounded p-2 w-full "
-                  >
-                    <option value="">Select a state</option>
-                    {states.map((state) => (
-                      <option key={state.value} value={state.value}>
-                        {state.label}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.tenth_passing_state && (
-                    <p className="text-red-500">
-                      {errors.tenth_passing_state.message}
-                    </p>
-                  )}
-                </label>
-
-                <label>
-                  Country:
-                  <input
-                    type="text"
-                    {...register("tenth_passing_country", {
-                      required: "Country is required",
-                    })}
-                    className="border rounded p-2 w-full"
-                  />
-                  {errors.tenth_passing_country && (
-                    <p className="text-red-500">
-                      {errors.tenth_passing_country.message}
-                    </p>
-                  )}
-                </label>
-
-                <label>
-                  Marksheet:
-                  <input
-                    type="file"
-                    {...register("tenth_marksheet", {
-                      required: "Marksheet is required",
-                    })}
-                    className="border rounded p-2 w-full"
-                    accept="application/pdf" // Restrict file type to PDF
-                  />
-                  <p className="text-gray-400">
-                    Upload the Class XII Marksheet (PDF only)
-                  </p>
-                  {errors.tenth_marksheet && (
-                    <p className="text-red-500">
-                      {errors.tenth_marksheet.message}
-                    </p>
-                  )}
-                </label>
-              </div>
-
-              <div className="flex items-center mt-10 gap-10">
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white py-2 px-4 rounded"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </Modal> */}
 
           <Modal
             isOpen={modalIsOpen}

@@ -176,7 +176,7 @@ const CompanyVisitAnnouncementCard = ({ announcement, setAnnouncements }) => {
     <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
       <div className="flex gap-5">
         <img
-          src={`${SERVER_URL}${company_logo}`}
+          src={`${company_logo}`}
           alt={`${company_name} Logo`}
           className="mb-4 w-16 h-16 object-cover rounded-full"
         />

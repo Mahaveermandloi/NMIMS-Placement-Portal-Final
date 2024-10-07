@@ -17,7 +17,7 @@ const Notifications = () => {
 
       try {
         const response = await getApi("/api/announcement");
-        console.log(response);
+      
 
         if (response.statusCode === 200) {
           if (response.data.length > 0) {
@@ -53,8 +53,6 @@ const Notifications = () => {
         announcementIds: announcementIds, // Include the filtered announcement IDs
         student_sap_no: SAPID, // Send SAPID in the payload as student_sap_no
       };
-
-      console.log("Payload for marking announcements as read:", payload);
 
       try {
         const response = await putApi(payload, "/api/announcement");
@@ -124,7 +122,7 @@ const NotificationCard = ({
       {/* Company Logo and Name */}
       <div className="flex items-center">
         <img
-          src={`${SERVER_URL}${company_logo}`}
+          src={`${company_logo}`}
           alt={`${company_name} logo`}
           className="w-14 h-14 rounded-full shadow-md object-cover mr-4"
         />

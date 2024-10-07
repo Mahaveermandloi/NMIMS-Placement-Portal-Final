@@ -66,8 +66,7 @@ export const Skills = ({ studentData }) => {
       skills: selectedSkills, // Include selectedSkills in the payload
     };
 
-    console.log(payload);
-    // setLoading(true);
+
 
     try {
       const response = await putApi(payload, `${SERVER_URL}/api/updateskills`);

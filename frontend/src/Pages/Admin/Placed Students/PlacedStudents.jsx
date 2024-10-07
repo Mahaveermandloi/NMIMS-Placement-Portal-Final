@@ -31,7 +31,7 @@ const PlacedStudents = () => {
       try {
         const response = await getApi(`/api/placedstudents`);
 
-        console.log(response);
+     
         if (response.statusCode === 200) {
           setStudents(response.data);
           setFilteredData(response.data);

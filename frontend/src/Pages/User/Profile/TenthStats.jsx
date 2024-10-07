@@ -25,25 +25,17 @@ export const TenthStats = ({ studentData }) => {
   const [loading, setLoading] = useState(false);
 
   const [modalIsOpen, setIsOpen] = useState(false);
-  
-  
+
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm(
-    
-    {
+  } = useForm({
     defaultValues: {
       ...studentData,
     },
-  }
-
-);
-
-
-
+  });
 
   const openModal = () => {
     reset(studentData);
@@ -58,7 +50,7 @@ export const TenthStats = ({ studentData }) => {
   const onSubmit = async (data) => {
     const payload = { ...data, student_sap_no: studentData.student_sap_no };
 
-    // setLoading(true);
+    setLoading(true);
 
     try {
       const response = await putApi(
@@ -69,6 +61,7 @@ export const TenthStats = ({ studentData }) => {
         setLoading(false);
         toast.success("Student Data Updated Successfully");
         closeModal();
+        window.location.reload();
       } else {
         alert("Failed to update student data. Please try again.");
       }
@@ -143,7 +136,8 @@ export const TenthStats = ({ studentData }) => {
                 <p className="text-gray-400">Marksheet:</p>
                 <p>
                   <a
-                    href={`${SERVER_URL}${studentData.tenth_marksheet}`}
+                    href={`${studentData.tenth_marksheet}`}
+                    download={`${studentData.tenth_marksheet}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 underline"

@@ -76,7 +76,7 @@ export const InternshipAndExperienceDetails = ({ studentData }) => {
 
   // Handle form submission
   const onSubmit = (data) => {
-    console.log("Form submitted:", data);
+ 
     closeModal();
   };
 

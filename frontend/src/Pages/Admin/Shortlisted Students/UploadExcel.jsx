@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { SERVER_URL } from "../../../Utils/URLPath";
-import { getApi, postApi } from "../../../Utils/API";
+import { deleteApi, getApi, postApi } from "../../../Utils/API";
 import Loader from "../../../Components/Loader";
 import { useNavigate } from "react-router-dom";
 import { Toast } from "../../../Components/Toast";
@@ -53,6 +53,7 @@ const UploadExcel = () => {
         const response = await getApi(
           `${SERVER_URL}/api/get-all-shortlisted-excels`
         );
+
         if (response.statusCode === 200) {
           setUploadedFiles(response.data);
         } else {
@@ -83,6 +84,8 @@ const UploadExcel = () => {
       return;
     }
 
+   
+
     setLoading(true);
 
     try {
@@ -107,37 +110,39 @@ const UploadExcel = () => {
   };
 
   const handleDownload = (filePath) => {
-    const downloadUrl = `${SERVER_URL}/api/download-file?filePath=${encodeURIComponent(
-      filePath
-    )}`;
     const link = document.createElement("a");
-    link.href = downloadUrl;
-    link.download = filePath.split("/").pop(); // Set the download filename
+    link.href = filePath;
+    link.setAttribute("download", "");
+
     document.body.appendChild(link);
+
     link.click();
+
     document.body.removeChild(link);
   };
 
-  const handleDelete = async (filePath) => {
+  const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this file?"
     );
+
+    alert(id);
+
     if (!confirmDelete) return;
 
-    setLoadingFiles(true); // Show the loader while deleting
+    setLoadingFiles(true);
 
     try {
-      const response = await postApi(
-        { filePath }, // Send the file path to delete
-        `${SERVER_URL}/api/delete-file`
-      );
+      const response = await deleteApi(`${SERVER_URL}/api/delete-file/${id}`);
 
       if (response.statusCode === 200) {
         toast.success("File deleted successfully");
-        // Remove the deleted file from the list
+
         setUploadedFiles((prevFiles) =>
           prevFiles.filter((file) => file.filePath !== filePath)
         );
+
+        window.location.reload();
       } else {
         toast.error("Failed to delete file");
       }
@@ -154,7 +159,7 @@ const UploadExcel = () => {
       <div className=" w-[340px] lg:w-full ">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl lg:text-3xl font-bold">
-            Upload Student Data
+            Upload Shortlisted Student
           </h1>
 
           <a href="../../../../public/ShortlistedStudents.xlsx" download>
@@ -163,11 +168,9 @@ const UploadExcel = () => {
               <FaDownload className="ml-2" />
             </button>
 
-
             <button className="lg:hidden bg-blue-500 text-white p-2 rounded">
               <FaDownload />
             </button>
-
           </a>
         </div>
 
@@ -268,6 +271,7 @@ const UploadExcel = () => {
                 <thead>
                   <tr>
                     <th className="py-2 px-4 border border-b">Date</th>
+                    <th className="py-2 px-4 border border-b">Company Name</th>
                     <th className="py-2 px-4 border border-b">File Name</th>
                     <th className="py-2 px-4 border  border-b">Actions</th>
                   </tr>
@@ -279,10 +283,13 @@ const UploadExcel = () => {
                         {new Date(file.date).toLocaleDateString()}
                       </td>
                       <td className="py-2 px-4 border border-b">
-                        {file.filePath.split("/").pop()}
+                        {file.company_name}
                       </td>
                       <td className="py-2 px-4 border border-b">
-                        <div  className="flex gap-5">
+                        {file.fileName}
+                      </td>
+                      <td className="py-2 px-4 border border-b">
+                        <div className="flex gap-5">
                           <FaDownload
                             className="ml-2 text-blue-600 cursor-pointer"
                             size={30}
@@ -291,7 +298,7 @@ const UploadExcel = () => {
                           <MdOutlineDeleteOutline
                             className="ml-2 text-red-600 cursor-pointer"
                             size={30}
-                            onClick={() => handleDelete(file.filePath)}
+                            onClick={() => handleDelete(file._id)}
                           />
                         </div>
                       </td>

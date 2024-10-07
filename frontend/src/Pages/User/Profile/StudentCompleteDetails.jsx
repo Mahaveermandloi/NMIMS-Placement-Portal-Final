@@ -29,7 +29,7 @@ const StudentCompleteDetails = () => {
           `/api/student/get-student-details-by-id/${student_sap_no}`
         );
 
-        console.log(response.data);
+      
         setStudentData(response.data);
       } catch (error) {
         console.error("Error fetching student data:", error);

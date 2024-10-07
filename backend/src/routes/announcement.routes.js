@@ -9,26 +9,32 @@ import {
   readAnnouncement,
   updateAnnouncement,
 } from "../controllers/announcement.controller.js";
+import { upload } from "../middleware/cloudinary.middleware.js";
 import { uploadCompanyFiles } from "../middleware/companymulter.middleware.js";
 
 const router = Router();
 
 // Route to create a new job listing
-router.post("/announcement", verifyJWT, uploadCompanyFiles, createAnnouncement);
+router.post(
+  "/announcement",
+  verifyJWT,
+  upload.single("company_logo"),
+  createAnnouncement
+);
+
+
+router.put(
+  "/announcement/:id",
+  verifyJWT,
+  upload.single("company_logo"),
+  updateAnnouncement
+);
 
 // Route to get all job listings
 router.get("/announcement", verifyAPIKey, getAllAnnouncements);
 
 // Route to get a specific job listing by ID
 router.get("/announcement/:id", verifyAPIKey, getAnnouncementById);
-
-// Route to update a specific job listing by ID
-router.put(
-  "/announcement/:id",
-  verifyJWT,
-  uploadCompanyFiles,
-  updateAnnouncement
-);
 
 // Route to delete a specific job listing by ID
 router.delete("/announcement/:id", verifyJWT, deleteAnnouncement);

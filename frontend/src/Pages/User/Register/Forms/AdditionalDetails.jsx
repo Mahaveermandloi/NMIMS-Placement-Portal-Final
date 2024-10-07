@@ -28,7 +28,7 @@ const AdditionalDetails = () => {
   };
 
   const onSubmit = async (data) => {
-    // console.log("Submitted data:", data);
+   
   };
 
   const hasYearDropOrGap = watch("has_year_drop_or_gap");

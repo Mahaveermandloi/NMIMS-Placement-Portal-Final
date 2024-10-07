@@ -117,10 +117,24 @@ export const CollegeStats = ({ studentData }) => {
           {/* Marksheet Links */}
           <div className="mt-10 lg:mt-0 flex flex-col font-serif text-[16px] gap-2">
             <div className="flex justify-between">
+              <p className="text-gray-400">Resume/ CV:</p>
+              <p>
+                <a
+                  href={`${studentData.student_cv}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 underline"
+                >
+                  View ResumeCV
+                </a>
+              </p>
+            </div>
+
+            <div className="flex justify-between">
               <p className="text-gray-400">Marksheet SEM I:</p>
               <p>
                 <a
-                  href={`${SERVER_URL}${studentData.student_marksheet_sem_1}`}
+                  href={`${studentData.student_marksheet_sem_1}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 underline"
@@ -129,11 +143,12 @@ export const CollegeStats = ({ studentData }) => {
                 </a>
               </p>
             </div>
+
             <div className="flex justify-between">
               <p className="text-gray-400">Marksheet SEM II:</p>
               <p>
                 <a
-                  href={`${SERVER_URL}${studentData.student_marksheet_sem_2}`}
+                  href={`${studentData.student_marksheet_sem_2}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 underline"
@@ -146,7 +161,7 @@ export const CollegeStats = ({ studentData }) => {
               <p className="text-gray-400">Marksheet SEM III:</p>
               <p>
                 <a
-                  href={`${SERVER_URL}${studentData.student_marksheet_sem_3}`}
+                  href={`${studentData.student_marksheet_sem_3}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 underline"
@@ -159,7 +174,7 @@ export const CollegeStats = ({ studentData }) => {
               <p className="text-gray-400">Marksheet SEM IV:</p>
               <p>
                 <a
-                  href={`${SERVER_URL}${studentData.student_marksheet_sem_4}`}
+                  href={`${studentData.student_marksheet_sem_4}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 underline"
@@ -172,7 +187,7 @@ export const CollegeStats = ({ studentData }) => {
               <p className="text-gray-400">Marksheet SEM V:</p>
               <p>
                 <a
-                  href={`${SERVER_URL}${studentData.student_marksheet_sem_5}`}
+                  href={`${studentData.student_marksheet_sem_5}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 underline"
@@ -185,7 +200,7 @@ export const CollegeStats = ({ studentData }) => {
               <p className="text-gray-400">Marksheet SEM VI:</p>
               <p>
                 <a
-                  href={`${SERVER_URL}${studentData.student_marksheet_sem_6}`}
+                  href={`${studentData.student_marksheet_sem_6}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 underline"
