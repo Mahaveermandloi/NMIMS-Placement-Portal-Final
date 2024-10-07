@@ -26,15 +26,6 @@ router.put(
   updateProfileImage
 );
 
-// Update College Details with multiple file upload (images, PDF, Excel)
-// router.put(
-//   "/updatecollegedetails",
-//   verifyAPIKey,
-//   verifyJWT,
-//   uploadMultipleFiles, // Middleware for handling multiple files (e.g., CV, marksheets)
-//   updateCollegeDetails // Controller to handle logic
-// );
-
 router.put(
   "/updatecollegedetails",
   verifyAPIKey,
@@ -42,7 +33,6 @@ router.put(
   uploadMultipleFiles, // Middleware for handling multiple files (e.g., CV, marksheets)
   updateCollegeDetails // Controller to handle logic
 );
-
 
 // Other routes remain unchanged
 router.put("/updatebasicdetails", verifyAPIKey, verifyJWT, updateBasicDetails);
