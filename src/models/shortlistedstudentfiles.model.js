@@ -15,6 +15,11 @@ const documentSchema = new Schema({
     type: String,
     required: true,
   },
+
+  fileName: {
+    type: String,
+    default: "",
+  },
 });
 
 // Create the model

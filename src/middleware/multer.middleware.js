@@ -33,34 +33,6 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
 });
 
-// const marksheetStorage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     if (file.fieldname === "tenth_marksheet" && file.mimetype.includes("pdf")) {
-//       cb(null, path.join(__dirname, "..", "uploads", "Student", "Marksheets"));
-//     }
-//     if (
-//       file.fieldname === "tenth_marksheet" &&
-//       file.mimetype === "application/pdf"
-//     ) {
-//       cb(null, path.join(__dirname, "..", "uploads", "Student", "Marksheets"));
-//     }
-//     if (
-//       file.fieldname === "twelfth_marksheet" &&
-//       file.mimetype.includes("pdf")
-//     ) {
-//       cb(null, path.join(__dirname, "..", "uploads", "Student", "Marksheets"));
-//     }
-//     if (
-//       file.fieldname === "diploma_marksheet" &&
-//       file.mimetype.includes("pdf")
-//     ) {
-//       cb(null, path.join(__dirname, "..", "uploads", "Student", "Marksheets"));
-//     } else {
-//       cb(new Error("Unsupported file type"), null);
-//     }
-//   },
-//   filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
-// });
 
 
 
