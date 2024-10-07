@@ -13,7 +13,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary.v2,
   params: (req, file) => {
-    console.log("File object: ", file);
+    
 
     let folder = "";
     let format;
@@ -55,8 +55,7 @@ const storage = new CloudinaryStorage({
         break;
     }
 
-    console.log("Selected folder: ", folder);
-    console.log(file.mimetype);
+  
 
     // Set the format based on the MIME type
     if (file.mimetype.startsWith("image/")) {

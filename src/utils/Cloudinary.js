@@ -71,7 +71,7 @@ const uploadOnCloudinary = async (localfilePath) => {
       folder: "Student",
     });
 
-    console.log("look here ", response);
+   
 
     fs.unlinkSync(localfilePath);
 

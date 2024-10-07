@@ -97,8 +97,7 @@ const updateAnnouncement = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { company_name, date, roles_offered } = req.body;
 
-  console.log(id, company_name, date, roles_offered);
-
+ 
   const announcement = await Announcement.findById(id);
 
   if (!announcement) {
@@ -107,8 +106,7 @@ const updateAnnouncement = asyncHandler(async (req, res) => {
 
   // Check if a new logo file is uploaded
   const logoFile = req.file ? req.file.path : ""; // Cloudinary uploads give `req.file.path` for the URL
-
-  console.log(logoFile)
+ 
 
   // Update fields if provided in the request body
   if (company_name) announcement.company_name = company_name;
@@ -170,7 +168,6 @@ const readAnnouncement = asyncHandler(async (req, res) => {
   try {
     const { announcementIds, student_sap_no } = req.body;
 
-    console.log(announcementIds, student_sap_no);
 
     // Check if both announcementIds and student_sap_no are provided
     // if (!announcementIds || !student_sap_no) {

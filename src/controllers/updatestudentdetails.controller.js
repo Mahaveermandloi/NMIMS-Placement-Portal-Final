@@ -54,7 +54,7 @@ const updateBasicDetails = asyncHandler(async (req, res) => {
     passport_expiry_date,
   } = req.body;
 
-  console.log(req.body);
+
 
   if (!student_sap_no) {
     throw new ApiError(400, "Student SAP number is required");
@@ -141,14 +141,14 @@ const updateClassTenthDetails = asyncHandler(async (req, res) => {
 
   const file = req.file;
 
-  console.log(req.file);
+ 
   const cloudinaryResult = await uploadOnCloudinary(file.path);
 
   const asset_id = cloudinaryResult.asset_id;
 
   const tenth_marksheetPath = `https://res-console.cloudinary.com/dlsl6hruh/media_explorer_thumbnails/${asset_id}/download`;
 
-  console.log(tenth_marksheetPath);
+
 
   const updateData = {
     ...(tenth_standard_percentage !== undefined && {
@@ -210,11 +210,11 @@ const updateClassTweflthDetails = asyncHandler(async (req, res) => {
 
   const file = req.file;
 
-  console.log(req.file);
+
 
   const cloudinaryResult = await uploadOnCloudinary(file.path);
 
-  console.log(cloudinaryResult);
+
   const asset_id = cloudinaryResult.asset_id;
 
   const twelfth_marksheetPath = `https://res-console.cloudinary.com/dlsl6hruh/media_explorer_thumbnails/${asset_id}/download`;
@@ -281,11 +281,11 @@ const updateDiplomaDetails = asyncHandler(async (req, res) => {
 
   const file = req.file;
 
-  console.log(req.file);
+
 
   const cloudinaryResult = await uploadOnCloudinary(file.path);
 
-  console.log(cloudinaryResult);
+  
 
   const asset_id = cloudinaryResult.asset_id;
   const diploma_marksheetPath = `https://res-console.cloudinary.com/dlsl6hruh/media_explorer_thumbnails/${asset_id}/download`;
@@ -302,7 +302,6 @@ const updateDiplomaDetails = asyncHandler(async (req, res) => {
     ...(diploma_marksheetPath && { diploma_marksheet: diploma_marksheetPath }),
   };
 
-  console.log(updateData);
 
   // Check if any data is provided to update
   if (Object.keys(updateData).length === 0) {
@@ -562,18 +561,18 @@ const updateProfileImage = asyncHandler(async (req, res) => {
   }
   const file = req.file;
 
-  console.log(file);
+ 
 
   if (req.file) {
-    console.log(req.file);
+   
     const cloudinaryResult = await uploadOnCloudinary(file.path);
-    console.log(cloudinaryResult);
+   
     student.student_profile_image = cloudinaryResult.secure_url;
   }
 
   await student.save();
 
-  console.log(student);
+
 
   // Return success response
   return res
@@ -590,7 +589,7 @@ const updateProfileImage = asyncHandler(async (req, res) => {
 const updateSkills = asyncHandler(async (req, res) => {
   const { student_sap_no, skills } = req.body;
 
-  console.log(skills);
+ 
 
   // Validate if SAP number and skills are provided
   if (!student_sap_no) {

@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     let uploadPath = "";
-    console.log(file);
+  
     if (
       file.fieldname === "student_profile_image" &&
       file.mimetype.includes("image")

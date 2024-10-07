@@ -16,7 +16,7 @@ const createCompany = asyncHandler(async (req, res) => {
   }
 
 const logoFile = req.file ? req.file.path : ""; 
-  console.log(logoFile)
+
 
   const company = new Company({
     company_name: company_name.trim(),

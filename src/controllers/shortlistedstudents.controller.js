@@ -24,15 +24,7 @@ const createShortlistedStudent = asyncHandler(async (req, res) => {
     year,
   } = req.body;
 
-  console.log(
-    branch,
-    company_name,
-    job_role,
-    name_of_student,
-    student_email_id,
-    student_sap_no,
-    year
-  );
+ 
 
   // Validate input fields
   if (
@@ -234,8 +226,7 @@ const getShortlistedStudentById = asyncHandler(async (req, res) => {
 const deleteShortlistedStudent = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  console.log(id);
-
+ 
   const shortlistedStudent = await ShortlistedStudent.findByIdAndDelete(id);
 
   if (!shortlistedStudent) {
@@ -286,8 +277,7 @@ const uploadExcelShortlistedStudent = asyncHandler(async (req, res) => {
   for (const row of data) {
     const { student_sap_no, name_of_student, campus, student_email_id } = row;
 
-    console.log(student_sap_no, name_of_student, campus, student_email_id);
-
+  
     if (campus === "shirpur" || campus === "Shirpur") {
       const student = await Student.findOne({ name_of_student });
 
@@ -351,7 +341,7 @@ const getAllExcels = asyncHandler(async (req, res) => {
 const deleteExcel = asyncHandler(async (req, res) => {
   const { id } = req.params; // Extract the ID from request parameters
 
-  console.log(id);
+ 
 
   // Find the document by ID and delete it
   const document = await Document.findByIdAndDelete(id);
