@@ -11,6 +11,17 @@ import XLSX from "xlsx";
 import { sendEmail } from "../utils/SendEmail.js";
 import { uploadOnCloudinary } from "../utils/Cloudinary.js";
 
+import fs from "fs";
+import pkg from "cloudinary";
+const { v2: cloudinary } = pkg;
+import path from "path";
+
+cloudinary.config({
+  cloud_name: "dlsl6hruh",
+  api_key: "217943112966755",
+  api_secret: "fc7NcOReVkScUObX2EA0u-5icaY",
+});
+
 const updateBasicDetails = asyncHandler(async (req, res) => {
   // Extract all fields explicitly from req.body
   const {
@@ -53,8 +64,6 @@ const updateBasicDetails = asyncHandler(async (req, res) => {
     passport_no,
     passport_expiry_date,
   } = req.body;
-
-
 
   if (!student_sap_no) {
     throw new ApiError(400, "Student SAP number is required");
@@ -141,14 +150,14 @@ const updateClassTenthDetails = asyncHandler(async (req, res) => {
 
   const file = req.file;
 
- 
   const cloudinaryResult = await uploadOnCloudinary(file.path);
 
   const asset_id = cloudinaryResult.asset_id;
+  // const tenth_marksheetPath = cloudinaryResult.secure_url;
 
   const tenth_marksheetPath = `https://res-console.cloudinary.com/dlsl6hruh/media_explorer_thumbnails/${asset_id}/download`;
 
-
+  console.log(cloudinaryResult);
 
   const updateData = {
     ...(tenth_standard_percentage !== undefined && {
@@ -210,10 +219,7 @@ const updateClassTweflthDetails = asyncHandler(async (req, res) => {
 
   const file = req.file;
 
-
-
   const cloudinaryResult = await uploadOnCloudinary(file.path);
-
 
   const asset_id = cloudinaryResult.asset_id;
 
@@ -281,11 +287,7 @@ const updateDiplomaDetails = asyncHandler(async (req, res) => {
 
   const file = req.file;
 
-
-
   const cloudinaryResult = await uploadOnCloudinary(file.path);
-
-  
 
   const asset_id = cloudinaryResult.asset_id;
   const diploma_marksheetPath = `https://res-console.cloudinary.com/dlsl6hruh/media_explorer_thumbnails/${asset_id}/download`;
@@ -301,7 +303,6 @@ const updateDiplomaDetails = asyncHandler(async (req, res) => {
     ...(diploma_passing_country && { diploma_passing_country }),
     ...(diploma_marksheetPath && { diploma_marksheet: diploma_marksheetPath }),
   };
-
 
   // Check if any data is provided to update
   if (Object.keys(updateData).length === 0) {
@@ -397,6 +398,7 @@ const updateCollegeDetails = asyncHandler(async (req, res) => {
   const student_cv_result = await uploadOnCloudinary(
     req.files.student_cv[0].path
   );
+
   const student_cv_url = `https://res-console.cloudinary.com/dlsl6hruh/media_explorer_thumbnails/${student_cv_result.asset_id}/download`;
 
   // Upload each semester marksheet separately
@@ -418,6 +420,9 @@ const updateCollegeDetails = asyncHandler(async (req, res) => {
   const student_marksheet_sem_4_result = await uploadOnCloudinary(
     req.files.student_marksheet[3].path
   );
+
+  console.log(student_marksheet_sem_4_result);
+
   const student_marksheet_sem_4_url = `https://res-console.cloudinary.com/dlsl6hruh/media_explorer_thumbnails/${student_marksheet_sem_4_result.asset_id}/download`;
 
   const student_marksheet_sem_5_result = await uploadOnCloudinary(
@@ -429,6 +434,13 @@ const updateCollegeDetails = asyncHandler(async (req, res) => {
     req.files.student_marksheet[5].path
   );
   const student_marksheet_sem_6_url = `https://res-console.cloudinary.com/dlsl6hruh/media_explorer_thumbnails/${student_marksheet_sem_6_result.asset_id}/download`;
+
+  console.log(student_marksheet_sem_1_url);
+  console.log(student_marksheet_sem_2_url);
+  console.log(student_marksheet_sem_3_url);
+  console.log(student_marksheet_sem_4_url);
+  console.log(student_marksheet_sem_5_url);
+  console.log(student_marksheet_sem_6_url);
 
   // Now you have all the URLs stored separately
 
@@ -561,18 +573,13 @@ const updateProfileImage = asyncHandler(async (req, res) => {
   }
   const file = req.file;
 
- 
-
   if (req.file) {
-   
     const cloudinaryResult = await uploadOnCloudinary(file.path);
-   
+
     student.student_profile_image = cloudinaryResult.secure_url;
   }
 
   await student.save();
-
-
 
   // Return success response
   return res
@@ -588,8 +595,6 @@ const updateProfileImage = asyncHandler(async (req, res) => {
 
 const updateSkills = asyncHandler(async (req, res) => {
   const { student_sap_no, skills } = req.body;
-
- 
 
   // Validate if SAP number and skills are provided
   if (!student_sap_no) {
@@ -625,6 +630,20 @@ const updateSkills = asyncHandler(async (req, res) => {
     );
 });
 
+const retrieveResource = asyncHandler(async (req, res) => {
+  const { publicId } = req.body;
+
+  console.log(publicId);
+  try {
+    const resource = await cloudinary.api.resource(publicId, {
+      resource_type: "raw", // Use raw if the resource is a PDF
+    });
+    console.log("Retrieved Resource:", resource);
+  } catch (error) {
+    console.error("Error retrieving resource:", error);
+  }
+});
+
 export {
   updateBasicDetails,
   updateClassTenthDetails,
@@ -633,4 +652,5 @@ export {
   updateCollegeDetails,
   updateProfileImage,
   updateSkills,
+  retrieveResource,
 };

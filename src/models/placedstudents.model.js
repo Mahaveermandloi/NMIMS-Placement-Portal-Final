@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Student from "./student.model.js"; // Assuming the path to the Student model
 
 const { Schema } = mongoose;
 
@@ -15,6 +16,8 @@ const PlacedStudentSchema = new Schema(
       type: String,
       required: true,
     },
+
+    // Keep student_profile_image here, it will be populated
     student_profile_image: {
       type: String,
       default: "",

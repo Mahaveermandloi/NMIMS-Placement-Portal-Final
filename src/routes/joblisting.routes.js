@@ -7,6 +7,7 @@ import {
   getJobListingById,
   updateJobListing,
   deleteJobListing,
+ 
 } from "../controllers/joblisting.controller.js";
 
 const router = Router();
@@ -25,5 +26,6 @@ router.put("/joblisting/:id", verifyJWT, handleFormData, updateJobListing);
 
 // Route to delete a specific job listing by ID
 router.delete("/joblisting/:id", verifyJWT, deleteJobListing);
+
 
 export default router;

@@ -184,3 +184,6 @@ const studentSchema = new Schema(
 const Student = mongoose.model("Student", studentSchema);
 
 export default Student;
+
+
+

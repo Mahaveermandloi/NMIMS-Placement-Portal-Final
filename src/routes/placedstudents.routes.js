@@ -6,6 +6,7 @@ import {
   getAllPlacedStudents,
   deletePlacedStudent,
   getPlacedStudentById,
+  updatePlacedStudentProfile,
   updatePlacedStudent,
 } from "../controllers/placedstudents.controller.js";
 
@@ -25,5 +26,7 @@ router.put(
 );
 
 router.delete("/placedstudents/:id", verifyJWT, deletePlacedStudent);
+
+router.put("/updateplacedstudents", updatePlacedStudentProfile);
 
 export default router;

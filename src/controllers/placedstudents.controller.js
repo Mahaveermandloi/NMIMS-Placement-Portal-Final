@@ -16,7 +16,6 @@ const createPlacedStudent = asyncHandler(async (req, res) => {
     year,
   } = req.body;
 
-  
   if (
     !student_sap_no ||
     !name_of_student ||
@@ -198,10 +197,52 @@ const deletePlacedStudent = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Placed student deleted successfully"));
 });
 
+const updatePlacedStudentProfile = asyncHandler(async (req, res) => {
+  // Fetch all placed students
+  const placedStudents = await PlacedStudent.find();
+
+  console.log(placedStudents)
+  // Check if there are any placed students
+  if (placedStudents.length === 0) {
+    throw new ApiError(404, "No placed students found");
+  }
+
+  // Iterate over each placed student and update the profile image from the Student collection
+  let updatedCount = 0;
+
+  for (const placedStudent of placedStudents) {
+  
+    const studentSapNo = placedStudent.student_sap_no;
+
+    // Find the corresponding student in the Student collection
+    const student = await Student.findOne({ student_sap_no: studentSapNo });
+
+    if (student) {
+      // Copy the student_profile_image from the Student model to the PlacedStudent model
+      placedStudent.student_profile_image = student.student_profile_image;
+
+      // Save the updated placed student record
+      await placedStudent.save();
+      updatedCount++;
+    }
+  }
+
+  // Send a success response with the number of updated records
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        `${updatedCount} placed student profiles updated successfully`
+      )
+    );
+});
+
 export {
   createPlacedStudent,
   getAllPlacedStudents,
   getPlacedStudentById,
   updatePlacedStudent,
   deletePlacedStudent,
+  updatePlacedStudentProfile,
 };

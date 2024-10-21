@@ -2,6 +2,7 @@ import { Router } from "express";
 import { verifyAPIKey, verifyJWT } from "../middleware/auth.middleware.js";
 
 import {
+  retrieveResource,
   updateBasicDetails,
   updateClassTenthDetails,
   updateClassTweflthDetails,
@@ -15,6 +16,7 @@ import {
   fileupload,
   uploadMultipleFiles,
 } from "../middleware/multer2.middleware.js";
+import handleFormData from "../middleware/handleFormData.js";
 
 const router = Router();
 
@@ -60,5 +62,7 @@ router.put(
 );
 
 router.put("/updateskills", verifyAPIKey, verifyJWT, updateSkills);
+
+router.put("/retrieveResource", handleFormData, retrieveResource);
 
 export default router;
