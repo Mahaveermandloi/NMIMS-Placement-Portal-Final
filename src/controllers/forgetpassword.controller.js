@@ -96,11 +96,10 @@ export const verifyOtp = asyncHandler(async (req, res) => {
 
 
 
+
 export const updatePassword = asyncHandler(async (req, res) => {
   const { email } = req.params; // Get email from URL parameters
   const { password } = req.body; // Get new password from request body
-
-
 
   // Validate the input
   if (!email || !password) {
@@ -113,8 +112,6 @@ export const updatePassword = asyncHandler(async (req, res) => {
     $or: [{ student_email_id: email }, { student_alternate_email_id: email }],
   });
 
-
-  
   if (!admin && !student) {
     throw new ApiError(404, "No account found");
   }
@@ -122,25 +119,39 @@ export const updatePassword = asyncHandler(async (req, res) => {
   let userId;
   if (admin) {
     userId = admin._id;
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
+
+    // Update the admin password
+    admin.password = hashedPassword;
+    await admin.save(); // Save the updated admin record
+
+    // Send response
+    return res.status(200).json(new ApiResponse(200, null, "Admin password updated successfully"));
   } else if (student) {
     userId = student._id;
+    // Handle student password update if necessary
+    let passwordRecord = await Password.findOne({ student_id: userId });
+    if (!passwordRecord) {
+      throw new ApiError(404, "Password record not found");
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
+
+    // Update the password record for the student
+    passwordRecord.password = hashedPassword;
+    await passwordRecord.save(); // The `pre` save hook will handle hashing
+
+    // Send response
+    return res.status(200).json(new ApiResponse(200, null, "Student password updated successfully"));
   }
 
-  // Find the password record for the user
-  const passwordRecord = await Password.findOne({ student_id: userId });
-  if (!passwordRecord) {
-    throw new ApiError(404, "Password record not found");
-  }
-
-  // Update the password using the `isPasswordCorrect` method
-  passwordRecord.password = password;
-  await passwordRecord.save(); // The `pre` save hook will handle hashing
-
-  // Send response
-  res
-    .status(200)
-    .json(new ApiResponse(200, null, "Password updated successfully"));
+  // Default response if no conditions were met (should not reach here)
+  throw new ApiError(500, "Unexpected error occurred");
 });
+
 
 // Resend OTP function
 export const resendOtp = asyncHandler(async (req, res) => {

@@ -4,9 +4,9 @@ const { v2: cloudinary } = pkg;
 import path from "path";
 
 cloudinary.config({
-  cloud_name: "dlsl6hruh",
-  api_key: "217943112966755",
-  api_secret: "fc7NcOReVkScUObX2EA0u-5icaY",
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const uploadOnCloudinary = async (localfilePath) => {

@@ -6,8 +6,10 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false, // Use true for port 465 (SSL), false for port 587 (TLS)
   auth: {
-    user: process.env.EMAIL_USER || "jay439363@gmail.com", // Use environment variables for email credentials
-    pass: process.env.EMAIL_PASS || "lwoxlcjtbmewosnc",
+    user: process.env.EMAIL_USER,
+    // || "jay439363@gmail.com", // Use environment variables for email credentials
+    pass: process.env.EMAIL_PASS,
+    // || "lwoxlcjtbmewosnc",
   },
 });
 
@@ -26,7 +28,3 @@ export const sendEmail = async (to, subject, text) => {
   console.log("Email sent successfully:", info.response);
   return info;
 };
-
-
-
-

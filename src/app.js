@@ -62,10 +62,12 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const allowedOrigins = [
   "https://nmims-placement-portal.vercel.app",
   "https://nmims-placement-portal.netlify.app",
+
   "http://localhost:3000",
   "http://localhost:5173",
   "http://192.168.166.62:3000",
   "https://nmims-placement-backend-v2.vercel.app",
+  "https://nmims-placement-portal.netlify.app/student/login"
   // Replace with your specific frontend URL
 ];
 
