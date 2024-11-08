@@ -225,10 +225,13 @@ const updateClassTenthDetails = asyncHandler(async (req, res) => {
 
   const file = req.file;
 
+  console.log(file)
+
   // Upload file to Cloudinary and get the result
   const cloudinaryResult = await uploadOnCloudinary(file.path);
 
-  const asset_id = cloudinaryResult.asset_id;
+ 
+  console.log(cloudinaryResult)
   const tenth_marksheetPath = cloudinaryResult.secure_url; // or another URL field as needed
 
   const updateData = {

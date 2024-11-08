@@ -18,7 +18,7 @@ import {
 } from "../middleware/multer2.middleware.js";
 import handleFormData from "../middleware/handleFormData.js";
 
-import { upload2  , upload} from "../middleware/cloudinary.middleware.js";
+import {  upload} from "../middleware/cloudinary.middleware.js";
 
 const router = Router();
 
@@ -47,7 +47,7 @@ router.put(
   "/updatetenthdetails",
   verifyAPIKey,
   verifyJWT,
-  upload2.single("tenth_marksheet"),
+  upload.single("tenth_marksheet"),
   updateClassTenthDetails
 );
 
@@ -56,7 +56,7 @@ router.put(
   "/updatetwelfthdetails",
   verifyAPIKey,
   verifyJWT,
-  upload2.single("twelfth_marksheet"),
+  upload.single("twelfth_marksheet"),
   
   updateClassTweflthDetails
 );
@@ -64,7 +64,7 @@ router.put(
   "/updatediplomadetails",
   verifyAPIKey,
   verifyJWT,
-  upload2.single("diploma_marksheet"),
+  upload.single("diploma_marksheet"),
   
   updateDiplomaDetails
 );
