@@ -133,6 +133,81 @@ const updateBasicDetails = asyncHandler(async (req, res) => {
     );
 });
 
+// const updateClassTenthDetails = asyncHandler(async (req, res) => {
+//   const {
+//     student_sap_no,
+//     tenth_standard_percentage,
+//     year_of_passing_tenth,
+//     board_of_passing_tenth,
+//     tenth_school,
+//     tenth_passing_state,
+//     tenth_passing_country,
+//   } = req.body;
+
+
+//   console.log( student_sap_no,
+//     tenth_standard_percentage,
+//     year_of_passing_tenth,
+//     board_of_passing_tenth,
+//     tenth_school,
+//     tenth_passing_state,
+//     tenth_passing_country,)
+
+//   if (!student_sap_no) {
+//     throw new ApiError(400, "Student SAP number is required");
+//   }
+
+//   const file = req.file;
+
+//   const cloudinaryResult = await uploadOnCloudinary(file.path);
+
+//   const asset_id = cloudinaryResult.asset_id;
+//   // const tenth_marksheetPath = cloudinaryResult.secure_url;
+
+//   const tenth_marksheetPath = `https://res-console.cloudinary.com/dlsl6hruh/media_explorer_thumbnails/${asset_id}/download`;
+
+//   console.log(cloudinaryResult);
+
+//   const updateData = {
+//     ...(tenth_standard_percentage !== undefined && {
+//       tenth_standard_percentage,
+//     }),
+//     ...(year_of_passing_tenth !== undefined && { year_of_passing_tenth }),
+//     ...(board_of_passing_tenth && { board_of_passing_tenth }),
+//     ...(tenth_school && { tenth_school }),
+//     ...(tenth_passing_state && { tenth_passing_state }),
+//     ...(tenth_passing_country && { tenth_passing_country }),
+//     ...(tenth_marksheetPath && { tenth_marksheet: tenth_marksheetPath }),
+//   };
+
+//   // Check if any data is provided to update
+//   if (Object.keys(updateData).length === 0) {
+//     throw new ApiError(400, "No data provided to update");
+//   }
+
+//   // Find and update the student record
+//   const student = await Student.findOneAndUpdate(
+//     { student_sap_no },
+//     { $set: updateData },
+//     { new: true, runValidators: true }
+//   );
+
+//   // Check if the student was found and updated
+//   if (!student) {
+//     throw new ApiError(
+//       404,
+//       `No student found with SAP number: ${student_sap_no}`
+//     );
+//   }
+
+//   // Return success response
+//   return res
+//     .status(200)
+//     .json(
+//       new ApiResponse(200, student, "Tenth class details updated successfully")
+//     );
+// });
+
 const updateClassTenthDetails = asyncHandler(async (req, res) => {
   const {
     student_sap_no,
@@ -150,19 +225,14 @@ const updateClassTenthDetails = asyncHandler(async (req, res) => {
 
   const file = req.file;
 
+  // Upload file to Cloudinary and get the result
   const cloudinaryResult = await uploadOnCloudinary(file.path);
 
   const asset_id = cloudinaryResult.asset_id;
-  // const tenth_marksheetPath = cloudinaryResult.secure_url;
-
-  const tenth_marksheetPath = `https://res-console.cloudinary.com/dlsl6hruh/media_explorer_thumbnails/${asset_id}/download`;
-
-  console.log(cloudinaryResult);
+  const tenth_marksheetPath = cloudinaryResult.secure_url; // or another URL field as needed
 
   const updateData = {
-    ...(tenth_standard_percentage !== undefined && {
-      tenth_standard_percentage,
-    }),
+    ...(tenth_standard_percentage !== undefined && { tenth_standard_percentage }),
     ...(year_of_passing_tenth !== undefined && { year_of_passing_tenth }),
     ...(board_of_passing_tenth && { board_of_passing_tenth }),
     ...(tenth_school && { tenth_school }),
@@ -171,33 +241,25 @@ const updateClassTenthDetails = asyncHandler(async (req, res) => {
     ...(tenth_marksheetPath && { tenth_marksheet: tenth_marksheetPath }),
   };
 
-  // Check if any data is provided to update
   if (Object.keys(updateData).length === 0) {
     throw new ApiError(400, "No data provided to update");
   }
 
-  // Find and update the student record
   const student = await Student.findOneAndUpdate(
     { student_sap_no },
     { $set: updateData },
     { new: true, runValidators: true }
   );
 
-  // Check if the student was found and updated
   if (!student) {
-    throw new ApiError(
-      404,
-      `No student found with SAP number: ${student_sap_no}`
-    );
+    throw new ApiError(404, `No student found with SAP number: ${student_sap_no}`);
   }
 
-  // Return success response
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, student, "Tenth class details updated successfully")
-    );
+  return res.status(200).json(
+    new ApiResponse(200, student, "Tenth class details updated successfully")
+  );
 });
+
 
 const updateClassTweflthDetails = asyncHandler(async (req, res) => {
   // Extract all relevant fields for class twelfth details from req.body
@@ -373,26 +435,7 @@ const updateCollegeDetails = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Student SAP number is required");
   }
 
-  // Upload files to Cloudinary
-  // const student_cv = await uploadOnCloudinary(req.files.student_cv[0].path);
-  // const student_marksheet_sem_1 = await uploadOnCloudinary(
-  //   req.files.student_marksheet[0].path
-  // );
-  // const student_marksheet_sem_2 = await uploadOnCloudinary(
-  //   req.files.student_marksheet[1].path
-  // );
-  // const student_marksheet_sem_3 = await uploadOnCloudinary(
-  //   req.files.student_marksheet[2].path
-  // );
-  // const student_marksheet_sem_4 = await uploadOnCloudinary(
-  //   req.files.student_marksheet[3].path
-  // );
-  // const student_marksheet_sem_5 = await uploadOnCloudinary(
-  //   req.files.student_marksheet[4].path
-  // );
-  // const student_marksheet_sem_6 = await uploadOnCloudinary(
-  //   req.files.student_marksheet[5].path
-  // );
+
 
   // Upload CV
   const student_cv_result = await uploadOnCloudinary(
@@ -573,9 +616,12 @@ const updateProfileImage = asyncHandler(async (req, res) => {
   }
   const file = req.file;
 
+  console.log(file)
+
   if (req.file) {
     const cloudinaryResult = await uploadOnCloudinary(file.path);
 
+    console.log(cloudinaryResult)
     student.student_profile_image = cloudinaryResult.secure_url;
   }
 

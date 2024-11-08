@@ -27,7 +27,7 @@ const uploadOnCloudinary = async (localfilePath) => {
       
     });
 
-    fs.unlinkSync(localfilePath);
+    // fs.unlinkSync(localfilePath);
 
     return response;
   } catch (error) {

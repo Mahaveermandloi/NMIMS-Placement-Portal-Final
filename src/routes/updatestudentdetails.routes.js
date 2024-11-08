@@ -18,15 +18,19 @@ import {
 } from "../middleware/multer2.middleware.js";
 import handleFormData from "../middleware/handleFormData.js";
 
+import { upload2  , upload} from "../middleware/cloudinary.middleware.js";
+
 const router = Router();
 
 router.put(
   "/updateprofileimage",
   verifyAPIKey,
   verifyJWT,
-  fileupload.single("student_profile_image"),
+  upload.single("student_profile_image"),
   updateProfileImage
 );
+
+
 
 router.put(
   "/updatecollegedetails",
@@ -37,32 +41,36 @@ router.put(
 );
 
 // Other routes remain unchanged
-router.put("/updatebasicdetails", verifyAPIKey, verifyJWT, updateBasicDetails);
+router.put("/updatebasicdetails", verifyAPIKey, verifyJWT, handleFormData, updateBasicDetails);
 
 router.put(
   "/updatetenthdetails",
   verifyAPIKey,
   verifyJWT,
-  fileupload.single("tenth_marksheet"),
+  upload2.single("tenth_marksheet"),
   updateClassTenthDetails
 );
+
+
 router.put(
   "/updatetwelfthdetails",
   verifyAPIKey,
   verifyJWT,
-  fileupload.single("twelfth_marksheet"),
+  upload2.single("twelfth_marksheet"),
+  
   updateClassTweflthDetails
 );
 router.put(
   "/updatediplomadetails",
   verifyAPIKey,
   verifyJWT,
-  fileupload.single("diploma_marksheet"),
+  upload2.single("diploma_marksheet"),
+  
   updateDiplomaDetails
 );
 
-router.put("/updateskills", verifyAPIKey, verifyJWT, updateSkills);
+router.put("/updateskills", verifyAPIKey, verifyJWT, handleFormData ,updateSkills);
 
-router.put("/retrieveResource", handleFormData, retrieveResource);
+router.put("/retrieveResource", handleFormData,  retrieveResource);
 
 export default router;

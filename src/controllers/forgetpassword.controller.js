@@ -97,6 +97,7 @@ export const verifyOtp = asyncHandler(async (req, res) => {
 
 
 
+
 export const updatePassword = asyncHandler(async (req, res) => {
   const { email } = req.params; // Get email from URL parameters
   const { password } = req.body; // Get new password from request body
@@ -120,29 +121,24 @@ export const updatePassword = asyncHandler(async (req, res) => {
   if (admin) {
     userId = admin._id;
 
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
-
     // Update the admin password
-    admin.password = hashedPassword;
+    admin.password = password; // Set the new password directly
     await admin.save(); // Save the updated admin record
 
     // Send response
     return res.status(200).json(new ApiResponse(200, null, "Admin password updated successfully"));
   } else if (student) {
     userId = student._id;
+
     // Handle student password update if necessary
     let passwordRecord = await Password.findOne({ student_id: userId });
     if (!passwordRecord) {
       throw new ApiError(404, "Password record not found");
     }
 
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
-
     // Update the password record for the student
-    passwordRecord.password = hashedPassword;
-    await passwordRecord.save(); // The `pre` save hook will handle hashing
+    passwordRecord.password = password; // Set the new password directly
+    await passwordRecord.save(); // Save the updated password record
 
     // Send response
     return res.status(200).json(new ApiResponse(200, null, "Student password updated successfully"));
